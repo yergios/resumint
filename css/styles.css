@@ -10,8 +10,9 @@
   --light-bg: #f7fafc;
   --border-color: #000000;
   --font-main: "Poppins", sans-serif;
-  --section-spacing: 15px;
+  --section-spacing: 10px;
   --left-margin: 15px;
+  --bottom-margin: 10px;
 }
 
 * {
@@ -41,6 +42,7 @@
 body {
   font-family: var(--font-main);
   font-size: 12px;
+  text-align: justify;
   color: var(--text-color);
   background: var(--light-bg);
   line-height: 1.5;
@@ -63,18 +65,21 @@ body {
   width: 100%;
   height: 100px;
   display: flex;
+  align-items: center;
 }
 
 .profile-figure {
   display: inline-block;
   overflow: hidden;
+  margin: auto;
 }
 
 .profile-image {
   border-radius: 5%;
   border: 1px solid var(--border-color);
-  width: 100px;
-  height: 100px;
+  width: 90px;
+  height: 90px;
+  margin-top: 4px;
 }
 
 .header-info {
@@ -86,7 +91,7 @@ body {
 }
 
 .name {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: normal;
   color: var(--primary-color);
   letter-spacing: 1.4px;
@@ -105,6 +110,7 @@ body {
   justify-content: space-between;
   row-gap: 5px;
   list-style: none;
+  margin-top: 5px;
 }
 
 .contact-item {
@@ -129,11 +135,9 @@ section {
   font-size: 16px;
   color: var(--secondary-color);
   text-transform: uppercase;
-  border-top: 1px solid var(--primary-color);
-  border-bottom: 1px solid var(--primary-color);
-  padding: 2px 0;
-  margin-bottom: 10px;
+  margin-bottom: var(--bottom-margin);
   letter-spacing: 1.4px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .item-header {
@@ -167,13 +171,22 @@ section {
 
 .company {
   font-size: 14px;
-  font-weight: normal;
+  font-weight: bold;
+}
+
+.company-header {
+  margin-bottom: var(--bottom-margin);
+  padding-bottom: 0px;
+  border-bottom: 1px solid var(--lightest-text);
 }
 
 .tech-stack {
   font-weight: normal;
   color: var(--light-text);
   padding: 2px 0;
+}
+
+.position-entry {
   margin-left: var(--left-margin);
 }
 
