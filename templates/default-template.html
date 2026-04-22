@@ -18,60 +18,78 @@
   <body>
     <div class="resume-container">
       <header class="header">
-        {{#if basic.profileImage}}
-        <figure class="profile-figure">
-          <img src="{{basic.profileImage}}" alt="{{basic.name}}" class="profile-image" />
-        </figure>
-        {{/if}}
-        <div class="header-info">
-          <div>
+        <div class="header-top">
+          <div class="header-name-title">
             <h1 class="name">{{basic.name}}</h1>
             <h2 class="title">{{lookup basic "title" language}}</h2>
           </div>
-          <div class="contact-info">
-            <div class="contact-item">
-              <ion-icon name="{{getIcon 'location'}}"></ion-icon>
-              <span>{{lookup basic "location" language}}</span>
-            </div>
-            {{#each basic.contactInfo}}
-            <div class="contact-item">
-              <ion-icon name="{{getIcon type}}"></ion-icon>
-              <span>{{value}}</span>
-            </div>
-            {{/each}}
+          {{#if basic.profileImage}}
+          <figure class="profile-figure">
+            <img src="{{basic.profileImage}}" alt="{{basic.name}}" class="profile-image" />
+          </figure>
+          {{/if}}
+        </div>
+        <div class="contact-info">
+          {{#each basic.contactInfo}} {{#if (eq type "email")}}
+          <div class="contact-item">
+            <ion-icon name="{{getIcon type}}"></ion-icon>
+            <span>{{value}}</span>
           </div>
+          {{/if}} {{/each}} {{#each basic.contactInfo}} {{#if (eq type "github")}}
+          <div class="contact-item">
+            <ion-icon name="{{getIcon type}}"></ion-icon>
+            <span>{{value}}</span>
+          </div>
+          {{/if}} {{/each}} {{#each basic.contactInfo}} {{#if (eq type "linkedin")}}
+          <div class="contact-item">
+            <ion-icon name="{{getIcon type}}"></ion-icon>
+            <span>{{value}}</span>
+          </div>
+          {{/if}} {{/each}}
+          <div class="contact-item">
+            <ion-icon name="{{getIcon 'location'}}"></ion-icon>
+            <span>{{lookup basic "location" language}}</span>
+          </div>
+          {{#each basic.contactInfo}} {{#if (eq type "phone")}}
+          <div class="contact-item">
+            <ion-icon name="{{getIcon type}}"></ion-icon>
+            <span>{{value}}</span>
+          </div>
+          {{/if}} {{/each}}
         </div>
       </header>
 
       <section class="experience">
         <h2 class="section-title">{{lookup (lookup metadata.sections language) "experience"}}</h2>
-
         {{#each experience}}
         <article class="item">
-          <div class="item-header">
-            <h3 class="position">{{lookup position ../language}}</h3>
+          <div class="item-header company-header">
+            <h3 class="company">{{lookup company ../language}}</h3>
             <p class="location">{{lookup location ../language}}</p>
           </div>
-          <div class="item-description">
-            <h3 class="company">{{lookup company ../language}}</h3>
-            <p class="date">{{lookup date.start ../language}} — {{lookup date.end ../language}}</p>
+          {{#each positions}}
+          <div class="position-entry">
+            <div class="item-description">
+              <h4 class="position">{{lookup position ../../language}}</h4>
+              <p class="date">
+                {{lookup date.start ../../language}} — {{lookup date.end ../../language}}
+              </p>
+            </div>
+            {{#if techStack}}
+            <p class="tech-stack">
+              <span class="italic">Tech Stack:</span> {{join techStack ", "}}
+            </p>
+            {{/if}}
+            <ul class="responsibilities">
+              {{#each (lookup responsibilities ../../language)}}
+              <li>{{this}}</li>
+              {{/each}}
+            </ul>
           </div>
-
-          {{#if techStack}}
-          <h4 class="tech-stack">
-            <span class="italic">Tech Stack:</span> {{join techStack ", "}}
-          </h4>
-          {{/if}}
-
-          <ul class="responsibilities">
-            {{#each (lookup responsibilities ../language)}}
-            <li>{{this}}</li>
-            {{/each}}
-          </ul>
+          {{/each}}
         </article>
         {{/each}}
       </section>
-
       <section class="education">
         <h2 class="section-title">{{lookup metadata.sections language "education"}}</h2>
 

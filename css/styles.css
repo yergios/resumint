@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 :root {
   --primary-color: #000000;
@@ -9,7 +9,7 @@
   --background-color: #ffffff;
   --light-bg: #f7fafc;
   --border-color: #000000;
-  --font-main: "Poppins", sans-serif;
+  --font-main: "Inter", sans-serif;
   --section-spacing: 10px;
   --left-margin: 15px;
   --bottom-margin: 10px;
@@ -42,12 +42,24 @@
 body {
   font-family: var(--font-main);
   font-size: 12px;
+  font-weight: 400;
   text-align: justify;
   color: var(--text-color);
   background: var(--light-bg);
   line-height: 1.5;
   width: 100%;
   height: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+strong,
+b {
+  font-weight: 600;
 }
 
 .resume-container {
@@ -63,64 +75,74 @@ body {
 /* Header section */
 .header {
   width: 100%;
-  height: 100px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.header-top {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+}
+
+.header-name-title {
+  display: flex;
+  flex-direction: column;
 }
 
 .profile-figure {
+  flex-shrink: 0; /* prevent the image from being squeezed */
   display: inline-block;
   overflow: hidden;
-  margin: auto;
+  margin: 0;
 }
 
 .profile-image {
   border-radius: 5%;
   border: 1px solid var(--border-color);
-  width: 90px;
-  height: 90px;
-  margin-top: 4px;
-}
-
-.header-info {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: calc(100% - 100px);
-  padding-left: 20px;
+  width: 45px;
+  height: 45px;
+  margin-top: 5px;
 }
 
 .name {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: normal;
   color: var(--primary-color);
   letter-spacing: 1.4px;
 }
 
 .title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: normal;
   color: var(--secondary-color);
   letter-spacing: 1.4px;
 }
 
 .contact-info {
-  display: grid;
-  grid-template-columns: auto auto auto;
+  display: flex;
+  flex-wrap: nowrap;
   justify-content: space-between;
-  row-gap: 5px;
+  gap: 5px;
   list-style: none;
-  margin-top: 5px;
+  margin-top: 10px;
+  width: 100%;
 }
 
 .contact-item {
   display: flex;
   align-items: center;
   color: var(--text-color);
+  white-space: nowrap; /* prevent text wrapping within an item */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 10px;
 }
 
 .contact-item ion-icon {
-  font-size: 14px;
+  font-size: 12px;
   margin-right: 5px;
   color: var(--primary-color);
 }
@@ -157,9 +179,8 @@ section {
   display: inline-block;
 }
 
-.experience .item:not(:last-child),
-.education .item:not(:last-child) {
-  margin-bottom: 5px;
+.experience .item:not(:last-child) {
+  margin-bottom: 10px;
 }
 
 /* Experience */
@@ -175,19 +196,21 @@ section {
 }
 
 .company-header {
-  margin-bottom: var(--bottom-margin);
+  margin-bottom: 5px;
   padding-bottom: 0px;
   border-bottom: 1px solid var(--lightest-text);
 }
 
 .tech-stack {
+  font-size: 10px;
   font-weight: normal;
   color: var(--light-text);
   padding: 2px 0;
 }
 
 .position-entry {
-  margin-left: var(--left-margin);
+  margin-top: 5px;
+  margin-left: 10px;
 }
 
 .italic {
@@ -196,7 +219,7 @@ section {
 }
 
 .responsibilities {
-  margin-left: calc(var(--left-margin) * 2);
+  margin-left: 20px;
 }
 
 /* Education */
@@ -209,5 +232,9 @@ section {
 .degree {
   font-weight: normal;
   font-size: 12px;
-  margin-left: var(--left-margin);
+  margin-left: 10px;
+}
+
+.education .item:not(:last-child) {
+  margin-bottom: 3px;
 }

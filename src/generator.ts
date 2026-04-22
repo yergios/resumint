@@ -12,7 +12,7 @@ import {
 } from "./models/generator.js";
 import { getCurrentDate, getErrorMessage, Timer } from "./utils.js";
 
-const A4_HEIGHT_PX = 1123;
+const A4_HEIGHT_PX = 1155;
 const MAX_CONTENT_HEIGHT_WARNING = "Content height exceeds A4 maximum";
 
 function createLogEntry(level: LogLevel, message: string): LogEntry {

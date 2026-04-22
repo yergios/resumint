@@ -20,6 +20,9 @@ importers:
         specifier: 17.7.2
         version: 17.7.2
     devDependencies:
+      "@types/yargs":
+        specifier: ^17.0.35
+        version: 17.0.35
       "@typescript-eslint/eslint-plugin":
         specifier: 6.21.0
         version: 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.44.0)(typescript@5.9.2))(eslint@8.44.0)(typescript@5.9.2)
@@ -157,6 +160,18 @@ packages:
     resolution:
       {
         integrity: sha512-FmgJfu+MOcQ370SD0ev7EI8TlCAfKYU+B4m5T3yXc1CiRN94g/SZPtsCkk506aUDtlMnFZvasDwHHUcZUEaYuA==
+      }
+
+  "@types/yargs-parser@21.0.3":
+    resolution:
+      {
+        integrity: sha512-I4q9QU9MQv4oEOz4tAHJtNz1cwuLxn2F3xcc2iV5WdqLPpUnj30aUuxt1mAxYTG+oe8CZMV/+6rU4S4gRDzqtQ==
+      }
+
+  "@types/yargs@17.0.35":
+    resolution:
+      {
+        integrity: sha512-qUHkeCyQFxMXg79wQfTtfndEC+N9ZZg76HJftDJp+qH2tV7Gj4OJi7l+PiWwJ+pWtW8GwSmqsDj/oymhrTWXjg==
       }
 
   "@types/yauzl@2.10.3":
@@ -1635,6 +1650,12 @@ snapshots:
     optional: true
 
   "@types/semver@7.7.1": {}
+
+  "@types/yargs-parser@21.0.3": {}
+
+  "@types/yargs@17.0.35":
+    dependencies:
+      "@types/yargs-parser": 21.0.3
 
   "@types/yauzl@2.10.3":
     dependencies:
