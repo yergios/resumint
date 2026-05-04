@@ -23,40 +23,45 @@
             <h1 class="name">{{basic.name}}</h1>
             <h2 class="title">{{lookup basic "title" language}}</h2>
           </div>
-          {{#if basic.profileImage}}
-          <figure class="profile-figure">
-            <img src="{{basic.profileImage}}" alt="{{basic.name}}" class="profile-image" />
-          </figure>
-          {{/if}}
+          <div class="contact-info">
+            {{#each basic.contactInfo}} {{#if (eq type "email")}}
+            <div class="contact-item">
+              <ion-icon name="{{getIcon type}}"></ion-icon>
+              <span>{{value}}</span>
+            </div>
+            {{/if}} {{/each}} {{#each basic.contactInfo}} {{#if (eq type "web")}}
+            <div class="contact-item">
+              <ion-icon name="{{getIcon type}}"></ion-icon>
+              <span>{{value}}</span>
+            </div>
+            {{/if}} {{/each}} {{#each basic.contactInfo}} {{#if (eq type "phone")}}
+            <div class="contact-item">
+              <ion-icon name="{{getIcon type}}"></ion-icon>
+              <span>{{value}}</span>
+            </div>
+            {{/if}} {{/each}} {{#each basic.contactInfo}} {{#if (eq type "github")}}
+            <div class="contact-item">
+              <ion-icon name="{{getIcon type}}"></ion-icon>
+              <span>{{value}}</span>
+            </div>
+            {{/if}} {{/each}}
+            <div class="contact-item">
+              <ion-icon name="{{getIcon 'location'}}"></ion-icon>
+              <span>{{lookup basic "location" language}}</span>
+            </div>
+            {{#each basic.contactInfo}} {{#if (eq type "linkedin")}}
+            <div class="contact-item">
+              <ion-icon name="{{getIcon type}}"></ion-icon>
+              <span>{{value}}</span>
+            </div>
+            {{/if}} {{/each}}
+          </div>
         </div>
-        <div class="contact-info">
-          {{#each basic.contactInfo}} {{#if (eq type "email")}}
-          <div class="contact-item">
-            <ion-icon name="{{getIcon type}}"></ion-icon>
-            <span>{{value}}</span>
-          </div>
-          {{/if}} {{/each}} {{#each basic.contactInfo}} {{#if (eq type "github")}}
-          <div class="contact-item">
-            <ion-icon name="{{getIcon type}}"></ion-icon>
-            <span>{{value}}</span>
-          </div>
-          {{/if}} {{/each}} {{#each basic.contactInfo}} {{#if (eq type "linkedin")}}
-          <div class="contact-item">
-            <ion-icon name="{{getIcon type}}"></ion-icon>
-            <span>{{value}}</span>
-          </div>
-          {{/if}} {{/each}}
-          <div class="contact-item">
-            <ion-icon name="{{getIcon 'location'}}"></ion-icon>
-            <span>{{lookup basic "location" language}}</span>
-          </div>
-          {{#each basic.contactInfo}} {{#if (eq type "phone")}}
-          <div class="contact-item">
-            <ion-icon name="{{getIcon type}}"></ion-icon>
-            <span>{{value}}</span>
-          </div>
-          {{/if}} {{/each}}
-        </div>
+        {{#if basic.profileImage}}
+        <figure class="profile-figure">
+          <img src="{{basic.profileImage}}" alt="{{basic.name}}" class="profile-image" />
+        </figure>
+        {{/if}}
       </header>
 
       <section class="experience">
