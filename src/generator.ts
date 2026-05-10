@@ -11,7 +11,7 @@ import {
   LogEntry,
   LogLevel
 } from "./models/generator.js";
-import { getCurrentDate, getErrorMessage, Timer } from "./utils.js";
+import { getCurrentDate, getErrorMessage } from "./utils.js";
 
 const A4_HEIGHT_PX = 1200;
 const MAX_CONTENT_HEIGHT_WARNING = "Content height exceeds A4 maximum";
@@ -179,11 +179,15 @@ async function generateResumeForLanguage(
 
 export async function generateResumes(options: CommandLineArgs) {
   try {
-    const browserLaunchPromise = launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]
-    });
     setupHandlebars();
+
+    let browser: Browser | undefined;
+    if (!options.htmlOnly) {
+      browser = await launch({
+        headless: true,
+        args: ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]
+      });
+    }
 
     const resumeData: ResumeData = yamlLoad(readFileSync(options.data, "utf8")) as ResumeData;
     const templateName = options.template || resumeData.metadata?.template || "default";
@@ -213,7 +217,6 @@ export async function generateResumes(options: CommandLineArgs) {
     const currentDate = getCurrentDate();
     const templateSource = readFileSync(templatePath, "utf8");
     const template = Handlebars.compile(templateSource);
-    const browser = await browserLaunchPromise;
 
     await Promise.all(
       languages.map((language) => {
@@ -236,7 +239,9 @@ export async function generateResumes(options: CommandLineArgs) {
       })
     );
 
-    await browser.close();
+    if (browser) {
+      await browser.close();
+    }
   } catch (err) {
     console.error(`Error: ${getErrorMessage(err)}`);
     process.exit(1);
