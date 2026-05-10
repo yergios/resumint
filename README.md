@@ -4,6 +4,12 @@ A refreshing tool for developers who maintain multilingual resumes.
 
 Stop fighting clunky Word docs, endless formatting battles, and sneaky typos. If you don't know Adobe and won't touch Canva, ResuMint takes your structured YAML data, applies your HTML/CSS templates, and outputs multilingual PDF resumes — all with a single command. It even spell-checks your content before generating.
 
+## Prerequisites
+
+- **Node.js 18+** — [nodejs.org](https://nodejs.org)
+- **pnpm** — `npm install -g pnpm`
+- **Chrome or Chromium** — optional; if not installed, Puppeteer can download a bundled browser for you (see Getting Started)
+
 ## Getting Started
 
 ```bash
