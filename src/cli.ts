@@ -49,7 +49,10 @@ const parseArguments = async () => {
     .example("$0 example-data.json", "Generate resumes from ./data/example-data.json")
     .example("$0 example-data.json --language en", "Generate resume only for English")
     .example("$0 example-data.json --template fancy", "Use the fancy-template.html template")
-    .example("$0 example-data.json --html --output ./my-resumes", "Save both HTML and PDF to custom directory")
+    .example(
+      "$0 example-data.json --html --output ./my-resumes",
+      "Save both HTML and PDF to custom directory"
+    )
     .example("$0 --data ./my-resume.json", "Generate resumes from an explicit path")
     .help()
     .alias("help", "h")
@@ -57,7 +60,8 @@ const parseArguments = async () => {
     .alias("version", "v").argv;
 
   const positionalFile = argv._?.[0] as string | undefined;
-  const data = argv.data ?? (positionalFile ? join("./data", positionalFile) : "./data/resume-data.json");
+  const data =
+    argv.data ?? (positionalFile ? join("./data", positionalFile) : "./data/resume-data.yaml");
 
   return { ...argv, data };
 };

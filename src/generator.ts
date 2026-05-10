@@ -1,6 +1,7 @@
 import { resolve, join } from "path";
 import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from "fs";
 import Handlebars from "handlebars";
+import { load as yamlLoad } from "js-yaml";
 import { Browser, launch, Page } from "puppeteer";
 import spellChecker from "./spell-checker.js";
 import {
@@ -181,7 +182,7 @@ export async function generateResumes(options: CommandLineArgs) {
     });
     setupHandlebars();
 
-    const resumeData: ResumeData = JSON.parse(readFileSync(options.data, "utf8"));
+    const resumeData: ResumeData = yamlLoad(readFileSync(options.data, "utf8")) as ResumeData;
     const templateName = options.template || resumeData.metadata?.template || "default";
     const templatePath = resolve(
       process.cwd(),

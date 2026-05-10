@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node ./dist/main.js",
     "build": "tsc",
-    "demo": "node ./dist/main.js --data ./data/example-data.json --html",
+    "demo": "node ./dist/main.js --data ./data/example-data.yaml --html",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --check .",
@@ -34,11 +34,13 @@
     "yargs": "17.7.2"
   },
   "devDependencies": {
+    "@types/js-yaml": "4.0.9",
     "@types/yargs": "17.0.35",
     "@typescript-eslint/eslint-plugin": "6.21.0",
     "@typescript-eslint/parser": "6.21.0",
     "eslint": "8.44.0",
     "eslint-config-prettier": "10.1.5",
+    "js-yaml": "4.1.1",
     "prettier": "3.0.3",
     "typescript": "5.9.2"
   },

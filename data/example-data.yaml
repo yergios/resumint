@@ -1,0 +1,215 @@
+languages:
+  - en
+  - es
+basic:
+  name: John Doe
+  title:
+    en: Software Engineer
+    es: Ingeniero de Software
+  location:
+    en: San Francisco, USA
+    es: San Francisco, EE.UU.
+  contactInfo:
+    - type: email
+      value: john.doe@example.com
+    - type: web
+      value: johndoe.dev
+    - type: phone
+      value: +1 555-123-4567
+    - type: github
+      value: github.com/johndoe
+    - type: linkedin
+      value: linkedin.com/in/johndoe
+  profileImage: ../images/john-doe-profile-picture.png
+experience:
+  - company: TechCorp Inc.
+    location:
+      en: San Francisco, USA
+      es: San Francisco, EE.UU.
+    positions:
+      - position:
+          en: Senior Software Engineer
+          es: Ingeniero de Software Senior
+        date:
+          start:
+            en: Jan 2022
+            es: Ene 2022
+          end:
+            en: Present
+            es: Presente
+        techStack:
+          - Python
+          - Django
+          - React
+          - AWS
+          - Docker
+          - Kubernetes
+          - PostgreSQL
+          - Redis
+          - CI/CD
+          - Microservices
+        responsibilities:
+          en:
+            - Lead a team of 5 engineers developing a high-traffic e-commerce platform.
+            - Designed and implemented microservices architecture reducing system latency by 40%.
+            - Established coding standards and review processes improving code quality metrics.
+            - Implemented automated CI/CD pipelines reducing deployment time from hours to minutes.
+          es:
+            - Liderazgo de un equipo de 5 ingenieros desarrollando una plataforma de comercio electrónico de alto tráfico.
+            - Diseño e implementación de arquitectura de microservicios reduciendo la latencia del sistema en un 40%.
+            - Establecimiento de estándares de codificación y procesos de revisión mejorando las métricas de calidad del código.
+            - Implementación de pipelines CI/CD automatizados reduciendo el tiempo de despliegue de horas a minutos.
+  - company: WebSolutions Ltd.
+    location:
+      en: Boston, USA
+      es: Boston, EE.UU.
+    positions:
+      - position:
+          en: Software Engineer
+          es: Ingeniero de Software
+        date:
+          start:
+            en: Mar 2019
+            es: Mar 2019
+          end:
+            en: Dec 2021
+            es: Dic 2021
+        techStack:
+          - JavaScript
+          - TypeScript
+          - Node.js
+          - Express
+          - React
+          - MongoDB
+          - Git
+          - Jest
+          - Agile
+          - SCRUM
+        responsibilities:
+          en:
+            - Developed and maintained RESTful APIs serving over 2 million requests daily.
+            - Built responsive and accessible frontend components using React and TypeScript.
+            - Implemented automated testing strategies achieving 85% code coverage.
+            - Collaborated with product and design teams to deliver features aligned with business goals.
+          es:
+            - Desarrollo y mantenimiento de APIs RESTful procesando más de 2 millones de solicitudes diarias.
+            - Construcción de componentes frontend responsivos y accesibles utilizando React y TypeScript.
+            - Implementación de estrategias de pruebas automatizadas logrando un 85% de cobertura de código.
+            - Colaboración con equipos de producto y diseño para entregar funcionalidades alineadas con los objetivos de negocio.
+      - position:
+          en: Junior Developer
+          es: Desarrollador Junior
+        date:
+          start:
+            en: Jul 2017
+            es: Jul 2017
+          end:
+            en: Feb 2019
+            es: Feb 2019
+        techStack:
+          - HTML
+          - CSS
+          - JavaScript
+          - jQuery
+          - PHP
+          - MySQL
+          - Bootstrap
+          - WordPress
+        responsibilities:
+          en:
+            - Developed responsive websites and web applications for clients across various industries.
+            - Created custom WordPress themes and plugins enhancing site functionality.
+            - Performed website optimization improving loading speeds by 35%.
+            - Assisted senior developers with troubleshooting and debugging client sites.
+          es:
+            - Desarrollo de sitios web responsivos y aplicaciones web para clientes de diversas industrias.
+            - Creación de temas y plugins personalizados de WordPress mejorando la funcionalidad de los sitios.
+            - Realización de optimizaciones de sitios web mejorando los tiempos de carga en un 35%.
+            - Asistencia a desarrolladores senior en la resolución de problemas y depuración de sitios de clientes.
+  - company: StartApp
+    location:
+      en: Boston, USA
+      es: Boston, EE.UU.
+    positions:
+      - position:
+          en: Intern
+          es: Pasante
+        date:
+          start:
+            en: Jun 2016
+            es: Jun 2016
+          end:
+            en: Jun 2017
+            es: Jun 2017
+        techStack:
+          - HTML
+          - CSS
+          - JavaScript
+          - jQuery
+          - PHP
+          - MySQL
+        responsibilities:
+          en:
+            - Supported the engineering team in building and maintaining client-facing web applications.
+            - Fixed bugs and implemented minor features under the guidance of senior developers.
+          es:
+            - Apoyo al equipo de ingeniería en el desarrollo y mantenimiento de aplicaciones web para clientes.
+            - Corrección de errores e implementación de funcionalidades menores bajo la supervisión de desarrolladores senior.
+education:
+  - institution:
+      en: Stack Overflow University
+      es: Universidad Stack Overflow
+    degree:
+      en: PhD in Copy & Paste
+      es: Doctorado de Copia y Pega
+    location:
+      en: Internet
+      es: Internet
+    date:
+      start:
+        en: Since forever
+        es: Desde siempre
+      end:
+        en: Never ends
+        es: Para siempre
+  - institution:
+      en: Massachusetts Institute of Technology
+      es: Instituto Tecnológico de Massachusetts
+    degree:
+      en: Master of Science in Computer Science
+      es: Maestría en Ciencias de la Computación
+    location:
+      en: Cambridge, USA
+      es: Cambridge, EE.UU.
+    date:
+      start:
+        en: Sept 2015
+        es: Sept 2015
+      end:
+        en: Jun 2017
+        es: Jun 2017
+  - institution:
+      en: University of California, Berkeley
+      es: Universidad de California, Berkeley
+    degree:
+      en: Bachelor of Science in Computer Science
+      es: Licenciatura en Ciencias de la Computación
+    location:
+      en: Berkeley, USA
+      es: Berkeley, EE.UU.
+    date:
+      start:
+        en: Sept 2011
+        es: Sept 2011
+      end:
+        en: May 2015
+        es: May 2015
+metadata:
+  template: default
+  sections:
+    en:
+      experience: EXPERIENCE
+      education: EDUCATION
+    es:
+      experience: EXPERIENCIA
+      education: EDUCACIÓN
