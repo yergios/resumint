@@ -1,11 +1,12 @@
 languages:
   - en
   - es
+
 basic:
   name: John Doe
   title:
-    en: Software Engineer
-    es: Ingeniero de Software
+    en: Staff Software Engineer
+    es: Ingeniero de Software Staff
   location:
     en: San Francisco, USA
     es: San Francisco, EE.UU.
@@ -21,8 +22,55 @@ basic:
     - type: linkedin
       value: linkedin.com/in/johndoe
   profileImage: ../images/john-doe-profile-picture.png
+
 experience:
-  - company: TechCorp Inc.
+  - company: Legacy Systems Memorial Hospital
+    location:
+      en: San Francisco, USA
+      es: San Francisco, EE.UU.
+    positions:
+      - position:
+          en: Staff Engineer
+          es: Ingeniero Staff
+        date:
+          start:
+            en: Jan 2022
+            es: Ene 2022
+          end:
+            en: Present
+            es: Presente
+        techStack:
+          - Go
+          - Python
+          - Kubernetes
+          - Docker
+          - PostgreSQL
+          - Redis
+          - Terraform
+          - Linux
+          - Bash
+          - YAML
+        responsibilities:
+          en:
+            - Successfully remained highly productive following organizational simplification and a sudden increase in "individual ownership."
+            - Absorbed responsibilities across infrastructure, backend, reliability, and technical leadership after the strategic elimination of several adjacent roles.
+            - Adapted to an AI-first development culture, including selective use of "vibe coding" for tasks previously considered engineering work.
+            - Maintained service reliability while operating in a team small enough to fit comfortably in a single Slack thread.
+            - Reduced operational incidents by 45% through improved observability, automated remediation, and fewer available humans.
+            - Designed scalable backend services handling high-throughput workloads across distributed environments.
+            - Removed over 120,000 lines of obsolete code, while quietly resisting similar optimization of headcount.
+            - Established engineering standards emphasizing simplicity, reliability, and sustainable skepticism toward productivity narratives.
+          es:
+            - Mantuvo alta productividad tras una simplificación organizativa y un aumento repentino de la "responsabilidad individual."
+            - Absorbió responsabilidades de infraestructura, backend, fiabilidad y liderazgo técnico tras la eliminación estratégica de varios roles adyacentes.
+            - Se adaptó a una cultura de desarrollo AI-first, incluyendo el uso selectivo de "vibe coding" para tareas previamente consideradas trabajo de ingeniería.
+            - Mantuvo la fiabilidad del servicio operando en un equipo lo suficientemente pequeño como para caber cómodamente en un solo hilo de Slack.
+            - Redujo incidentes operativos en un 45% mediante mejor observabilidad, remediación automatizada y menos humanos disponibles.
+            - Diseñó servicios backend escalables para cargas de trabajo de alto volumen en entornos distribuidos.
+            - Eliminó más de 120.000 líneas de código obsoleto, mientras resistía silenciosamente una optimización similar de plantilla.
+            - Estableció estándares de ingeniería centrados en simplicidad, fiabilidad y escepticismo sostenible ante ciertas narrativas de productividad.
+
+  - company: Acme Distributed Systems Inc.
     location:
       en: San Francisco, USA
       es: San Francisco, EE.UU.
@@ -32,73 +80,41 @@ experience:
           es: Ingeniero de Software Senior
         date:
           start:
-            en: Jan 2022
-            es: Ene 2022
-          end:
-            en: Present
-            es: Presente
-        techStack:
-          - Python
-          - Django
-          - React
-          - AWS
-          - Docker
-          - Kubernetes
-          - PostgreSQL
-          - Redis
-          - CI/CD
-          - Microservices
-        responsibilities:
-          en:
-            - Lead a team of 5 engineers developing a high-traffic e-commerce platform.
-            - Designed and implemented microservices architecture reducing system latency by 40%.
-            - Established coding standards and review processes improving code quality metrics.
-            - Implemented automated CI/CD pipelines reducing deployment time from hours to minutes.
-          es:
-            - Liderazgo de un equipo de 5 ingenieros desarrollando una plataforma de comercio electrónico de alto tráfico.
-            - Diseño e implementación de arquitectura de microservicios reduciendo la latencia del sistema en un 40%.
-            - Establecimiento de estándares de codificación y procesos de revisión mejorando las métricas de calidad del código.
-            - Implementación de pipelines CI/CD automatizados reduciendo el tiempo de despliegue de horas a minutos.
-  - company: WebSolutions Ltd.
-    location:
-      en: Boston, USA
-      es: Boston, EE.UU.
-    positions:
-      - position:
-          en: Software Engineer
-          es: Ingeniero de Software
-        date:
-          start:
             en: Mar 2019
             es: Mar 2019
           end:
             en: Dec 2021
             es: Dic 2021
         techStack:
-          - JavaScript
           - TypeScript
           - Node.js
-          - Express
-          - React
-          - MongoDB
-          - Git
-          - Jest
-          - Agile
-          - SCRUM
+          - PostgreSQL
+          - Redis
+          - Kafka
+          - Docker
+          - Kubernetes
+          - OpenTelemetry
+          - CI/CD
+          - AWS
         responsibilities:
           en:
-            - Developed and maintained RESTful APIs serving over 2 million requests daily.
-            - Built responsive and accessible frontend components using React and TypeScript.
-            - Implemented automated testing strategies achieving 85% code coverage.
-            - Collaborated with product and design teams to deliver features aligned with business goals.
+            - Designed and implemented microservices supporting 10K+ requests per second across mission-critical production systems.
+            - Reduced deployment time from 45 minutes to under 10 through CI/CD pipeline optimization and infrastructure automation.
+            - Built distributed tracing and observability tooling that made debugging feasible—and occasionally pleasant.
+            - Improved service reliability to 99.95% through performance tuning and failure-mode analysis.
+            - Refactored large monolithic components into modular systems with clear ownership boundaries.
+            - Mentored junior engineers in software design, debugging methodology, and responsible use of "temporary" fixes.
           es:
-            - Desarrollo y mantenimiento de APIs RESTful procesando más de 2 millones de solicitudes diarias.
-            - Construcción de componentes frontend responsivos y accesibles utilizando React y TypeScript.
-            - Implementación de estrategias de pruebas automatizadas logrando un 85% de cobertura de código.
-            - Colaboración con equipos de producto y diseño para entregar funcionalidades alineadas con los objetivos de negocio.
+            - Diseñó e implementó microservicios que soportan más de 10K solicitudes por segundo en sistemas críticos de producción.
+            - Redujo el tiempo de despliegue de 45 minutos a menos de 10 mediante optimización de CI/CD y automatización de infraestructura.
+            - Construyó herramientas de trazabilidad distribuida y observabilidad que hicieron la depuración viable—e incluso agradable.
+            - Mejoró la fiabilidad de servicios hasta 99,95% mediante optimización de rendimiento y análisis de fallos.
+            - Refactorizó componentes monolíticos hacia sistemas modulares con límites claros de responsabilidad.
+            - Mentorizó ingenieros junior en diseño de software, metodologías de depuración y uso responsable de arreglos "temporales".
+
       - position:
-          en: Junior Developer
-          es: Desarrollador Junior
+          en: Software Engineer
+          es: Ingeniero de Software
         date:
           start:
             en: Jul 2017
@@ -107,33 +123,36 @@ experience:
             en: Feb 2019
             es: Feb 2019
         techStack:
-          - HTML
-          - CSS
           - JavaScript
-          - jQuery
+          - TypeScript
+          - React
+          - Node.js
           - PHP
           - MySQL
-          - Bootstrap
-          - WordPress
+          - HTML
+          - CSS
         responsibilities:
           en:
-            - Developed responsive websites and web applications for clients across various industries.
-            - Created custom WordPress themes and plugins enhancing site functionality.
-            - Performed website optimization improving loading speeds by 35%.
-            - Assisted senior developers with troubleshooting and debugging client sites.
+            - Developed customer-facing web applications with focus on performance, usability, and maintainable frontend architecture.
+            - Migrated legacy JavaScript codebases to TypeScript, reducing runtime errors and increasing developer confidence.
+            - Diagnosed and resolved complex production defects, including several caused by assumptions about asynchronous behavior.
+            - Introduced automated testing and code review practices that improved release quality across the team.
+            - Learned that there is nothing more permanent than a temporary workaround.
           es:
-            - Desarrollo de sitios web responsivos y aplicaciones web para clientes de diversas industrias.
-            - Creación de temas y plugins personalizados de WordPress mejorando la funcionalidad de los sitios.
-            - Realización de optimizaciones de sitios web mejorando los tiempos de carga en un 35%.
-            - Asistencia a desarrolladores senior en la resolución de problemas y depuración de sitios de clientes.
-  - company: StartApp
+            - Desarrolló aplicaciones web orientadas al cliente con foco en rendimiento, usabilidad y arquitectura mantenible.
+            - Migró bases de código JavaScript heredadas a TypeScript, reduciendo errores en tiempo de ejecución.
+            - Diagnosticó y resolvió defectos complejos en producción, incluyendo varios causados por supuestos sobre comportamiento asíncrono.
+            - Introdujo pruebas automatizadas y revisiones de código que mejoraron la calidad de entrega del equipo.
+            - Aprendió que no hay nada más permanente que una solución temporal.
+
+  - company: Crunch Time Startups LLC
     location:
       en: Boston, USA
       es: Boston, EE.UU.
     positions:
       - position:
-          en: Intern
-          es: Pasante
+          en: Founding Engineer
+          es: Ingeniero Fundador
         date:
           start:
             en: Jun 2016
@@ -142,36 +161,27 @@ experience:
             en: Jun 2017
             es: Jun 2017
         techStack:
-          - HTML
-          - CSS
-          - JavaScript
-          - jQuery
-          - PHP
-          - MySQL
+          - Python
+          - React
+          - Firebase
+          - Docker
+          - Linux
+          - Sentry
         responsibilities:
           en:
-            - Supported the engineering team in building and maintaining client-facing web applications.
-            - Fixed bugs and implemented minor features under the guidance of senior developers.
+            - Built and shipped initial product prototypes from concept to production under aggressive delivery timelines.
+            - Owned full-stack architecture, infrastructure, deployment, and incident response.
+            - Implemented authentication, billing, and analytics systems foundational to early customer growth.
+            - Performed emergency production fixes directly over SSH, which remains memorable for all involved.
+            - Wrote comprehensive technical documentation despite overwhelming historical evidence that nobody reads it.
           es:
-            - Apoyo al equipo de ingeniería en el desarrollo y mantenimiento de aplicaciones web para clientes.
-            - Corrección de errores e implementación de funcionalidades menores bajo la supervisión de desarrolladores senior.
+            - Construyó y lanzó prototipos iniciales desde concepto hasta producción bajo plazos agresivos.
+            - Gestionó arquitectura full-stack, infraestructura, despliegues y respuesta a incidentes.
+            - Implementó sistemas de autenticación, facturación y analítica esenciales para el crecimiento inicial.
+            - Realizó correcciones urgentes en producción vía SSH, algo que sigue siendo memorable para todos los involucrados.
+            - Escribió documentación técnica exhaustiva pese a la evidencia histórica de que pocos la leen.
+
 education:
-  - institution:
-      en: Stack Overflow University
-      es: Universidad Stack Overflow
-    degree:
-      en: PhD in Copy & Paste
-      es: Doctorado de Copia y Pega
-    location:
-      en: Internet
-      es: Internet
-    date:
-      start:
-        en: Since forever
-        es: Desde siempre
-      end:
-        en: Never ends
-        es: Para siempre
   - institution:
       en: Massachusetts Institute of Technology
       es: Instituto Tecnológico de Massachusetts
@@ -183,11 +193,12 @@ education:
       es: Cambridge, EE.UU.
     date:
       start:
-        en: Sept 2015
-        es: Sept 2015
+        en: Sep 2015
+        es: Sep 2015
       end:
         en: Jun 2017
         es: Jun 2017
+
   - institution:
       en: University of California, Berkeley
       es: Universidad de California, Berkeley
@@ -199,11 +210,12 @@ education:
       es: Berkeley, EE.UU.
     date:
       start:
-        en: Sept 2011
-        es: Sept 2011
+        en: Sep 2011
+        es: Sep 2011
       end:
         en: May 2015
         es: May 2015
+
 metadata:
   template: default
   sections:

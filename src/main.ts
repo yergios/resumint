@@ -5,7 +5,7 @@ import { generateResumes } from "./generator.js";
 
 async function main() {
   const argv = await cli.parseArguments();
-  await generateResumes(argv as any);
+  await generateResumes(argv);
 }
 
 main();

@@ -1,13 +1,14 @@
 import yargs from "yargs/yargs";
 import { hideBin } from "yargs/helpers";
 import { join } from "path";
+import { CommandLineArgs } from "./models/generator.js";
 
-const parseArguments = async () => {
+const parseArguments = async (): Promise<CommandLineArgs> => {
   const argv = await yargs(hideBin(process.argv))
     .usage("Usage: $0 [file] [options]")
     .option("data", {
       alias: "d",
-      describe: "Explicit path to the resume data JSON file (overrides positional [file])",
+      describe: "Explicit path to the resume data YAML file (overrides positional [file])",
       type: "string"
     })
     .option("template", {
@@ -46,14 +47,14 @@ const parseArguments = async () => {
       type: "boolean",
       default: false
     })
-    .example("$0 example-data.json", "Generate resumes from ./data/example-data.json")
-    .example("$0 example-data.json --language en", "Generate resume only for English")
-    .example("$0 example-data.json --template fancy", "Use the fancy-template.html template")
+    .example("$0 example-data.yaml", "Generate resumes from ./data/example-data.yaml")
+    .example("$0 example-data.yaml --language en", "Generate resume only for English")
+    .example("$0 example-data.yaml --template fancy", "Use the fancy-template.html template")
     .example(
-      "$0 example-data.json --html --output ./my-resumes",
+      "$0 example-data.yaml --html --output ./my-resumes",
       "Save both HTML and PDF to custom directory"
     )
-    .example("$0 --data ./my-resume.json", "Generate resumes from an explicit path")
+    .example("$0 --data ./my-resume.yaml", "Generate resumes from an explicit path")
     .help()
     .alias("help", "h")
     .version()
@@ -63,9 +64,16 @@ const parseArguments = async () => {
   const data =
     argv.data ?? (positionalFile ? join("./data", positionalFile) : "./data/resume-data.yaml");
 
-  return { ...argv, data };
+  return {
+    data,
+    template: argv.template,
+    templatesDir: argv.templatesDir ?? "./templates",
+    output: argv.output ?? "./output",
+    language: argv.language,
+    html: argv.html ?? false,
+    htmlOnly: argv.htmlOnly ?? false,
+    noSpellCheck: argv.noSpellCheck ?? false
+  };
 };
 
-export default {
-  parseArguments
-};
+export default { parseArguments };

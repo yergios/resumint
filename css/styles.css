@@ -1,4 +1,23 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  src: url("../fonts/inter-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  src: url("../fonts/inter-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  src: url("../fonts/inter-700.woff2") format("woff2");
+}
 
 :root {
   --primary-color: #000000;
@@ -141,10 +160,12 @@ b {
   font-size: 10px;
 }
 
-.contact-item ion-icon {
-  font-size: 12px;
+.contact-item svg {
+  width: 12px;
+  height: 12px;
   margin-right: 5px;
   color: var(--primary-color);
+  flex-shrink: 0;
 }
 
 /* Both Experience and Education */

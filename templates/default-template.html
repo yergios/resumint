@@ -5,14 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{basic.name}} - Curriculum</title>
     <link rel="stylesheet" href="../css/styles.css" />
-    <script
-      type="module"
-      src="https://cdnjs.cloudflare.com/ajax/libs/ionicons/7.1.0/ionicons/ionicons.esm.js"
-    ></script>
-    <script
-      nomodule
-      src="https://cdnjs.cloudflare.com/ajax/libs/ionicons/7.1.0/ionicons/ionicons.js"
-    ></script>
   </head>
 
   <body>
@@ -24,37 +16,12 @@
             <h2 class="title">{{lookup basic "title" language}}</h2>
           </div>
           <div class="contact-info">
-            {{#each basic.contactInfo}} {{#if (eq type "email")}}
+            {{#each basic.contactInfo}}
             <div class="contact-item">
-              <ion-icon name="{{getIcon type}}"></ion-icon>
+              {{{getIconSvg type}}}
               <span>{{value}}</span>
             </div>
-            {{/if}} {{/each}} {{#each basic.contactInfo}} {{#if (eq type "web")}}
-            <div class="contact-item">
-              <ion-icon name="{{getIcon type}}"></ion-icon>
-              <span>{{value}}</span>
-            </div>
-            {{/if}} {{/each}} {{#each basic.contactInfo}} {{#if (eq type "phone")}}
-            <div class="contact-item">
-              <ion-icon name="{{getIcon type}}"></ion-icon>
-              <span>{{value}}</span>
-            </div>
-            {{/if}} {{/each}} {{#each basic.contactInfo}} {{#if (eq type "github")}}
-            <div class="contact-item">
-              <ion-icon name="{{getIcon type}}"></ion-icon>
-              <span>{{value}}</span>
-            </div>
-            {{/if}} {{/each}}
-            <div class="contact-item">
-              <ion-icon name="{{getIcon 'location'}}"></ion-icon>
-              <span>{{lookup basic "location" language}}</span>
-            </div>
-            {{#each basic.contactInfo}} {{#if (eq type "linkedin")}}
-            <div class="contact-item">
-              <ion-icon name="{{getIcon type}}"></ion-icon>
-              <span>{{value}}</span>
-            </div>
-            {{/if}} {{/each}}
+            {{/each}}
           </div>
         </div>
         {{#if basic.profileImage}}
