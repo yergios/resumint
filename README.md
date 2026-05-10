@@ -2,7 +2,7 @@
 
 A refreshing tool for developers who maintain multilingual resumes.
 
-Stop fighting clunky Word docs, endless formatting battles, and sneaky typos. If you don't know Adobe and won't touch Canva, ResuMint takes your structured YAML data, applies your HTML/CSS templates, and outputs multilingual PDF resumes — all with a single command. It even spell-checks your content before generating.
+Stop fighting clunky Word docs, endless formatting battles, and sneaky typos. If you don't know Adobe and won't touch Canva, ResuMint takes your structured data (YAML or JSON), applies your HTML/CSS templates, and outputs multilingual PDF resumes — all with a single command. It even spell-checks your content before generating.
 
 ## Prerequisites
 
@@ -41,20 +41,20 @@ npm start [file] [options]
 
 ### Arguments
 
-- `file`: YAML file name to look up in `./data/` (e.g. `example-data.yaml`). Omit to use `resume-data.yaml`. Overridden by `--data`.
+- `file`: Data file name to look up in `./data/` (e.g. `example-data.yaml`). Accepts YAML or JSON. If you omit the extension it will default yo `.yaml`. You may also omit the file name entirely to use `resume-data.yaml`. Overridden by `--data`.
 
 ### Options
 
-| Flag             | Alias | Description                                                | Default                         |
-| ---------------- | ----- | ---------------------------------------------------------- | ------------------------------- |
-| `--data`         | `-d`  | Explicit path to a YAML file (overrides positional `file`) | —                               |
-| `--language`     | `-l`  | Generate for a specific language only                      | all languages in file           |
-| `--template`     | `-t`  | Template name to use                                       | from file metadata or `default` |
-| `--output`       | `-o`  | Output directory                                           | `./output`                      |
-| `--html`         |       | Save HTML alongside PDFs                                   | `false`                         |
-| `--htmlOnly`     |       | Generate HTML only, no PDFs                                | `false`                         |
-| `--templatesDir` |       | Directory containing templates                             | `./templates`                   |
-| `--noSpellCheck` |       | Skip spell checking                                        | `false`                         |
+| Flag             | Alias | Description                                                        | Default                         |
+| ---------------- | ----- | ------------------------------------------------------------------ | ------------------------------- |
+| `--data`         | `-d`  | Explicit path to a YAML or JSON file (overrides positional `file`) | —                               |
+| `--language`     | `-l`  | Generate for a specific language only                              | all languages in file           |
+| `--template`     | `-t`  | Template name to use                                               | from file metadata or `default` |
+| `--output`       | `-o`  | Output directory                                                   | `./output`                      |
+| `--html`         |       | Save HTML alongside PDFs                                           | `false`                         |
+| `--htmlOnly`     |       | Generate HTML only, no PDFs                                        | `false`                         |
+| `--templatesDir` |       | Directory containing templates                                     | `./templates`                   |
+| `--noSpellCheck` |       | Skip spell checking                                                | `false`                         |
 
 ### Examples
 
@@ -83,7 +83,7 @@ resumint example-data.yaml --noSpellCheck
 
 ## Data File
 
-ResuMint reads YAML files. See [`data/example-data.yaml`](data/example-data.yaml) for a complete example with multilingual support.
+ResuMint accepts YAML or JSON. YAML is recommended — it's less noisy for deeply nested, multilingual data. See [`data/example-data.yaml`](data/example-data.yaml) for a complete example.
 
 Localized fields accept any language code that matches an entry in `languages`. Contact info is displayed in a fixed opinionated order (email → web → phone → github → location → linkedin) regardless of the order in the file.
 

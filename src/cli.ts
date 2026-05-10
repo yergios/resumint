@@ -8,7 +8,7 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
     .usage("Usage: $0 [file] [options]")
     .option("data", {
       alias: "d",
-      describe: "Explicit path to the resume data YAML file (overrides positional [file])",
+      describe: "Explicit path to a YAML or JSON data file (overrides positional [file])",
       type: "string"
     })
     .option("template", {
@@ -67,8 +67,12 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
     .alias("version", "v").argv;
 
   const positionalFile = argv._?.[0] as string | undefined;
-  const data =
-    argv.data ?? (positionalFile ? join("./data", positionalFile) : "./data/resume-data.yaml");
+  const resolvedFile = positionalFile
+    ? /\.(yaml|yml|json)$/i.test(positionalFile)
+      ? positionalFile
+      : `${positionalFile}.yaml`
+    : "resume-data.yaml";
+  const data = argv.data ?? join("./data", resolvedFile);
 
   return {
     data,
