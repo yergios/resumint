@@ -7,7 +7,6 @@ Stop fighting clunky Word docs, endless formatting battles, and sneaky typos. If
 ## Prerequisites
 
 - **Node.js 18+** — [nodejs.org](https://nodejs.org)
-- **pnpm** — `npm install -g pnpm`
 - **Chrome or Chromium** — optional; if not installed, Puppeteer can download a bundled browser for you (see Getting Started)
 
 ## Getting Started
@@ -18,16 +17,16 @@ git clone https://github.com/yergios/resumint.git
 cd resumint
 
 # Install dependencies
-pnpm install
+npm install
 
 # Build TypeScript source
-pnpm build
+npm build
 
 # Install a headless browser (skip if Chrome is already installed)
 npx puppeteer browsers install chrome
 
 # (Optional) Make resumint available as a global CLI command
-pnpm link --global
+npm link --global
 ```
 
 ## Usage
@@ -60,7 +59,7 @@ npm start [file] [options]
 
 ```bash
 # Try the demo
-pnpm demo
+npm demo
 
 # Generate from a file in ./data/
 resumint example-data.yaml
@@ -169,7 +168,7 @@ To add a new icon type:
        value: some value
    ```
 
-4. Rebuild: `pnpm build`
+4. Rebuild: `npm build`
 
 The SVG inherits `color: currentColor` from the `.contact-item svg` CSS rule, so it matches the surrounding text color automatically.
 
