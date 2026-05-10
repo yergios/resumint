@@ -56,6 +56,7 @@ export interface CommandLineArgs {
   html: boolean;
   htmlOnly: boolean;
   noSpellCheck: boolean;
+  verbose: boolean;
 }
 
 export type LogLevel = "info" | "warn" | "error";

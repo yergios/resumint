@@ -47,6 +47,12 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
       type: "boolean",
       default: false
     })
+    .option("verbose", {
+      alias: "V",
+      describe: "Print detailed logs and timing information",
+      type: "boolean",
+      default: false
+    })
     .example("$0 example-data.yaml", "Generate resumes from ./data/example-data.yaml")
     .example("$0 example-data.yaml --language en", "Generate resume only for English")
     .example("$0 example-data.yaml --template fancy", "Use the fancy-template.html template")
@@ -72,7 +78,8 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
     language: argv.language,
     html: argv.html ?? false,
     htmlOnly: argv.htmlOnly ?? false,
-    noSpellCheck: argv.noSpellCheck ?? false
+    noSpellCheck: argv.noSpellCheck ?? false,
+    verbose: argv.verbose ?? false
   };
 };
 

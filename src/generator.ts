@@ -23,9 +23,20 @@ function createLogEntry(level: LogLevel, message: string): LogEntry {
   return { level, message, timestamp: new Date() };
 }
 
-function log(generationResult: GenerationResult, level: LogLevel, message: string): void {
+function log(
+  generationResult: GenerationResult,
+  level: LogLevel,
+  message: string,
+  verbose: boolean
+): void {
   generationResult.logs.push(createLogEntry(level, message));
-  console.log(`[${level.toUpperCase()}]: ${message}`);
+  if (verbose || level !== "info") {
+    console.log(`[${level.toUpperCase()}]: ${message}`);
+  }
+}
+
+function logPerf(label: string, ms: number, verbose: boolean): void {
+  if (verbose) console.log(`[PERF]: ${label}: ${ms.toFixed(1)}ms`);
 }
 
 function generateBaseFileName(date: string, language: string, name: string): string {
@@ -35,10 +46,14 @@ function generateBaseFileName(date: string, language: string, name: string): str
     .replace(/[^a-z0-9-]/g, "")}`;
 }
 
-function handleGenerationError(generationResult: GenerationResult, error: string): void {
+function handleGenerationError(
+  generationResult: GenerationResult,
+  error: string,
+  verbose: boolean
+): void {
   generationResult.errors.push(error);
   generationResult.success = false;
-  log(generationResult, "error", error);
+  log(generationResult, "error", error, verbose);
 }
 
 const ICON_SVGS: Record<string, string> = {
@@ -72,7 +87,8 @@ async function generatePDF(
   page: Page,
   htmlPath: string,
   outputPath: string,
-  generationResult: GenerationResult
+  generationResult: GenerationResult,
+  verbose: boolean
 ) {
   const absoluteHtmlPath = `file://${resolve(htmlPath)}`;
   await page.goto(absoluteHtmlPath, { waitUntil: "networkidle0" });
@@ -86,44 +102,56 @@ async function generatePDF(
   });
 
   if (!containerFound) {
-    log(generationResult, "warn", "Resume container not found, using body height");
+    log(generationResult, "warn", "Resume container not found, using body height", verbose);
   }
 
   if (contentHeight > A4_HEIGHT_PX) {
     handleGenerationError(
       generationResult,
-      `Content height exceeds A4 maximum (${contentHeight}px exceeds ${A4_HEIGHT_PX}px)`
+      `Content height exceeds A4 maximum (${contentHeight}px exceeds ${A4_HEIGHT_PX}px)`,
+      verbose
     );
     return;
   }
 
+  const t = performance.now();
   await page.pdf({
     path: outputPath,
     format: "A4",
     margin: { top: "0", right: "0", bottom: "0", left: "0" }
   });
+  logPerf(`PDF render (${generationResult.language})`, performance.now() - t, verbose);
 
-  log(generationResult, "info", `PDF generated: ${outputPath}`);
+  log(generationResult, "info", `PDF generated: ${outputPath}`, verbose);
 }
 
 async function runSpellCheck(
   html: string,
   language: string,
-  generationResult: GenerationResult
+  generationResult: GenerationResult,
+  verbose: boolean
 ): Promise<void> {
+  const t = performance.now();
   const result = await spellCheckHtml(html, language);
+  logPerf(`Spell check (${language})`, performance.now() - t, verbose);
 
   if (result.misspelledCount > 0) {
     log(
       generationResult,
       "warn",
-      `Found ${result.misspelledCount} misspelled words in '${language}' resume:`
+      `Found ${result.misspelledCount} misspelled words in '${language}' resume:`,
+      verbose
     );
     result.misspelled.forEach(({ word, suggestions }) => {
-      log(generationResult, "warn", `\t- "${word}" -> Suggestions: ${suggestions.join(", ")}`);
+      log(
+        generationResult,
+        "warn",
+        `\t- "${word}" -> Suggestions: ${suggestions.join(", ")}`,
+        verbose
+      );
     });
   } else {
-    log(generationResult, "info", `No spelling errors found in ${language} resume`);
+    log(generationResult, "info", `No spelling errors found in ${language} resume`, verbose);
   }
 }
 
@@ -132,6 +160,9 @@ async function generateResumeForLanguage(
   options: CommandLineArgs,
   generationResult: GenerationResult
 ) {
+  const t = performance.now();
+  const { verbose } = options;
+
   let newPagePromise;
   if (!options.htmlOnly) {
     newPagePromise = browser?.newPage();
@@ -141,21 +172,21 @@ async function generateResumeForLanguage(
 
   const spellCheckPromise = options.noSpellCheck
     ? undefined
-    : runSpellCheck(generationResult.html, generationResult.language, generationResult);
+    : runSpellCheck(generationResult.html, generationResult.language, generationResult, verbose);
 
   writeFileSync(htmlPath, generationResult.html);
 
   let pdfGenerationPromise;
   if (options.htmlOnly) {
-    log(generationResult, "info", `HTML saved: ${htmlPath}`);
+    log(generationResult, "info", `HTML saved: ${htmlPath}`, verbose);
   } else {
     const pdfPath = join(generationResult.outputDir, `${generationResult.baseFileName}.pdf`);
     const page = await newPagePromise;
     if (!page) {
-      handleGenerationError(generationResult, "Browser page was not created");
+      handleGenerationError(generationResult, "Browser page was not created", verbose);
       return;
     }
-    pdfGenerationPromise = generatePDF(page, htmlPath, pdfPath, generationResult);
+    pdfGenerationPromise = generatePDF(page, htmlPath, pdfPath, generationResult, verbose);
   }
 
   await spellCheckPromise;
@@ -164,6 +195,8 @@ async function generateResumeForLanguage(
   if (!options.html && !options.htmlOnly && generationResult.success) {
     unlinkSync(htmlPath);
   }
+
+  logPerf(`Total (${generationResult.language})`, performance.now() - t, verbose);
 }
 
 function buildContactInfo(resumeData: ResumeData, language: string): ContactInfo[] {
@@ -209,6 +242,7 @@ export async function generateResumes(options: CommandLineArgs) {
 
     const currentDate = getCurrentDate();
     const template = Handlebars.compile(readFileSync(templatePath, "utf8"));
+    const totalStart = performance.now();
 
     await Promise.all(
       languages.map((language) => {
@@ -228,11 +262,12 @@ export async function generateResumes(options: CommandLineArgs) {
           }
         };
 
-        log(generationResult, "info", `Generating '${language.toUpperCase()}' resume`);
+        log(generationResult, "info", `Generating '${language.toUpperCase()}' resume`, options.verbose);
         return generateResumeForLanguage(browser, options, generationResult);
       })
     );
 
+    logPerf("Total overall", performance.now() - totalStart, options.verbose);
     await browser?.close();
   } catch (err) {
     console.error(`Error: ${getErrorMessage(err)}`);
