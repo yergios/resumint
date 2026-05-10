@@ -170,7 +170,7 @@ async function generateResumeForLanguage(
     await pdfGenerationPromise;
   }
 
-  if (!options.html && !options.htmlOnly) {
+  if (!options.html && !options.htmlOnly && generationResult.success) {
     unlinkSync(htmlPath);
   }
 
