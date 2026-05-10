@@ -1,14 +1,14 @@
 import yargs from "yargs/yargs";
 import { hideBin } from "yargs/helpers";
+import { join } from "path";
 
-const parseArguments = () =>
-  yargs(hideBin(process.argv))
-    .usage("Usage: $0 [options]")
+const parseArguments = async () => {
+  const argv = await yargs(hideBin(process.argv))
+    .usage("Usage: $0 [file] [options]")
     .option("data", {
       alias: "d",
-      describe: "Path to the resume data JSON file",
-      type: "string",
-      default: "./data/resume-data.json"
+      describe: "Explicit path to the resume data JSON file (overrides positional [file])",
+      type: "string"
     })
     .option("template", {
       alias: "t",
@@ -46,15 +46,21 @@ const parseArguments = () =>
       type: "boolean",
       default: false
     })
-    .example("$0 --data ./my-resume.json", "Generate resumes from a specific JSON file")
-    .example("$0 --language en", "Generate resume only for English")
-    .example("$0 --template fancy", "Use the fancy-template.html template")
-    .example("$0 --html --output ./my-resumes", "Save both HTML and PDF to custom directory")
-    .example("$0 --noSpellCheck", "Skip spell checking")
+    .example("$0 example-data.json", "Generate resumes from ./data/example-data.json")
+    .example("$0 example-data.json --language en", "Generate resume only for English")
+    .example("$0 example-data.json --template fancy", "Use the fancy-template.html template")
+    .example("$0 example-data.json --html --output ./my-resumes", "Save both HTML and PDF to custom directory")
+    .example("$0 --data ./my-resume.json", "Generate resumes from an explicit path")
     .help()
     .alias("help", "h")
     .version()
     .alias("version", "v").argv;
+
+  const positionalFile = argv._?.[0] as string | undefined;
+  const data = argv.data ?? (positionalFile ? join("./data", positionalFile) : "./data/resume-data.json");
+
+  return { ...argv, data };
+};
 
 export default {
   parseArguments
