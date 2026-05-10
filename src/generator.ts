@@ -75,16 +75,19 @@ async function generatePDF(
   await page.goto(absoluteHtmlPath, { waitUntil: "networkidle0" });
 
   // Validate height
-  const contentHeight = await page.evaluate(() => {
+  const { contentHeight, containerFound } = await page.evaluate(() => {
     const container = document.querySelector(".resume-container");
     if (!container) {
-      generationResult.logs.push(
-        createLogEntry("warn", "Resume container not found, using body height")
-      );
-      return document.body.scrollHeight;
+      return { contentHeight: document.body.scrollHeight, containerFound: false };
     }
-    return container.scrollHeight;
+    return { contentHeight: container.scrollHeight, containerFound: true };
   });
+
+  if (!containerFound) {
+    generationResult.logs.push(
+      createLogEntry("warn", "Resume container not found, using body height")
+    );
+  }
 
   if (contentHeight > A4_HEIGHT_PX) {
     const errorMsg = `${MAX_CONTENT_HEIGHT_WARNING} (${contentHeight}px exceeds ${A4_HEIGHT_PX}px)`;
