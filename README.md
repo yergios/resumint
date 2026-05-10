@@ -10,7 +10,7 @@ It even spell-checks your content, so no more embarrassing mistakes 😉
 
 ```bash
 # Clone the repository
-git clone https://github.com/asiansergio/resumint.git
+git clone https://github.com/yergios/resumint.git
 cd resumint
 
 # Install dependencies
@@ -20,6 +20,7 @@ npm install
 npm run build
 
 # If you have chrome installed you may skip this step
+# This command will install a headless browser for ResuMint to use
 npx puppeteer browsers install chrome
 
 # Run the tool
@@ -37,7 +38,7 @@ resumint [file] [options]
 npm demo
 
 # Generate from a JSON file in the data/ directory
-resumint start example-data.json
+resumint example-data.json
 ```
 
 ## Usage
