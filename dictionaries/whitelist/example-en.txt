@@ -101,3 +101,18 @@ Cambridge
 
 # Other
 Curriculum
+
+sergioylee.com
+github.com/sergioylee
+company-wide
+customer-facing
+third-party
+integrations
+data/platform
+Directory-based
+multi-tenant
+RBAC
+homologation
+Framework/.NET
+WebSockets
+data-loading
