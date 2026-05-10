@@ -23,7 +23,11 @@ npm run build
 npx puppeteer browsers install chrome
 
 # Run the tool
-npm start [options]
+npm start [file] [options]
+
+# (Optional) Use resumint directly as a CLI command from any directory
+npm link --global
+resumint [file] [options]
 ```
 
 ## Quick Start
@@ -32,19 +36,23 @@ npm start [options]
 # Try the demo with example data
 npm demo
 
-# Command to run directly with example data
-npm start -d ./data/example-data.json
+# Generate from a JSON file in the data/ directory
+resumint start example-data.json
 ```
 
 ## Usage
 
 ```bash
-npm start [options]
+resumint [file] [options]
 ```
+
+### Arguments
+
+- `file`: Resume data JSON file name from the `data/` directory (e.g. `example-data.json`). Overridden by `--data`.
 
 ### Options
 
-- `--data, -d`: Path to the resume data JSON file (default: ./data/resume-data.json)
+- `--data, -d`: Explicit path to the resume data JSON file (overrides positional `file`)
 - `--template, -t`: Template name to use (default: from metadata or "default")
 - `--language, -l`: Generate resume for specific language only
 - `--output, -o`: Output directory for the generated files (default: ./output)
@@ -56,20 +64,23 @@ npm start [options]
 ### Examples
 
 ```bash
-# Generate resumes from a specific JSON file
-npm start --data ./my-resume.json
+# Generate from example data (resolves to ./data/example-data.json)
+npm start example-data.json
 
-# Generate resume only for English
-npm start --language en
+# Generate only for English
+npm start example-data.json --language en
 
 # Use a specific template
-npm start --template fancy
+npm start example-data.json --template fancy
 
 # Save both HTML and PDF to custom directory
-npm start --html --output ./my-resumes
+npm start example-data.json --html --output ./my-resumes
 
-# Generate resumes skipping spell checking
-npm start -d ./my-data.json --noSpellCheck
+# Generate from a path outside the data/ directory
+npm start --data ./my-resume.json
+
+# Skip spell checking
+npm start example-data.json --noSpellCheck
 ```
 
 ## Data Structure
