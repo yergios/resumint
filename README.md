@@ -1,10 +1,8 @@
 # ResuMint
 
-A refreshing tool for developers who maintain multilingual resumes:
+A refreshing tool for developers who maintain multilingual resumes.
 
-Stop fighting clunky Word docs, endless formatting battles, and sneaky typos.
-If you don't know Adobe and won't touch Canva, ResuMint takes your structured JSON, applies your HTML/CSS templates and outputs multilingual PDF resumes — all with a single command.
-It even spell-checks your content, so no more embarrassing mistakes 😉
+Stop fighting clunky Word docs, endless formatting battles, and sneaky typos. If you don't know Adobe and won't touch Canva, ResuMint takes your structured YAML data, applies your HTML/CSS templates, and outputs multilingual PDF resumes — all with a single command. It even spell-checks your content before generating.
 
 ## Getting Started
 
@@ -14,138 +12,193 @@ git clone https://github.com/yergios/resumint.git
 cd resumint
 
 # Install dependencies
-npm install
+pnpm install
 
 # Build TypeScript source
-npm run build
+pnpm build
 
-# If you have chrome installed you may skip this step
-# This command will install a headless browser for ResuMint to use
+# Install a headless browser (skip if Chrome is already installed)
 npx puppeteer browsers install chrome
 
-# Run the tool
-npm start [file] [options]
-
-# (Optional) Use resumint directly as a CLI command from any directory
-npm link --global
-resumint [file] [options]
-```
-
-## Quick Start
-
-```bash
-# Try the demo with example data
-npm demo
-
-# Generate from a JSON file in the data/ directory
-resumint example-data.json
+# (Optional) Make resumint available as a global CLI command
+pnpm link --global
 ```
 
 ## Usage
 
 ```bash
 resumint [file] [options]
+
+# Or without global install
+npm start [file] [options]
 ```
 
 ### Arguments
 
-- `file`: Resume data JSON file name from the `data/` directory (e.g. `example-data.json`). Overridden by `--data`.
+- `file`: YAML file name to look up in `./data/` (e.g. `example-data.yaml`). Omit to use `resume-data.yaml`. Overridden by `--data`.
 
 ### Options
 
-- `--data, -d`: Explicit path to the resume data JSON file (overrides positional `file`)
-- `--template, -t`: Template name to use (default: from metadata or "default")
-- `--language, -l`: Generate resume for specific language only
-- `--output, -o`: Output directory for the generated files (default: ./output)
-- `--html`: Save HTML files along with PDFs
-- `--htmlOnly`: Generate only HTML files, not PDFs
-- `--templatesDir`: Directory containing templates (default: ./templates)
-- `--noSpellCheck`: Skips spell checking
+| Flag             | Alias | Description                                                | Default                         |
+| ---------------- | ----- | ---------------------------------------------------------- | ------------------------------- |
+| `--data`         | `-d`  | Explicit path to a YAML file (overrides positional `file`) | —                               |
+| `--language`     | `-l`  | Generate for a specific language only                      | all languages in file           |
+| `--template`     | `-t`  | Template name to use                                       | from file metadata or `default` |
+| `--output`       | `-o`  | Output directory                                           | `./output`                      |
+| `--html`         |       | Save HTML alongside PDFs                                   | `false`                         |
+| `--htmlOnly`     |       | Generate HTML only, no PDFs                                | `false`                         |
+| `--templatesDir` |       | Directory containing templates                             | `./templates`                   |
+| `--noSpellCheck` |       | Skip spell checking                                        | `false`                         |
 
 ### Examples
 
 ```bash
-# Generate from example data (resolves to ./data/example-data.json)
-npm start example-data.json
+# Try the demo
+pnpm demo
 
-# Generate only for English
-npm start example-data.json --language en
+# Generate from a file in ./data/
+resumint example-data.yaml
 
-# Use a specific template
-npm start example-data.json --template fancy
+# English only
+resumint example-data.yaml --language en
 
-# Save both HTML and PDF to custom directory
-npm start example-data.json --html --output ./my-resumes
+# Custom template
+resumint example-data.yaml --template fancy
 
-# Generate from a path outside the data/ directory
-npm start --data ./my-resume.json
+# Save both HTML and PDF
+resumint example-data.yaml --html --output ./my-resumes
+
+# File outside ./data/
+resumint --data ./path/to/resume.yaml
 
 # Skip spell checking
-npm start example-data.json --noSpellCheck
+resumint example-data.yaml --noSpellCheck
 ```
 
-## Data Structure
+## Data File
 
-ResuMint uses a JSON file to store your resume data. See [data/example-data.json](data/example-data.json) for a complete example with multilingual support.
+ResuMint reads YAML files. See [`data/example-data.yaml`](data/example-data.yaml) for a complete example with multilingual support.
+
+Localized fields accept any language code that matches an entry in `languages`. Contact info is displayed in a fixed opinionated order (email → web → phone → github → location → linkedin) regardless of the order in the file.
 
 ## Templates
 
-The default template is included. To create custom templates:
+Templates are Handlebars HTML files in `./templates/`, named `[name]-template.html`. The default template is `default-template.html`.
 
-1. Create a new HTML file in the `templates` directory
-2. Name it `[your-template-name]-template.html`
-3. Use Handlebars syntax for templating
+To create a custom template:
+
+1. Copy `templates/default-template.html` to `templates/[name]-template.html`
+2. Edit the markup and styles as needed
+3. Set `metadata.template: [name]` in your data file, or pass `--template [name]`
+
+Available Handlebars helpers:
+
+| Helper       | Usage                   | Description                                 |
+| ------------ | ----------------------- | ------------------------------------------- |
+| `lookup`     | `{{lookup obj key}}`    | Resolves a localized string by language key |
+| `join`       | `{{join array ", "}}`   | Joins an array with a separator             |
+| `eq`         | `{{#if (eq a b)}}`      | Equality check                              |
+| `getIconSvg` | `{{{getIconSvg type}}}` | Renders an inline SVG icon by contact type  |
+
+## Vendoring Fonts
+
+Fonts are vendored locally in `./fonts/` and declared in `css/styles.css` via `@font-face`. This avoids network requests during PDF generation.
+
+To replace or add a font:
+
+1. Download the `.woff2` file for the weight you need. [Fontsource](https://fontsource.org) provides woff2 files for most Google Fonts:
+
+   ```bash
+   # Example: download Inter 400 via jsDelivr
+   curl -o fonts/inter-400.woff2 \
+     "https://cdn.jsdelivr.net/npm/@fontsource/inter@5.1.1/files/inter-latin-400-normal.woff2"
+   ```
+
+2. Add a `@font-face` rule in `css/styles.css`:
+
+   ```css
+   @font-face {
+     font-family: "Inter";
+     font-style: normal;
+     font-weight: 400;
+     src: url("../fonts/inter-400.woff2") format("woff2");
+   }
+   ```
+
+3. Update the `--font-main` variable if switching families:
+   ```css
+   :root {
+     --font-main: "Your Font", sans-serif;
+   }
+   ```
+
+Only download the weights you actually use. ResuMint currently uses **400** (body), **600** (headings), and **700** (company names, institutions).
+
+## Vendoring Icons
+
+Icons are inline SVGs rendered by the `getIconSvg` Handlebars helper, defined in `src/generator.ts`. No external scripts or CDN requests are needed.
+
+To add a new icon type:
+
+1. Get the SVG markup. [Ionicons](https://ionic.io/ionicons) is a good source — find your icon, open the SVG file, and copy the markup:
+
+   ```bash
+   curl -s "https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/svg/heart-outline.svg"
+   ```
+
+2. Add an entry to the `ICON_SVGS` record in `src/generator.ts`:
+
+   ```typescript
+   const ICON_SVGS: Record<string, string> = {
+     // existing icons...
+     heart: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">...</svg>`
+   };
+   ```
+
+3. Use the new type in your data file:
+
+   ```yaml
+   contactInfo:
+     - type: heart
+       value: some value
+   ```
+
+4. Rebuild: `pnpm build`
+
+The SVG inherits `color: currentColor` from the `.contact-item svg` CSS rule, so it matches the surrounding text color automatically.
 
 ## Spell Checking
 
-ResuMint includes built-in spell checking to catch embarrassing typos before they end up in your resume. English dictionaries are included by default.
+Spell checking runs by default and reports misspelled words with suggestions. Use `--noSpellCheck` to skip it.
 
-Spell checking is active by default, use the `--noSpellCheck` flag to skip spell checking.
+### Adding Dictionaries
 
-### Adding Additional Dictionaries
+English and Spanish dictionaries are included. To add another language:
 
-To add spell checking for other languages:
-
-1. Download the appropriate `.aff` and `.dic` files for your language from [here](https://github.com/wooorm/dictionaries/tree/main/dictionaries) or any compatible Hunspell dictionary source.
-2. Name the files using the language code (e.g., `es.aff` and `es.dic` for Spanish)
-3. Place both files in the `dictionaries` directory
-
-Example structure:
-
-```text
-resumint/
-├── dictionaries/
-│   ├── en.aff         # English (included)
-│   ├── en.dic         # English (included)
-│   ├── es.aff         # Spanish (added by user)
-│   └── es.dic         # Spanish (added by user)
-```
+1. Download the `.aff` and `.dic` files for your language from [wooorm/dictionaries](https://github.com/wooorm/dictionaries/tree/main/dictionaries)
+2. Name them using the language code (e.g. `fr.aff`, `fr.dic` for French)
+3. Place both files in `./dictionaries/`
 
 ### Custom Whitelist
 
-Add terms to prevent false positives:
+Add terms to suppress false positives:
 
-1. Create whitelist files:
-   - `whitelist.txt` - applies to all languages
-   - `whitelist-en.txt` - applies only to English documents
-   - `whitelist-es.txt` - applies only to Spanish documents
-2. Add one term per line (comments start with `#`)
-
-Example whitelist file:
+1. Create a text file in `./dictionaries/whitelist/`:
+   - `whitelist.txt` — applies to all languages
+   - `whitelist-en.txt` — English only
+   - `whitelist-es.txt` — Spanish only
+2. One term per line; lines starting with `#` are comments
 
 ```text
 # Technical terms
 TypeScript
 PostgreSQL
-Django
-Redis
-Kubernetes
 
-# Company names
-TechCorp
-WebSolutions
+# Brand names
+GitHub
+LinkedIn
 ```
 
 ## License
 
-This project is licensed under the [LICENSE](LICENSE).
+This project is licensed under the [MIT License](LICENSE).

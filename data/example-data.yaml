@@ -24,7 +24,7 @@ basic:
   profileImage: ../images/john-doe-profile-picture.png
 
 experience:
-  - company: Legacy Systems Memorial Hospital
+  - company: TheStartup (multi-billion)
     location:
       en: San Francisco, USA
       es: San Francisco, EE.UU.
@@ -41,34 +41,34 @@ experience:
             es: Presente
         techStack:
           - Go
-          - Python
+          - TypeScript
           - Kubernetes
           - Docker
           - PostgreSQL
           - Redis
           - Terraform
-          - Linux
-          - Bash
+          - OpenTelemetry
+          - AI copilots
           - YAML
         responsibilities:
           en:
-            - Successfully remained highly productive following organizational simplification and a sudden increase in "individual ownership."
-            - Absorbed responsibilities across infrastructure, backend, reliability, and technical leadership after the strategic elimination of several adjacent roles.
-            - Adapted to an AI-first development culture, including selective use of "vibe coding" for tasks previously considered engineering work.
-            - Maintained service reliability while operating in a team small enough to fit comfortably in a single Slack thread.
+            - Survived strategic organizational flattening, inheriting ownership of three services and half a platform.
+            - Practiced selective vibe coding to meet ambitious roadmap commitments after headcount optimization.
+            - Increased individual impact following transition to a "lean, founder-mode" engineering structure.
+            - Helped transform engineering velocity into measurable progress on the quarterly investor deck.
+            - Maintained production uptime despite architectural decisions made primarily for fundraising narratives.
             - Reduced operational incidents by 45% through improved observability, automated remediation, and fewer available humans.
-            - Designed scalable backend services handling high-throughput workloads across distributed environments.
-            - Removed over 120,000 lines of obsolete code, while quietly resisting similar optimization of headcount.
-            - Established engineering standards emphasizing simplicity, reliability, and sustainable skepticism toward productivity narratives.
+            - Removed over 120,000 lines of obsolete code while quietly resisting similar optimization of headcount.
+            - Established engineering standards emphasizing simplicity, reliability, and skepticism toward productivity theater.
           es:
-            - Mantuvo alta productividad tras una simplificación organizativa y un aumento repentino de la "responsabilidad individual."
-            - Absorbió responsabilidades de infraestructura, backend, fiabilidad y liderazgo técnico tras la eliminación estratégica de varios roles adyacentes.
-            - Se adaptó a una cultura de desarrollo AI-first, incluyendo el uso selectivo de "vibe coding" para tareas previamente consideradas trabajo de ingeniería.
-            - Mantuvo la fiabilidad del servicio operando en un equipo lo suficientemente pequeño como para caber cómodamente en un solo hilo de Slack.
+            - Sobrevivió al aplanamiento organizativo estratégico, heredando la responsabilidad de tres servicios y media plataforma.
+            - Practicó "vibe coding" selectivo para cumplir objetivos ambiciosos tras la optimización de plantilla.
+            - Incrementó su impacto individual tras la transición a una estructura de ingeniería más "lean" y orientada al fundador.
+            - Ayudó a convertir la velocidad de ingeniería en progreso medible para la presentación trimestral a inversores.
+            - Mantuvo la disponibilidad del sistema pese a decisiones arquitectónicas tomadas principalmente para narrativa de fundraising.
             - Redujo incidentes operativos en un 45% mediante mejor observabilidad, remediación automatizada y menos humanos disponibles.
-            - Diseñó servicios backend escalables para cargas de trabajo de alto volumen en entornos distribuidos.
-            - Eliminó más de 120.000 líneas de código obsoleto, mientras resistía silenciosamente una optimización similar de plantilla.
-            - Estableció estándares de ingeniería centrados en simplicidad, fiabilidad y escepticismo sostenible ante ciertas narrativas de productividad.
+            - Eliminó más de 120.000 líneas de código obsoleto mientras resistía discretamente una optimización similar de plantilla.
+            - Estableció estándares centrados en simplicidad, fiabilidad y escepticismo frente al teatro de productividad.
 
   - company: Acme Distributed Systems Inc.
     location:
@@ -145,41 +145,47 @@ experience:
             - Introdujo pruebas automatizadas y revisiones de código que mejoraron la calidad de entrega del equipo.
             - Aprendió que no hay nada más permanente que una solución temporal.
 
-  - company: Crunch Time Startups LLC
+  - company: Enterprise Solutions Global
     location:
-      en: Boston, USA
-      es: Boston, EE.UU.
+      en: Remote
+      es: Remoto
     positions:
       - position:
-          en: Founding Engineer
-          es: Ingeniero Fundador
+          en: Software Engineering Intern
+          es: Becario de Ingeniería de Software
         date:
           start:
-            en: Jun 2016
-            es: Jun 2016
+            en: Jun 2015
+            es: Jun 2015
           end:
-            en: Jun 2017
-            es: Jun 2017
+            en: Aug 2015
+            es: Ago 2015
         techStack:
-          - Python
-          - React
-          - Firebase
-          - Docker
+          - Java
+          - Spring
+          - Oracle SQL
+          - XML
+          - Jenkins
           - Linux
-          - Sentry
+          - Vim
+          - Stack Overflow
         responsibilities:
           en:
-            - Built and shipped initial product prototypes from concept to production under aggressive delivery timelines.
-            - Owned full-stack architecture, infrastructure, deployment, and incident response.
-            - Implemented authentication, billing, and analytics systems foundational to early customer growth.
-            - Performed emergency production fixes directly over SSH, which remains memorable for all involved.
-            - Wrote comprehensive technical documentation despite overwhelming historical evidence that nobody reads it.
+            - Changed a single line in production and triggered a deployment approval process involving seven stakeholders.
+            - Learned that "enterprise-grade" usually means "too critical to rewrite."
+            - Closed 47 browser tabs while debugging, only to discover the answer was in the first one.
+            - Added logging statements that remained the primary observability platform for several years.
+            - Asked whether the monolith could be split into services and was politely advised not to.
+            - Accidentally fixed a decade-old bug while renaming a variable.
+            - Began a lifelong habit of saying "this should be simple" before losing an entire afternoon.
           es:
-            - Construyó y lanzó prototipos iniciales desde concepto hasta producción bajo plazos agresivos.
-            - Gestionó arquitectura full-stack, infraestructura, despliegues y respuesta a incidentes.
-            - Implementó sistemas de autenticación, facturación y analítica esenciales para el crecimiento inicial.
-            - Realizó correcciones urgentes en producción vía SSH, algo que sigue siendo memorable para todos los involucrados.
-            - Escribió documentación técnica exhaustiva pese a la evidencia histórica de que pocos la leen.
+            - Cambió una sola línea en producción y activó un proceso de aprobación con siete responsables.
+            - Aprendió que "enterprise-grade" suele significar "demasiado crítico para reescribir."
+            - Cerró 47 pestañas del navegador depurando, solo para descubrir que la respuesta estaba en la primera.
+            - Añadió logs que permanecieron como principal plataforma de observabilidad durante varios años.
+            - Preguntó si el monolito podía dividirse en servicios y recibió una recomendación amable de no hacerlo.
+            - Arregló accidentalmente un bug de una década al renombrar una variable.
+            - Comenzó el hábito de decir "esto debería ser sencillo" antes de perder toda una tarde.
 
 education:
   - institution:
