@@ -65,3 +65,4 @@ dictionaries/*
 !dictionaries/whitelist
 
 .claude/
+AGENTS.md

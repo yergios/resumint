@@ -16,6 +16,9 @@ cd resumint
 # Install dependencies
 npm install
 
+# Build TypeScript source
+npm run build
+
 # If you have chrome installed you may skip this step
 npx puppeteer browsers install chrome
 
@@ -66,7 +69,7 @@ npm start --template fancy
 npm start --html --output ./my-resumes
 
 # Generate resumes skipping spell checking
-npm start -d ./my-data.json --noSpellChecking
+npm start -d ./my-data.json --noSpellCheck
 ```
 
 ## Data Structure
