@@ -3,8 +3,8 @@ import { readdir } from "node:fs/promises";
 import { join } from "node:path";
 // @ts-expect-error - nspell has no type definitions
 import nspell from "nspell";
-import type { Logger } from "./models/logger.js";
-import { getErrorMessage } from "./utils.js";
+import type { Logger } from "../logging/types.js";
+import { getErrorMessage } from "../utils.js";
 
 const DICTIONARIES_DIR = "workspace/dictionaries";
 const MAX_SUGGESTIONS = 5;

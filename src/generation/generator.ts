@@ -10,14 +10,14 @@ import Handlebars from "handlebars";
 import { load as yamlLoad } from "js-yaml";
 import { type Browser, launch, type Page } from "puppeteer";
 import { ICON_SVGS } from "./icons.js";
-import { createLogger } from "./logger.js";
+import { createLogger } from "../logging/logger.js";
 import type {
     CommandLineArgs,
     GenerationResult,
     ResumeMetadata
-} from "./models/generator.js";
-import { spellCheckHtml } from "./spell-checker.js";
-import { getCurrentDate, getErrorMessage } from "./utils.js";
+} from "./types.js";
+import { spellCheckHtml } from "../spell-check/spell-checker.js";
+import { getCurrentDate, getErrorMessage } from "../utils.js";
 
 // A4 at 96 DPI is ~1123px; 1200 gives headroom for subpixel rounding and browser zoom
 const A4_HEIGHT_PX = 1200;

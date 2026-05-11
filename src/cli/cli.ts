@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs/yargs";
-import type { CommandLineArgs } from "./models/generator.js";
+import type { CommandLineArgs } from "../generation/types.js";
 
 const parseArguments = async (): Promise<CommandLineArgs> => {
     const argv = await yargs(hideBin(process.argv))

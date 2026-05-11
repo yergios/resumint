@@ -1,4 +1,4 @@
-import type { LogEntry, Logger, LogLevel } from "./models/logger.js";
+import type { LogEntry, Logger, LogLevel } from "./types.js";
 
 export function createLogger(verbose: boolean): Logger {
     const entries: LogEntry[] = [];

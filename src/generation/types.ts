@@ -1,4 +1,4 @@
-import type { Logger } from "./logger.js";
+import type { Logger } from "../logging/types.js";
 
 export interface ResumeMetadata {
     languages?: string[];
