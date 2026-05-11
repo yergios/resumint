@@ -1,50 +1,46 @@
 {
-  "name": "resumint",
-  "version": "1.0.0",
-  "description": "Generate multilingual resumes from JSON data",
-  "main": "./src/main.ts",
-  "type": "module",
-  "bin": {
-    "resumint": "./dist/main.js"
-  },
-  "scripts": {
-    "start": "node ./dist/main.js",
-    "build": "tsc",
-    "demo": "node ./dist/main.js --data ./data/example-data.yaml --html",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier --check .",
-    "format:fix": "prettier --write .",
-    "style": "eslint . --fix && prettier --write ."
-  },
-  "keywords": [
-    "resume",
-    "cv",
-    "generator",
-    "pdf",
-    "multilingual"
-  ],
-  "author": "Sergio Y. Lee",
-  "license": "MIT",
-  "packageManager": "pnpm@10.29.3",
-  "dependencies": {
-    "handlebars": "4.7.9",
-    "nspell": "2.1.5",
-    "puppeteer": "24.40.0",
-    "yargs": "17.7.2"
-  },
-  "devDependencies": {
-    "@types/js-yaml": "4.0.9",
-    "@types/yargs": "17.0.35",
-    "@typescript-eslint/eslint-plugin": "6.21.0",
-    "@typescript-eslint/parser": "6.21.0",
-    "eslint": "8.44.0",
-    "eslint-config-prettier": "10.1.5",
-    "js-yaml": "4.1.1",
-    "prettier": "3.0.3",
-    "typescript": "5.9.2"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  }
+    "name": "resumint",
+    "version": "1.0.0",
+    "description": "Generate multilingual resumes from JSON data",
+    "main": "./src/main.ts",
+    "type": "module",
+    "bin": {
+        "resumint": "./dist/main.js"
+    },
+    "scripts": {
+        "start": "node ./dist/main.js",
+        "build": "tsc",
+        "demo": "node ./dist/main.js --data ./data/example-data.yaml --html",
+        "lint": "biome lint .",
+        "lint:fix": "biome lint --write .",
+        "format": "biome format .",
+        "format:fix": "biome format --write .",
+        "style": "biome check --write ."
+    },
+    "keywords": [
+        "resume",
+        "cv",
+        "generator",
+        "pdf",
+        "multilingual"
+    ],
+    "author": "Sergio Y. Lee",
+    "license": "MIT",
+    "packageManager": "pnpm@10.29.3",
+    "dependencies": {
+        "handlebars": "4.7.9",
+        "nspell": "2.1.5",
+        "puppeteer": "24.40.0",
+        "yargs": "17.7.2"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "2.4.15",
+        "@types/js-yaml": "4.0.9",
+        "@types/yargs": "17.0.35",
+        "js-yaml": "4.1.1",
+        "typescript": "5.9.2"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
 }
