@@ -6,11 +6,13 @@ yarn-error.log
 yarn.lock
 package-lock.json
 
-# Output
+# Build output
 dist/
 build/
-output/
 types/
+
+# Generated resumes
+resumes/
 *.pdf
 
 # Environment
@@ -52,19 +54,16 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 
-personal-data.json
-personal-data.yaml
-resume-data.yaml
-images/personal-profile-picture.*
-dictionaries/whitelist/personal-whitelist.txt
+# Personal data files (keep example files, ignore personal ones)
+workspace/content/resume.yaml
+workspace/assets/images/personal-profile-picture.*
 
-# Ignore everything in dictionaries directory
-dictionaries/*
-
-# But keep these specific files
-!dictionaries/en.aff
-!dictionaries/en.dic
-!dictionaries/whitelist
+# Dictionaries: ignore everything, then allow example/shared files
+workspace/dictionaries/*
+!workspace/dictionaries/en.aff
+!workspace/dictionaries/en.dic
+!workspace/dictionaries/whitelist-en.txt
+!workspace/dictionaries/whitelist-es.txt
 
 .claude/
 AGENTS.md

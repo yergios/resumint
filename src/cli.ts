@@ -32,7 +32,7 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
             alias: "o",
             describe: "Output directory for the generated files",
             type: "string",
-            default: "./output"
+            default: "./resumes"
         })
         .option("html", {
             describe: "Save HTML files along with PDFs",
@@ -47,7 +47,7 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
         .option("templatesDir", {
             describe: "Directory containing templates",
             type: "string",
-            default: "./templates"
+            default: "./workspace/templates"
         })
         .option("noSpellCheck", {
             describe: "Skip spell checking",
@@ -61,19 +61,19 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
             default: false
         })
         .example(
-            "$0 example-data.yaml",
-            "Generate resumes from ./data/example-data.yaml"
+            "$0 example.yaml",
+            "Generate resumes from ./workspace/content/example.yaml"
         )
         .example(
-            "$0 example-data.yaml --language en",
+            "$0 example.yaml --language en",
             "Generate resume only for English"
         )
         .example(
-            "$0 example-data.yaml --template fancy",
+            "$0 example.yaml --template fancy",
             "Use the fancy-template.html template"
         )
         .example(
-            "$0 example-data.yaml --html --output ./my-resumes",
+            "$0 example.yaml --html --output ./my-resumes",
             "Save both HTML and PDF to custom directory"
         )
         .example(
@@ -90,14 +90,14 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
         ? /\.(yaml|yml|json)$/i.test(positionalFile)
             ? positionalFile
             : `${positionalFile}.yaml`
-        : "resume-data.yaml";
-    const data = argv.data ?? join("./data", resolvedFile);
+        : "resume.yaml";
+    const data = argv.data ?? join("./workspace/content", resolvedFile);
 
     return {
         data,
         template: argv.template,
-        templatesDir: argv.templatesDir ?? "./templates",
-        output: argv.output ?? "./output",
+        templatesDir: argv.templatesDir ?? "./workspace/templates",
+        output: argv.output ?? "./resumes",
         language: argv.language,
         name: argv.name,
         html: argv.html ?? false,

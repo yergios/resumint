@@ -77,7 +77,7 @@ async function generatePDF(
     if (contentHeight > A4_HEIGHT_PX) {
         generationResult.success = false;
         logger.error(
-            `Content height exceeds A4 maximum (${contentHeight}px exceeds ${A4_HEIGHT_PX}px)`
+            `Content height exceeds A4 maximum (${contentHeight}px > ${A4_HEIGHT_PX}px)`
         );
         return;
     }
@@ -229,11 +229,14 @@ export async function generateResumes(options: CommandLineArgs) {
         const currentDate = getCurrentDate();
         const template = Handlebars.compile(readFileSync(templatePath, "utf8"));
         const dataFileName = basename(options.data, extname(options.data));
+        const templatesAbsPath = resolve(process.cwd(), options.templatesDir);
+        const baseTag = `<base href="file://${templatesAbsPath}/">`;
         const totalStart = performance.now();
 
         await Promise.all(
             languages.map((language) => {
                 const logger = createLogger(options.verbose);
+                const rawHtml = template({ ...resumeData, language });
                 const generationResult: GenerationResult = {
                     language,
                     templateName,
@@ -243,7 +246,7 @@ export async function generateResumes(options: CommandLineArgs) {
                         language,
                         options.name ?? dataFileName
                     ),
-                    html: template({ ...resumeData, language }),
+                    html: rawHtml.replace("<head>", `<head>\n    ${baseTag}`),
                     success: true,
                     logger
                 };

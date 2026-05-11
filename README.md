@@ -29,6 +29,23 @@ npx puppeteer browsers install chrome
 npm link --global
 ```
 
+## Workspace layout
+
+All user-facing files live under `workspace/`. Everything else is implementation.
+
+```
+workspace/
+├── content/       ← your YAML/JSON data files
+├── styles/        ← CSS for templates
+├── templates/     ← Handlebars HTML templates
+├── assets/
+│   ├── fonts/     ← vendored woff2 font files
+│   └── images/    ← profile photos and other images
+└── dictionaries/  ← spell-check dictionaries and whitelists
+```
+
+Generated PDFs and HTML go to `./resumes/` at the project root.
+
 ## Usage
 
 ```bash
@@ -40,7 +57,7 @@ npm start [file] [options]
 
 ### Arguments
 
-- `file`: Data file name to look up in `./data/` (e.g. `example-data.yaml`). Accepts YAML or JSON. If you omit the extension it will default yo `.yaml`. You may also omit the file name entirely to use `resume-data.yaml`. Overridden by `--data`.
+- `file`: Data file name to look up in `./workspace/content/` (e.g. `example.yaml`). Accepts YAML or JSON. Omit the extension to default to `.yaml`. Omit entirely to use `resume.yaml`. Overridden by `--data`.
 
 ### Options
 
@@ -50,54 +67,54 @@ npm start [file] [options]
 | `--language`     | `-l`  | Generate for a specific language only                              | all languages in file           |
 | `--name`         | `-n`  | Output filename stem (e.g. `john-doe` → `2026-05-11-en-john-doe.pdf`) | data filename            |
 | `--template`     | `-t`  | Template name to use                                               | from file metadata or `default` |
-| `--output`       | `-o`  | Output directory                                                   | `./output`                      |
+| `--output`       | `-o`  | Output directory                                                   | `./resumes`                     |
 | `--html`         |       | Save HTML alongside PDFs                                           | `false`                         |
 | `--htmlOnly`     |       | Generate HTML only, no PDFs                                        | `false`                         |
-| `--templatesDir` |       | Directory containing templates                                     | `./templates`                   |
+| `--templatesDir` |       | Directory containing templates                                     | `./workspace/templates`         |
 | `--noSpellCheck` |       | Skip spell checking                                                | `false`                         |
 | `--verbose`      | `-V`  | Print detailed logs and timing information                         | `false`                         |
 
 ### Examples
 
 ```bash
-# Generate from a file in ./data/
-resumint example-data.yaml
+# Generate from a file in ./workspace/content/
+resumint example.yaml
 
 # English only
-resumint example-data.yaml --language en
+resumint example.yaml --language en
 
 # Custom template
-resumint example-data.yaml --template fancy
+resumint example.yaml --template fancy
 
 # Save both HTML and PDF
-resumint example-data.yaml --html --output ./my-resumes
+resumint example.yaml --html --output ./my-resumes
 
-# File outside ./data/
+# File outside workspace/content/
 resumint --data ./path/to/resume.yaml
 
 # Skip spell checking
-resumint example-data.yaml --noSpellCheck
+resumint example.yaml --noSpellCheck
 
 # Custom output filename stem
-resumint example-data.yaml --name john-doe
+resumint example.yaml --name john-doe
 
 # Verbose output with timings
-resumint example-data.yaml --verbose
+resumint example.yaml --verbose
 ```
 
 ## Data File
 
-ResuMint accepts YAML or JSON. YAML is recommended — it's less noisy for deeply nested, multilingual data. See [`data/example-data.yaml`](data/example-data.yaml) for a complete example.
+ResuMint accepts YAML or JSON. YAML is recommended — it's less noisy for deeply nested, multilingual data. See [`workspace/content/example.yaml`](workspace/content/example.yaml) for a complete example.
 
 Localized fields accept any language code that matches an entry in `languages`. Contact items are displayed in the order they appear in the file.
 
 ## Templates
 
-Templates are Handlebars HTML files in `./templates/`, named `[name]-template.html`. The default template is `default-template.html`.
+Templates are Handlebars HTML files in `./workspace/templates/`, named `[name]-template.html`. The default template is `default-template.html`.
 
 To create a custom template:
 
-1. Copy `templates/default-template.html` to `templates/[name]-template.html`
+1. Copy `workspace/templates/default-template.html` to `workspace/templates/[name]-template.html`
 2. Edit the markup and styles as needed
 3. Set `metadata.template: [name]` in your data file, or pass `--template [name]`
 
@@ -112,7 +129,7 @@ Available Handlebars helpers:
 
 ## Vendoring Fonts
 
-Fonts are vendored locally in `./fonts/` and declared in `css/styles.css` via `@font-face`. This avoids network requests during PDF generation.
+Fonts are vendored locally in `./workspace/assets/fonts/` and declared in `workspace/styles/styles.css` via `@font-face`. This avoids network requests during PDF generation.
 
 To replace or add a font:
 
@@ -120,18 +137,18 @@ To replace or add a font:
 
    ```bash
    # Example: download Inter 400 via jsDelivr
-   curl -o fonts/inter-400.woff2 \
+   curl -o workspace/assets/fonts/inter-400.woff2 \
      "https://cdn.jsdelivr.net/npm/@fontsource/inter@5.1.1/files/inter-latin-400-normal.woff2"
    ```
 
-2. Add a `@font-face` rule in `css/styles.css`:
+2. Add a `@font-face` rule in `workspace/styles/styles.css`:
 
    ```css
    @font-face {
      font-family: "Inter";
      font-style: normal;
      font-weight: 400;
-     src: url("../fonts/inter-400.woff2") format("woff2");
+     src: url("../assets/fonts/inter-400.woff2") format("woff2");
    }
    ```
 
@@ -187,17 +204,17 @@ English and Spanish dictionaries are included. To add another language:
 
 1. Download the `.aff` and `.dic` files for your language from [wooorm/dictionaries](https://github.com/wooorm/dictionaries/tree/main/dictionaries)
 2. Name them using the language code (e.g. `fr.aff`, `fr.dic` for French)
-3. Place both files in `./dictionaries/`
+3. Place both files in `./workspace/dictionaries/`
 
 ### Custom Whitelist
 
-Add terms to suppress false positives:
+Add terms to suppress false positives. Place text files directly in `./workspace/dictionaries/`:
 
-1. Create a text file in `./dictionaries/whitelist/`:
-   - `whitelist.txt` — applies to all languages
-   - `whitelist-en.txt` — English only
-   - `whitelist-es.txt` — Spanish only
-2. One term per line; lines starting with `#` are comments
+- `whitelist.txt` — applies to all languages
+- `whitelist-en.txt` — English only
+- `whitelist-es.txt` — Spanish only
+
+One term per line; lines starting with `#` are comments.
 
 ```text
 # Technical terms

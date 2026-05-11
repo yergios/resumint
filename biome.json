@@ -48,9 +48,9 @@
             "!dist",
             "!types",
             "!node_modules",
-            "!output",
+            "!resumes",
             "!pnpm-lock.yaml",
-            "!templates"
+            "!workspace/templates"
         ]
     }
 }

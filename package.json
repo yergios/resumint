@@ -10,7 +10,7 @@
     "scripts": {
         "start": "node ./dist/main.js",
         "build": "tsc",
-        "demo": "node ./dist/main.js --data ./data/example-data.yaml --html",
+        "demo": "node ./dist/main.js --data ./workspace/content/example.yaml --html",
         "lint": "biome lint .",
         "lint:fix": "biome lint --write .",
         "format": "biome format .",

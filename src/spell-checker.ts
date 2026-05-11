@@ -6,8 +6,7 @@ import nspell from "nspell";
 import type { Logger } from "./models/logger.js";
 import { getErrorMessage } from "./utils.js";
 
-const DICTIONARIES_DIR = "dictionaries";
-const WHITELIST_DIR = "whitelist";
+const DICTIONARIES_DIR = "workspace/dictionaries";
 const MAX_SUGGESTIONS = 5;
 
 interface SpellInstance {
@@ -36,7 +35,7 @@ async function addWhitelistedTerms(
     language: string,
     logger?: Logger
 ): Promise<void> {
-    const whitelistDir = join(process.cwd(), DICTIONARIES_DIR, WHITELIST_DIR);
+    const whitelistDir = join(process.cwd(), DICTIONARIES_DIR);
     if (!existsSync(whitelistDir)) return;
 
     try {
