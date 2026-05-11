@@ -1,8 +1,10 @@
 # ResuMint
 
-A refreshing tool for developers who maintain multilingual resumes.
+A refreshing tool for web developers who maintain multilingual resumes. It uses exactly what you already know. No need to learn yet another syntax.
 
-Stop fighting clunky Word docs, endless formatting battles, and sneaky typos. If you don't know Adobe and won't touch Canva, ResuMint takes your structured data (YAML or JSON), applies your HTML/CSS templates, and outputs multilingual PDF resumes — all with a single command. It even spell-checks your content before generating.
+No more clunky Word docs, figuring out Canva nor need to learn Adobe. Just write your content in a YAML or JSON file and get your PDF resumes generated. ResuMint may even check out spelling for you.
+
+For those who may want further customization and pixel-perfect control, you can create your own HTML templates and style them with CSS.
 
 ## Prerequisites
 
@@ -61,18 +63,18 @@ npm start [file] [options]
 
 ### Options
 
-| Flag             | Alias | Description                                                        | Default                         |
-| ---------------- | ----- | ------------------------------------------------------------------ | ------------------------------- |
-| `--data`         | `-d`  | Explicit path to a YAML or JSON file (overrides positional `file`) | —                               |
-| `--language`     | `-l`  | Generate for a specific language only                              | all languages in file           |
-| `--name`         | `-n`  | Output filename stem (e.g. `john-doe` → `2026-05-11-en-john-doe.pdf`) | data filename            |
-| `--template`     | `-t`  | Template name to use                                               | from file metadata or `default` |
-| `--output`       | `-o`  | Output directory                                                   | `./resumes`                     |
-| `--html`         |       | Save HTML alongside PDFs                                           | `false`                         |
-| `--htmlOnly`     |       | Generate HTML only, no PDFs                                        | `false`                         |
-| `--templatesDir` |       | Directory containing templates                                     | `./workspace/templates`         |
-| `--noSpellCheck` |       | Skip spell checking                                                | `false`                         |
-| `--verbose`      | `-V`  | Print detailed logs and timing information                         | `false`                         |
+| Flag             | Alias | Description                                                           | Default                         |
+| ---------------- | ----- | --------------------------------------------------------------------- | ------------------------------- |
+| `--data`         | `-d`  | Explicit path to a YAML or JSON file (overrides positional `file`)    | —                               |
+| `--language`     | `-l`  | Generate for a specific language only                                 | all languages in file           |
+| `--name`         | `-n`  | Output filename stem (e.g. `john-doe` → `2026-05-11-en-john-doe.pdf`) | data filename                   |
+| `--template`     | `-t`  | Template name to use                                                  | from file metadata or `default` |
+| `--output`       | `-o`  | Output directory                                                      | `./resumes`                     |
+| `--html`         |       | Save HTML alongside PDFs                                              | `false`                         |
+| `--htmlOnly`     |       | Generate HTML only, no PDFs                                           | `false`                         |
+| `--templatesDir` |       | Directory containing templates                                        | `./workspace/templates`         |
+| `--noSpellCheck` |       | Skip spell checking                                                   | `false`                         |
+| `--verbose`      | `-V`  | Print detailed logs and timing information                            | `false`                         |
 
 ### Examples
 
@@ -178,7 +180,7 @@ To add a new icon type:
    ```typescript
    export const ICON_SVGS: Record<string, string> = {
      // existing icons...
-     heart: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">...</svg>`
+     heart: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">...</svg>`,
    };
    ```
 
