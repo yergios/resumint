@@ -70,7 +70,7 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
         )
         .example(
             "$0 example.yaml --template fancy",
-            "Use the fancy-template.html template"
+            "Use the fancy.html template"
         )
         .example(
             "$0 example.yaml --html --output ./my-resumes",

@@ -205,7 +205,7 @@ export async function generateResumes(options: CommandLineArgs) {
         const templatePath = resolve(
             process.cwd(),
             options.templatesDir,
-            `${templateName}-template.html`
+            `${templateName}.html`
         );
 
         if (!existsSync(templatePath)) {

@@ -112,11 +112,11 @@ Localized fields accept any language code that matches an entry in `languages`. 
 
 ## Templates
 
-Templates are Handlebars HTML files in `./workspace/templates/`, named `[name]-template.html`. The default template is `default-template.html`.
+Templates are Handlebars HTML files in `./workspace/templates/`, named `[name].html`. The default template is `default.html`.
 
 To create a custom template:
 
-1. Copy `workspace/templates/default-template.html` to `workspace/templates/[name]-template.html`
+1. Copy `workspace/templates/default.html` to `workspace/templates/[name].html`
 2. Edit the markup and styles as needed
 3. Set `metadata.template: [name]` in your data file, or pass `--template [name]`
 
