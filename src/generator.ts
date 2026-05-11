@@ -228,7 +228,7 @@ export async function generateResumes(options: CommandLineArgs) {
 
         const currentDate = getCurrentDate();
         const template = Handlebars.compile(readFileSync(templatePath, "utf8"));
-        const dataBaseName = basename(options.data, extname(options.data));
+        const dataFileName = basename(options.data, extname(options.data));
         const totalStart = performance.now();
 
         await Promise.all(
@@ -241,7 +241,7 @@ export async function generateResumes(options: CommandLineArgs) {
                     baseFileName: generateBaseFileName(
                         currentDate,
                         language,
-                        dataBaseName
+                        options.name ?? dataFileName
                     ),
                     html: template({ ...resumeData, language }),
                     success: true,

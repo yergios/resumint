@@ -11,6 +11,7 @@ export interface CommandLineArgs {
     templatesDir: string;
     output: string;
     language: string | undefined;
+    name: string | undefined;
     html: boolean;
     htmlOnly: boolean;
     noSpellCheck: boolean;

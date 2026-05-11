@@ -22,6 +22,12 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
             describe: "Generate resume for specific language only",
             type: "string"
         })
+        .option("name", {
+            alias: "n",
+            describe:
+                "Output filename stem (e.g. john-doe → 2026-05-11-en-john-doe.pdf)",
+            type: "string"
+        })
         .option("output", {
             alias: "o",
             describe: "Output directory for the generated files",
@@ -93,6 +99,7 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
         templatesDir: argv.templatesDir ?? "./templates",
         output: argv.output ?? "./output",
         language: argv.language,
+        name: argv.name,
         html: argv.html ?? false,
         htmlOnly: argv.htmlOnly ?? false,
         noSpellCheck: argv.noSpellCheck ?? false,

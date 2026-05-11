@@ -20,7 +20,7 @@ cd resumint
 npm install
 
 # Build TypeScript source
-npm build
+npm run build
 
 # Install a headless browser (skip if Chrome is already installed)
 npx puppeteer browsers install chrome
@@ -48,19 +48,18 @@ npm start [file] [options]
 | ---------------- | ----- | ------------------------------------------------------------------ | ------------------------------- |
 | `--data`         | `-d`  | Explicit path to a YAML or JSON file (overrides positional `file`) | —                               |
 | `--language`     | `-l`  | Generate for a specific language only                              | all languages in file           |
+| `--name`         | `-n`  | Output filename stem (e.g. `john-doe` → `2026-05-11-en-john-doe.pdf`) | data filename            |
 | `--template`     | `-t`  | Template name to use                                               | from file metadata or `default` |
 | `--output`       | `-o`  | Output directory                                                   | `./output`                      |
 | `--html`         |       | Save HTML alongside PDFs                                           | `false`                         |
 | `--htmlOnly`     |       | Generate HTML only, no PDFs                                        | `false`                         |
 | `--templatesDir` |       | Directory containing templates                                     | `./templates`                   |
 | `--noSpellCheck` |       | Skip spell checking                                                | `false`                         |
+| `--verbose`      | `-V`  | Print detailed logs and timing information                         | `false`                         |
 
 ### Examples
 
 ```bash
-# Try the demo
-npm demo
-
 # Generate from a file in ./data/
 resumint example-data.yaml
 
@@ -78,13 +77,19 @@ resumint --data ./path/to/resume.yaml
 
 # Skip spell checking
 resumint example-data.yaml --noSpellCheck
+
+# Custom output filename stem
+resumint example-data.yaml --name john-doe
+
+# Verbose output with timings
+resumint example-data.yaml --verbose
 ```
 
 ## Data File
 
 ResuMint accepts YAML or JSON. YAML is recommended — it's less noisy for deeply nested, multilingual data. See [`data/example-data.yaml`](data/example-data.yaml) for a complete example.
 
-Localized fields accept any language code that matches an entry in `languages`. Contact info is displayed in a fixed opinionated order (email → web → phone → github → location → linkedin) regardless of the order in the file.
+Localized fields accept any language code that matches an entry in `languages`. Contact items are displayed in the order they appear in the file.
 
 ## Templates
 
@@ -141,7 +146,7 @@ Only download the weights you actually use. ResuMint currently uses **400** (bod
 
 ## Vendoring Icons
 
-Icons are inline SVGs rendered by the `getIconSvg` Handlebars helper, defined in `src/generator.ts`. No external scripts or CDN requests are needed.
+Icons are inline SVGs rendered by the `getIconSvg` Handlebars helper, defined in `src/icons.ts`. No external scripts or CDN requests are needed.
 
 To add a new icon type:
 
@@ -151,10 +156,10 @@ To add a new icon type:
    curl -s "https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/svg/heart-outline.svg"
    ```
 
-2. Add an entry to the `ICON_SVGS` record in `src/generator.ts`:
+2. Add an entry to the `ICON_SVGS` record in `src/icons.ts`:
 
    ```typescript
-   const ICON_SVGS: Record<string, string> = {
+   export const ICON_SVGS: Record<string, string> = {
      // existing icons...
      heart: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">...</svg>`
    };
@@ -168,7 +173,7 @@ To add a new icon type:
        value: some value
    ```
 
-4. Rebuild: `npm build`
+4. Rebuild: `npm run build`
 
 The SVG inherits `color: currentColor` from the `.contact-item svg` CSS rule, so it matches the surrounding text color automatically.
 
