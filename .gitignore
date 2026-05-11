@@ -9,7 +9,6 @@ package-lock.json
 # Build output
 dist/
 build/
-types/
 
 # Generated resumes
 resumes/
