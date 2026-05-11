@@ -9,18 +9,16 @@ import { basename, extname, join, resolve } from "node:path";
 import Handlebars from "handlebars";
 import { load as yamlLoad } from "js-yaml";
 import { type Browser, launch, type Page } from "puppeteer";
-import { ICON_SVGS } from "./icons.js";
 import { createLogger } from "../logging/logger.js";
+import { spellCheckHtml } from "../spell-check/spell-checker.js";
+import { getCurrentDate, getErrorMessage } from "../utils.js";
+import { renderHtml, setupHandlebars } from "./html.js";
+import { generatePDF } from "./pdf.js";
 import type {
     CommandLineArgs,
     GenerationResult,
     ResumeMetadata
 } from "./types.js";
-import { spellCheckHtml } from "../spell-check/spell-checker.js";
-import { getCurrentDate, getErrorMessage } from "../utils.js";
-
-// A4 at 96 DPI is ~1123px; 1200 gives headroom for subpixel rounding and browser zoom
-const A4_HEIGHT_PX = 1200;
 
 function generateBaseFileName(
     date: string,
@@ -31,69 +29,6 @@ function generateBaseFileName(
         .toLowerCase()
         .replace(/\s+/g, "-")
         .replace(/[^a-z0-9-]/g, "")}`;
-}
-
-function setupHandlebars(): void {
-    Handlebars.registerHelper("eq", (a, b) => a === b);
-    Handlebars.registerHelper("join", (array, separator) =>
-        array.join(separator)
-    );
-    Handlebars.registerHelper("getIconSvg", (type: string) => {
-        return new Handlebars.SafeString(ICON_SVGS[type] ?? "");
-    });
-    Handlebars.registerHelper("lookup", (obj, field, subfield) => {
-        if (!obj || !field) return "";
-        if (typeof subfield === "string") return obj[field][subfield];
-        return obj[field] !== undefined ? obj[field] : obj;
-    });
-}
-
-async function generatePDF(
-    page: Page,
-    htmlPath: string,
-    outputPath: string,
-    generationResult: GenerationResult
-) {
-    const { logger } = generationResult;
-    const absoluteHtmlPath = `file://${resolve(htmlPath)}`;
-    await page.emulateMediaType("print");
-    await page.goto(absoluteHtmlPath, { waitUntil: "networkidle0" });
-
-    const { contentHeight, containerFound } = await page.evaluate(() => {
-        const container = document.querySelector(".resume-container");
-        if (!container) {
-            return {
-                contentHeight: document.body.scrollHeight,
-                containerFound: false
-            };
-        }
-        return { contentHeight: container.scrollHeight, containerFound: true };
-    });
-
-    if (!containerFound) {
-        logger.warn("Resume container not found, using body height");
-    }
-
-    if (contentHeight > A4_HEIGHT_PX) {
-        generationResult.success = false;
-        logger.error(
-            `Content height exceeds A4 maximum (${contentHeight}px > ${A4_HEIGHT_PX}px)`
-        );
-        return;
-    }
-
-    const t = performance.now();
-    await page.pdf({
-        path: outputPath,
-        format: "A4",
-        printBackground: true,
-        margin: { top: "0", right: "0", bottom: "0", left: "0" }
-    });
-    logger.perf(
-        `PDF render (${generationResult.language})`,
-        performance.now() - t
-    );
-    logger.info(`PDF generated: ${outputPath}`);
 }
 
 async function runSpellCheck(
@@ -230,13 +165,11 @@ export async function generateResumes(options: CommandLineArgs) {
         const template = Handlebars.compile(readFileSync(templatePath, "utf8"));
         const dataFileName = basename(options.data, extname(options.data));
         const templatesAbsPath = resolve(process.cwd(), options.templatesDir);
-        const baseTag = `<base href="file://${templatesAbsPath}/">`;
         const totalStart = performance.now();
 
         await Promise.all(
             languages.map((language) => {
                 const logger = createLogger(options.verbose);
-                const rawHtml = template({ ...resumeData, language });
                 const generationResult: GenerationResult = {
                     language,
                     templateName,
@@ -246,7 +179,12 @@ export async function generateResumes(options: CommandLineArgs) {
                         language,
                         options.name ?? dataFileName
                     ),
-                    html: rawHtml.replace("<head>", `<head>\n    ${baseTag}`),
+                    html: renderHtml(
+                        template,
+                        resumeData,
+                        language,
+                        templatesAbsPath
+                    ),
                     success: true,
                     logger
                 };
