@@ -107,6 +107,7 @@ async function generatePDF(
     verbose: boolean
 ) {
     const absoluteHtmlPath = `file://${resolve(htmlPath)}`;
+    await page.emulateMediaType("print");
     await page.goto(absoluteHtmlPath, { waitUntil: "networkidle0" });
 
     const { contentHeight, containerFound } = await page.evaluate(() => {
@@ -142,6 +143,7 @@ async function generatePDF(
     await page.pdf({
         path: outputPath,
         format: "A4",
+        printBackground: true,
         margin: { top: "0", right: "0", bottom: "0", left: "0" }
     });
     logPerf(

@@ -45,19 +45,6 @@
     margin: 0;
 }
 
-@media print {
-    body {
-        margin: 0;
-        padding: 0;
-        background: var(--background-color);
-    }
-
-    .resume-container {
-        background: var(--background-color);
-        box-shadow: none;
-    }
-}
-
 body {
     font-family: var(--font-main);
     font-size: 12px;
@@ -258,4 +245,17 @@ section {
 
 .education .item:not(:last-child) {
     margin-bottom: 3px;
+}
+
+@media print {
+    body {
+        margin: 0;
+        padding: 0;
+        background: var(--background-color);
+    }
+
+    .resume-container {
+        background: var(--background-color);
+        box-shadow: none;
+    }
 }
