@@ -5,52 +5,21 @@ import {
     unlinkSync,
     writeFileSync
 } from "node:fs";
-import { join, resolve } from "node:path";
+import { basename, extname, join, resolve } from "node:path";
 import Handlebars from "handlebars";
 import { load as yamlLoad } from "js-yaml";
 import { type Browser, launch, type Page } from "puppeteer";
+import { createLogger } from "./logger.js";
 import type {
     CommandLineArgs,
-    ContactInfo,
     GenerationResult,
-    LogEntry,
-    LogLevel,
-    ResumeData
+    ResumeMetadata
 } from "./models/generator.js";
 import { spellCheckHtml } from "./spell-checker.js";
 import { getCurrentDate, getErrorMessage } from "./utils.js";
 
 // A4 at 96 DPI is ~1123px; 1200 gives headroom for subpixel rounding and browser zoom
 const A4_HEIGHT_PX = 1200;
-
-const CONTACT_ORDER = [
-    "email",
-    "web",
-    "phone",
-    "github",
-    "location",
-    "linkedin"
-];
-
-function createLogEntry(level: LogLevel, message: string): LogEntry {
-    return { level, message, timestamp: new Date() };
-}
-
-function log(
-    generationResult: GenerationResult,
-    level: LogLevel,
-    message: string,
-    verbose: boolean
-): void {
-    generationResult.logs.push(createLogEntry(level, message));
-    if (verbose || level !== "info") {
-        console.log(`[${level.toUpperCase()}]: ${message}`);
-    }
-}
-
-function logPerf(label: string, ms: number, verbose: boolean): void {
-    if (verbose) console.log(`[PERF]: ${label}: ${ms.toFixed(1)}ms`);
-}
 
 function generateBaseFileName(
     date: string,
@@ -61,16 +30,6 @@ function generateBaseFileName(
         .toLowerCase()
         .replace(/\s+/g, "-")
         .replace(/[^a-z0-9-]/g, "")}`;
-}
-
-function handleGenerationError(
-    generationResult: GenerationResult,
-    error: string,
-    verbose: boolean
-): void {
-    generationResult.errors.push(error);
-    generationResult.success = false;
-    log(generationResult, "error", error, verbose);
 }
 
 const ICON_SVGS: Record<string, string> = {
@@ -103,9 +62,9 @@ async function generatePDF(
     page: Page,
     htmlPath: string,
     outputPath: string,
-    generationResult: GenerationResult,
-    verbose: boolean
+    generationResult: GenerationResult
 ) {
+    const { logger } = generationResult;
     const absoluteHtmlPath = `file://${resolve(htmlPath)}`;
     await page.emulateMediaType("print");
     await page.goto(absoluteHtmlPath, { waitUntil: "networkidle0" });
@@ -122,19 +81,13 @@ async function generatePDF(
     });
 
     if (!containerFound) {
-        log(
-            generationResult,
-            "warn",
-            "Resume container not found, using body height",
-            verbose
-        );
+        logger.warn("Resume container not found, using body height");
     }
 
     if (contentHeight > A4_HEIGHT_PX) {
-        handleGenerationError(
-            generationResult,
-            `Content height exceeds A4 maximum (${contentHeight}px exceeds ${A4_HEIGHT_PX}px)`,
-            verbose
+        generationResult.success = false;
+        logger.error(
+            `Content height exceeds A4 maximum (${contentHeight}px exceeds ${A4_HEIGHT_PX}px)`
         );
         return;
     }
@@ -146,47 +99,34 @@ async function generatePDF(
         printBackground: true,
         margin: { top: "0", right: "0", bottom: "0", left: "0" }
     });
-    logPerf(
+    logger.perf(
         `PDF render (${generationResult.language})`,
-        performance.now() - t,
-        verbose
+        performance.now() - t
     );
-
-    log(generationResult, "info", `PDF generated: ${outputPath}`, verbose);
+    logger.info(`PDF generated: ${outputPath}`);
 }
 
 async function runSpellCheck(
     html: string,
     language: string,
-    generationResult: GenerationResult,
-    verbose: boolean
+    generationResult: GenerationResult
 ): Promise<void> {
+    const { logger } = generationResult;
     const t = performance.now();
     const result = await spellCheckHtml(html, language);
-    logPerf(`Spell check (${language})`, performance.now() - t, verbose);
+    logger.perf(`Spell check (${language})`, performance.now() - t);
 
     if (result.misspelledCount > 0) {
-        log(
-            generationResult,
-            "warn",
-            `Found ${result.misspelledCount} misspelled words in '${language}' resume:`,
-            verbose
+        logger.warn(
+            `Found ${result.misspelledCount} misspelled words in '${language}' resume:`
         );
         result.misspelled.forEach(({ word, suggestions }) => {
-            log(
-                generationResult,
-                "warn",
-                `\t- "${word}" -> Suggestions: ${suggestions.join(", ")}`,
-                verbose
+            logger.warn(
+                `\t- "${word}" -> Suggestions: ${suggestions.join(", ")}`
             );
         });
     } else {
-        log(
-            generationResult,
-            "info",
-            `No spelling errors found in ${language} resume`,
-            verbose
-        );
+        logger.info(`No spelling errors found in ${language} resume`);
     }
 }
 
@@ -195,8 +135,8 @@ async function generateResumeForLanguage(
     options: CommandLineArgs,
     generationResult: GenerationResult
 ) {
+    const { logger } = generationResult;
     const t = performance.now();
-    const { verbose } = options;
 
     let newPagePromise: Promise<Page> | undefined;
     if (!options.htmlOnly) {
@@ -213,15 +153,14 @@ async function generateResumeForLanguage(
         : runSpellCheck(
               generationResult.html,
               generationResult.language,
-              generationResult,
-              verbose
+              generationResult
           );
 
     writeFileSync(htmlPath, generationResult.html);
 
     let pdfGenerationPromise: Promise<void> | undefined;
     if (options.htmlOnly) {
-        log(generationResult, "info", `HTML saved: ${htmlPath}`, verbose);
+        logger.info(`HTML saved: ${htmlPath}`);
     } else {
         const pdfPath = join(
             generationResult.outputDir,
@@ -229,19 +168,15 @@ async function generateResumeForLanguage(
         );
         const page = await newPagePromise;
         if (!page) {
-            handleGenerationError(
-                generationResult,
-                "Browser page was not created",
-                verbose
-            );
+            generationResult.success = false;
+            logger.error("Browser page was not created");
             return;
         }
         pdfGenerationPromise = generatePDF(
             page,
             htmlPath,
             pdfPath,
-            generationResult,
-            verbose
+            generationResult
         );
     }
 
@@ -252,24 +187,7 @@ async function generateResumeForLanguage(
         unlinkSync(htmlPath);
     }
 
-    logPerf(
-        `Total (${generationResult.language})`,
-        performance.now() - t,
-        verbose
-    );
-}
-
-function buildContactInfo(
-    resumeData: ResumeData,
-    language: string
-): ContactInfo[] {
-    const locationValue = resumeData.basic.location[language] ?? "";
-    return [
-        ...resumeData.basic.contactInfo,
-        { type: "location", value: locationValue }
-    ].sort(
-        (a, b) => CONTACT_ORDER.indexOf(a.type) - CONTACT_ORDER.indexOf(b.type)
-    );
+    logger.perf(`Total (${generationResult.language})`, performance.now() - t);
 }
 
 export async function generateResumes(options: CommandLineArgs) {
@@ -288,9 +206,10 @@ export async function generateResumes(options: CommandLineArgs) {
             });
         }
 
-        const resumeData: ResumeData = yamlLoad(
+        const resumeData = yamlLoad(
             readFileSync(options.data, "utf8")
-        ) as ResumeData;
+        ) as ResumeMetadata & Record<string, unknown>;
+
         const templateName =
             options.template ?? resumeData.metadata?.template ?? "default";
         const templatePath = resolve(
@@ -319,11 +238,12 @@ export async function generateResumes(options: CommandLineArgs) {
 
         const currentDate = getCurrentDate();
         const template = Handlebars.compile(readFileSync(templatePath, "utf8"));
+        const dataBaseName = basename(options.data, extname(options.data));
         const totalStart = performance.now();
 
         await Promise.all(
             languages.map((language) => {
-                const contactInfo = buildContactInfo(resumeData, language);
+                const logger = createLogger(options.verbose);
                 const generationResult: GenerationResult = {
                     language,
                     templateName,
@@ -331,28 +251,14 @@ export async function generateResumes(options: CommandLineArgs) {
                     baseFileName: generateBaseFileName(
                         currentDate,
                         language,
-                        resumeData.basic.name
+                        dataBaseName
                     ),
-                    html: template({
-                        ...resumeData,
-                        language,
-                        basic: { ...resumeData.basic, contactInfo }
-                    }),
-                    logs: [],
-                    errors: [],
+                    html: template({ ...resumeData, language }),
                     success: true,
-                    metadata: {
-                        generationTime: new Date(),
-                        spellCheckEnabled: !options.noSpellCheck
-                    }
+                    logger
                 };
 
-                log(
-                    generationResult,
-                    "info",
-                    `Generating '${language.toUpperCase()}' resume`,
-                    options.verbose
-                );
+                logger.info(`Generating '${language.toUpperCase()}' resume`);
                 return generateResumeForLanguage(
                     browser,
                     options,
@@ -361,11 +267,8 @@ export async function generateResumes(options: CommandLineArgs) {
             })
         );
 
-        logPerf(
-            "Total overall",
-            performance.now() - totalStart,
-            options.verbose
-        );
+        const rootLogger = createLogger(options.verbose);
+        rootLogger.perf("Total overall", performance.now() - totalStart);
         await browser?.close();
     } catch (err) {
         console.error(`Error: ${getErrorMessage(err)}`);

@@ -7,9 +7,6 @@ basic:
   title:
     en: Staff Software Engineer
     es: Ingeniero de Software Staff
-  location:
-    en: San Francisco, USA
-    es: San Francisco, EE.UU.
   contactInfo:
     - type: email
       value: john.doe@example.com
@@ -19,6 +16,8 @@ basic:
       value: +1 555-123-4567
     - type: github
       value: github.com/johndoe
+    - type: location
+      value: San Francisco, USA
     - type: linkedin
       value: linkedin.com/in/johndoe
   profileImage: ../images/john-doe-profile-picture.png

@@ -3,6 +3,7 @@ import { readdir } from "node:fs/promises";
 import { join } from "node:path";
 // @ts-expect-error - nspell has no type definitions
 import nspell from "nspell";
+import type { Logger } from "./models/logger.js";
 import { getErrorMessage } from "./utils.js";
 
 const DICTIONARIES_DIR = "dictionaries";
@@ -32,7 +33,8 @@ const dictionaryCache: Record<string, SpellInstance> = {};
 
 async function addWhitelistedTerms(
     spell: SpellInstance,
-    language: string
+    language: string,
+    logger?: Logger
 ): Promise<void> {
     const whitelistDir = join(process.cwd(), DICTIONARIES_DIR, WHITELIST_DIR);
     if (!existsSync(whitelistDir)) return;
@@ -52,11 +54,15 @@ async function addWhitelistedTerms(
             }
         }
     } catch (error) {
-        console.error(`Error loading whitelist: ${getErrorMessage(error)}`);
+        const msg = `Error loading whitelist: ${getErrorMessage(error)}`;
+        logger?.error(msg) ?? console.error(msg);
     }
 }
 
-async function loadDictionary(language: string): Promise<SpellInstance> {
+async function loadDictionary(
+    language: string,
+    logger?: Logger
+): Promise<SpellInstance> {
     if (dictionaryCache[language]) return dictionaryCache[language];
 
     const dictionariesDir = join(process.cwd(), DICTIONARIES_DIR);
@@ -70,19 +76,18 @@ async function loadDictionary(language: string): Promise<SpellInstance> {
             const dic = readFileSync(join(dictionariesDir, dicFile), "utf8");
             const aff = readFileSync(join(dictionariesDir, affFile), "utf8");
             const spell = nspell(aff, dic) as SpellInstance;
-            await addWhitelistedTerms(spell, language);
+            await addWhitelistedTerms(spell, language, logger);
             dictionaryCache[language] = spell;
             return spell;
         }
     } catch (error) {
-        console.error(
-            `Error loading dictionary for ${language}: ${getErrorMessage(error)}`
-        );
+        const msg = `Error loading dictionary for ${language}: ${getErrorMessage(error)}`;
+        logger?.error(msg) ?? console.error(msg);
     }
 
-    console.log(
-        `No dictionary found for '${language}', all words will pass spell check`
-    );
+    const notFoundMsg = `No dictionary found for '${language}', all words will pass spell check`;
+    logger?.info(notFoundMsg) ?? console.info(notFoundMsg);
+
     const dummy: SpellInstance = {
         correct: () => true,
         suggest: () => [],
@@ -122,10 +127,11 @@ function shouldSkip(word: string): boolean {
 
 export async function spellCheckHtml(
     html: string,
-    language: string
+    language: string,
+    logger?: Logger
 ): Promise<SpellCheckResult> {
     try {
-        const spell = await loadDictionary(language);
+        const spell = await loadDictionary(language, logger);
         const words = extractText(html).split(/\s+/).filter(Boolean);
         const misspelled: MisspelledWord[] = [];
 
@@ -146,7 +152,7 @@ export async function spellCheckHtml(
         return { language, misspelledCount: misspelled.length, misspelled };
     } catch (error) {
         const errorMessage = getErrorMessage(error);
-        console.error(`Spell check error: ${errorMessage}`);
+        (logger ?? console).error(`Spell check error: ${errorMessage}`);
         return {
             language,
             misspelledCount: 0,

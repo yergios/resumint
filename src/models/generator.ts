@@ -1,50 +1,8 @@
-export type LocalizedString = Record<string, string>;
+import type { Logger } from "./logger.js";
 
-export interface ContactInfo {
-    type: string;
-    value: string;
-}
-
-export interface DateRange {
-    start?: LocalizedString;
-    end?: LocalizedString;
-}
-
-export interface Position {
-    position: LocalizedString;
-    date: DateRange;
-    techStack?: string[];
-    responsibilities: Record<string, string[]>;
-}
-
-export interface Experience {
-    company: string | LocalizedString;
-    location: LocalizedString;
-    positions: Position[];
-}
-
-export interface Education {
-    institution: LocalizedString;
-    degree: LocalizedString;
-    location: LocalizedString;
-    date: DateRange;
-}
-
-export interface ResumeData {
-    languages: string[];
-    basic: {
-        name: string;
-        title: LocalizedString;
-        location: LocalizedString;
-        contactInfo: ContactInfo[];
-        profileImage?: string;
-    };
-    experience: Experience[];
-    education: Education[];
-    metadata: {
-        template?: string;
-        sections: Record<string, Record<string, string>>;
-    };
+export interface ResumeMetadata {
+    languages?: string[];
+    metadata?: { template?: string };
 }
 
 export interface CommandLineArgs {
@@ -59,25 +17,12 @@ export interface CommandLineArgs {
     verbose: boolean;
 }
 
-export type LogLevel = "info" | "warn" | "error";
-
-export interface LogEntry {
-    level: LogLevel;
-    message: string;
-    timestamp: Date;
-}
-
 export interface GenerationResult {
     language: string;
     templateName: string;
     outputDir: string;
     baseFileName: string;
     html: string;
-    logs: LogEntry[];
-    errors: string[];
     success: boolean;
-    metadata: {
-        generationTime?: Date;
-        spellCheckEnabled: boolean;
-    };
+    logger: Logger;
 }
