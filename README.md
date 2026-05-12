@@ -34,9 +34,9 @@ All user-facing files live under `workspace/`. Everything else is implementation
 
 ```
 workspace/
-├── content/       ← your YAML/JSON data files
+├── content/       ← your YAML/JSON input files
 ├── styles/        ← CSS for templates
-├── templates/     ← Handlebars HTML templates
+├── templates/     ← HTML templates
 ├── assets/
 │   ├── fonts/     ← vendored woff2 font files
 │   └── images/    ← profile photos and other images
