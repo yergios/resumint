@@ -8,10 +8,11 @@ import {
 import { basename, extname, join, resolve } from "node:path";
 import Handlebars from "handlebars";
 import { load as yamlLoad } from "js-yaml";
-import { type Browser, launch, type Page } from "puppeteer";
+import { type Browser, launch, type Page } from "puppeteer-core";
 import { createLogger } from "../logging/logger.js";
 import { spellCheckHtml } from "../spell-check/spell-checker.js";
 import { getCurrentDate, getErrorMessage } from "../utils.js";
+import { resolveBrowserPath } from "./browser.js";
 import { renderHtml, setupHandlebars } from "./html.js";
 import { generatePDF } from "./pdf.js";
 import type {
@@ -123,6 +124,7 @@ export async function generateResumes(options: CommandLineArgs) {
         if (!options.htmlOnly) {
             browser = await launch({
                 headless: true,
+                executablePath: resolveBrowserPath(options.browserPath),
                 args: [
                     "--no-sandbox",
                     "--disable-dev-shm-usage",

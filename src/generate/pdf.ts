@@ -1,5 +1,5 @@
 import { resolve } from "node:path";
-import type { Page } from "puppeteer";
+import type { Page } from "puppeteer-core";
 import type { GenerationResult } from "./types.js";
 
 // A4 at 96 DPI is ~1123px; 1200 gives headroom for subpixel rounding and browser zoom

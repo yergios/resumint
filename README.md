@@ -8,8 +8,8 @@ For those who may want further customization and pixel-perfect control, you can 
 
 ## Prerequisites
 
-- **Node.js 18+** — [nodejs.org](https://nodejs.org)
-- **Chrome or Chromium** — optional; if not installed, Puppeteer can download a bundled browser for you (see Getting Started)
+- **Node.js 20+** — [nodejs.org](https://nodejs.org)
+- **Chromium** — required for PDF generation. ResuMint uses your system browser. Skip if you only use `--htmlOnly`.
 
 ## Getting Started
 
@@ -23,9 +23,6 @@ npm ci
 
 # Build TypeScript source
 npm run build
-
-# Install a headless browser (skip if Chrome is already installed)
-npx puppeteer browsers install chrome
 
 # (Optional) Make resumint available as a global CLI command
 npm link --global
@@ -73,6 +70,7 @@ npm start [file] [options]
 | `--html`         |       | Save HTML alongside PDFs                                              | `false`                         |
 | `--htmlOnly`     |       | Generate HTML only, no PDFs                                           | `false`                         |
 | `--templatesDir` |       | Directory containing templates                                        | `./workspace/templates`         |
+| `--browserPath`  |       | Path to Chrome/Chromium executable                                    | auto-detected                   |
 | `--noSpellCheck` |       | Skip spell checking                                                   | `false`                         |
 | `--verbose`      | `-V`  | Print detailed logs and timing information                            | `false`                         |
 
@@ -103,6 +101,25 @@ resumint example.yaml --name john-doe
 # Verbose output with timings
 resumint example.yaml --verbose
 ```
+
+### Browser detection
+
+ResuMint uses your system Chrome/Chromium to render PDFs. The executable is resolved in this order:
+
+1. `--browserPath` CLI argument
+2. `PUPPETEER_EXECUTABLE_PATH` environment variable
+3. Common system locations (`/usr/bin/google-chrome`, `/Applications/Google Chrome.app/...`, `C:\Program Files\Google\Chrome\...`, etc.)
+
+If none are found, generation fails with a hint to install Chrome or pass `--browserPath`.
+
+To set the browser path once for convenience, copy `.env.example` to `.env` and fill in the value:
+
+```bash
+cp .env.example .env
+# then edit .env and set PUPPETEER_EXECUTABLE_PATH to your browser path
+```
+
+ResuMint loads `.env` automatically on startup if the file exists.
 
 ## Data File
 

@@ -16,6 +16,7 @@ Options:
   -n, --name <stem>     Output filename stem (e.g. john-doe)
   -o, --output <dir>    Output directory                    [default: ./resumes]
       --templatesDir <dir>  Directory containing templates  [default: ./workspace/templates]
+      --browserPath <path>  Path to Chrome/Chromium executable (auto-detected if omitted)
       --html            Save HTML files along with PDFs
       --htmlOnly        Generate only HTML files, not PDFs
       --noSpellCheck    Skip spell checking
@@ -47,6 +48,7 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
             name: { type: "string", short: "n" },
             output: { type: "string", short: "o", default: "./resumes" },
             templatesDir: { type: "string", default: "./workspace/templates" },
+            browserPath: { type: "string" },
             html: { type: "boolean", default: false },
             htmlOnly: { type: "boolean", default: false },
             noSpellCheck: { type: "boolean", default: false },
@@ -80,6 +82,7 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
         output: values.output ?? "./resumes",
         language: values.language,
         name: values.name,
+        browserPath: values.browserPath,
         html: values.html ?? false,
         htmlOnly: values.htmlOnly ?? false,
         noSpellCheck: values.noSpellCheck ?? false,

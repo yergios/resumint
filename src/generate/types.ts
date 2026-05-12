@@ -12,6 +12,7 @@ export interface CommandLineArgs {
     output: string;
     language: string | undefined;
     name: string | undefined;
+    browserPath: string | undefined;
     html: boolean;
     htmlOnly: boolean;
     noSpellCheck: boolean;

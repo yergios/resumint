@@ -30,7 +30,7 @@
     "dependencies": {
         "handlebars": "4.7.9",
         "nspell": "2.1.5",
-        "puppeteer": "24.40.0"
+        "puppeteer-core": "24.40.0"
     },
     "devDependencies": {
         "@biomejs/biome": "2.4.15",
