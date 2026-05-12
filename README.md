@@ -129,7 +129,7 @@ Localized fields accept any language code that matches an entry in `languages`. 
 
 ## Templates
 
-Templates are Handlebars HTML files in `./workspace/templates/`, named `[name].html`. The default template is `default.html`.
+Templates are plain HTML files in `./workspace/templates/`, named `[name].html`, with a small set of mustache-style tags. The default template is `default.html`.
 
 To create a custom template:
 
@@ -137,14 +137,19 @@ To create a custom template:
 2. Edit the markup and styles as needed
 3. Set `metadata.template: [name]` in your data file, or pass `--template [name]`
 
-Available Handlebars helpers:
+Supported template tags:
 
-| Helper       | Usage                   | Description                                 |
-| ------------ | ----------------------- | ------------------------------------------- |
-| `lookup`     | `{{lookup obj key}}`    | Resolves a localized string by language key |
-| `join`       | `{{join array ", "}}`   | Joins an array with a separator             |
-| `eq`         | `{{#if (eq a b)}}`      | Equality check                              |
-| `getIconSvg` | `{{{getIconSvg type}}}` | Renders an inline SVG icon by contact type  |
+| Syntax                              | Behavior                                                                             |
+| ----------------------------------- | ------------------------------------------------------------------------------------ |
+| `{{path.to.var}}`                   | HTML-escaped interpolation. Dotted paths supported.                                  |
+| `{{{path.to.var}}}`                 | Raw interpolation (no escaping). Use for trusted HTML like SVG.                      |
+| `{{#each arr}}...{{/each}}`         | Iterate. Inside: `{{this}}` for scalars, `{{@index}}`, `{{@first}}`, `{{@last}}`.    |
+| `{{#if path}}...{{/if}}`            | Render if value is truthy.                                                           |
+| `{{#unless path}}...{{/unless}}`    | Render if value is falsy.                                                            |
+
+Localized strings are resolved before rendering: any object in your data file whose keys are all language codes (e.g. `{ en: "Hello", es: "Hola" }`) is replaced with the value for the active language. Templates see the resolved string directly — no helpers needed.
+
+Each `contactInfo` item gets an `iconSvg` field auto-attached (inline SVG looked up by `type`). Use `{{{iconSvg}}}` in custom templates.
 
 ## Vendoring Fonts
 

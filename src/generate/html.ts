@@ -1,28 +1,35 @@
-import Handlebars from "handlebars";
 import { ICON_SVGS } from "./icons.js";
+import { localize } from "./localize.js";
+import { renderTemplate } from "./template.js";
 
-export function setupHandlebars(): void {
-    Handlebars.registerHelper("eq", (a, b) => a === b);
-    Handlebars.registerHelper("join", (array, separator) =>
-        array.join(separator)
-    );
-    Handlebars.registerHelper("getIconSvg", (type: string) => {
-        return new Handlebars.SafeString(ICON_SVGS[type] ?? "");
-    });
-    Handlebars.registerHelper("lookup", (obj, field, subfield) => {
-        if (!obj || !field) return "";
-        if (typeof subfield === "string") return obj[field][subfield];
-        return obj[field] !== undefined ? obj[field] : obj;
-    });
+function attachIcons(data: Record<string, unknown>): void {
+    const basic = data["basic"] as Record<string, unknown> | undefined;
+    const contactInfo = basic?.["contactInfo"];
+    if (!Array.isArray(contactInfo)) return;
+    for (const item of contactInfo) {
+        if (item && typeof item === "object") {
+            const entry = item as Record<string, unknown>;
+            const type = entry["type"];
+            if (typeof type === "string") {
+                entry["iconSvg"] = ICON_SVGS[type] ?? "";
+            }
+        }
+    }
 }
 
 export function renderHtml(
-    template: HandlebarsTemplateDelegate,
+    source: string,
     data: Record<string, unknown>,
     language: string,
+    languages: string[],
     templatesAbsPath: string
 ): string {
-    const rawHtml = template({ ...data, language });
+    const localized = localize(data, languages, language) as Record<
+        string,
+        unknown
+    >;
+    attachIcons(localized);
+    const html = renderTemplate(source, { ...localized, language });
     const baseTag = `<base href="file://${templatesAbsPath}/">`;
-    return rawHtml.replace("<head>", `<head>\n    ${baseTag}`);
+    return html.replace("<head>", `<head>\n    ${baseTag}`);
 }

@@ -10,7 +10,7 @@
     "scripts": {
         "start": "node ./dist/main.js",
         "build": "tsc",
-        "demo": "node ./dist/main.js --data ./workspace/content/example.yaml --html",
+        "demo": "node ./dist/main.js --data ./workspace/content/example.yaml",
         "lint": "biome lint .",
         "lint:fix": "biome lint --write .",
         "format": "biome format .",
@@ -28,7 +28,6 @@
     "license": "MIT",
     "packageManager": "pnpm@10.29.3",
     "dependencies": {
-        "handlebars": "4.7.9",
         "nspell": "2.1.5",
         "puppeteer-core": "24.40.0"
     },

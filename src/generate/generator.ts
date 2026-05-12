@@ -6,14 +6,13 @@ import {
     writeFileSync
 } from "node:fs";
 import { basename, extname, join, resolve } from "node:path";
-import Handlebars from "handlebars";
 import { load as yamlLoad } from "js-yaml";
 import { type Browser, launch, type Page } from "puppeteer-core";
 import { createLogger } from "../logging/logger.js";
 import { spellCheckHtml } from "../spell-check/spell-checker.js";
 import { getCurrentDate, getErrorMessage } from "../utils.js";
 import { resolveBrowserPath } from "./browser.js";
-import { renderHtml, setupHandlebars } from "./html.js";
+import { renderHtml } from "./html.js";
 import { generatePDF } from "./pdf.js";
 import type {
     CommandLineArgs,
@@ -118,8 +117,6 @@ async function generateResumeForLanguage(
 
 export async function generateResumes(options: CommandLineArgs) {
     try {
-        setupHandlebars();
-
         let browser: Browser | undefined;
         if (!options.htmlOnly) {
             browser = await launch({
@@ -164,7 +161,7 @@ export async function generateResumes(options: CommandLineArgs) {
         }
 
         const currentDate = getCurrentDate();
-        const template = Handlebars.compile(readFileSync(templatePath, "utf8"));
+        const templateSource = readFileSync(templatePath, "utf8");
         const dataFileName = basename(options.data, extname(options.data));
         const templatesAbsPath = resolve(process.cwd(), options.templatesDir);
         const totalStart = performance.now();
@@ -182,9 +179,10 @@ export async function generateResumes(options: CommandLineArgs) {
                         options.name ?? dataFileName
                     ),
                     html: renderHtml(
-                        template,
+                        templateSource,
                         resumeData,
                         language,
+                        resumeData.languages ?? languages,
                         templatesAbsPath
                     ),
                     success: true,
