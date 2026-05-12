@@ -30,17 +30,15 @@
     "dependencies": {
         "handlebars": "4.7.9",
         "nspell": "2.1.5",
-        "puppeteer": "24.40.0",
-        "yargs": "17.7.2"
+        "puppeteer": "24.40.0"
     },
     "devDependencies": {
         "@biomejs/biome": "2.4.15",
         "@types/js-yaml": "4.0.9",
-        "@types/yargs": "17.0.35",
         "js-yaml": "4.1.1",
         "typescript": "5.9.2"
     },
     "engines": {
-        "node": ">=18.0.0"
+        "node": ">=20.0.0"
     }
 }

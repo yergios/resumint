@@ -1,109 +1,89 @@
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { hideBin } from "yargs/helpers";
-import yargs from "yargs/yargs";
+import { parseArgs } from "node:util";
 import type { CommandLineArgs } from "../generate/types.js";
 
-const parseArguments = async (): Promise<CommandLineArgs> => {
-    const argv = await yargs(hideBin(process.argv))
-        .usage("Usage: $0 [file] [options]")
-        .option("data", {
-            alias: "d",
-            describe:
-                "Explicit path to a YAML or JSON data file (overrides positional [file])",
-            type: "string"
-        })
-        .option("template", {
-            alias: "t",
-            describe: "Template name to use",
-            type: "string"
-        })
-        .option("language", {
-            alias: "l",
-            describe: "Generate resume for specific language only",
-            type: "string"
-        })
-        .option("name", {
-            alias: "n",
-            describe:
-                "Output filename stem (e.g. john-doe → 2026-05-11-en-john-doe.pdf)",
-            type: "string"
-        })
-        .option("output", {
-            alias: "o",
-            describe: "Output directory for the generated files",
-            type: "string",
-            default: "./resumes"
-        })
-        .option("html", {
-            describe: "Save HTML files along with PDFs",
-            type: "boolean",
-            default: false
-        })
-        .option("htmlOnly", {
-            describe: "Generate only HTML files, not PDFs",
-            type: "boolean",
-            default: false
-        })
-        .option("templatesDir", {
-            describe: "Directory containing templates",
-            type: "string",
-            default: "./workspace/templates"
-        })
-        .option("noSpellCheck", {
-            describe: "Skip spell checking",
-            type: "boolean",
-            default: false
-        })
-        .option("verbose", {
-            alias: "V",
-            describe: "Print detailed logs and timing information",
-            type: "boolean",
-            default: false
-        })
-        .example(
-            "$0 example.yaml",
-            "Generate resumes from ./workspace/content/example.yaml"
-        )
-        .example(
-            "$0 example.yaml --language en",
-            "Generate resume only for English"
-        )
-        .example(
-            "$0 example.yaml --template fancy",
-            "Use the fancy.html template"
-        )
-        .example(
-            "$0 example.yaml --html --output ./my-resumes",
-            "Save both HTML and PDF to custom directory"
-        )
-        .example(
-            "$0 --data ./my-resume.yaml",
-            "Generate resumes from an explicit path"
-        )
-        .help()
-        .alias("help", "h")
-        .version()
-        .alias("version", "v").argv;
+const HELP = `Usage: resumint [file] [options]
 
-    const positionalFile = argv._?.[0] as string | undefined;
+Arguments:
+  file                  Data file under ./workspace/content/ (e.g. example.yaml).
+                        Omit extension to default to .yaml. Overridden by --data.
+
+Options:
+  -d, --data <path>     Explicit path to a YAML or JSON data file
+  -t, --template <name> Template name to use
+  -l, --language <lang> Generate resume for specific language only
+  -n, --name <stem>     Output filename stem (e.g. john-doe)
+  -o, --output <dir>    Output directory                    [default: ./resumes]
+      --templatesDir <dir>  Directory containing templates  [default: ./workspace/templates]
+      --html            Save HTML files along with PDFs
+      --htmlOnly        Generate only HTML files, not PDFs
+      --noSpellCheck    Skip spell checking
+  -V, --verbose         Print detailed logs and timing information
+  -h, --help            Show this help and exit
+  -v, --version         Show version and exit
+
+Examples:
+  resumint example.yaml
+  resumint example.yaml --language en
+  resumint example.yaml --template fancy
+  resumint example.yaml --html --output ./my-resumes
+  resumint --data ./my-resume.yaml
+`;
+
+function readVersion(): string {
+    const pkgUrl = new URL("../../package.json", import.meta.url);
+    const pkg = JSON.parse(readFileSync(pkgUrl, "utf8")) as { version: string };
+    return pkg.version;
+}
+
+const parseArguments = async (): Promise<CommandLineArgs> => {
+    const { values, positionals } = parseArgs({
+        allowPositionals: true,
+        options: {
+            data: { type: "string", short: "d" },
+            template: { type: "string", short: "t" },
+            language: { type: "string", short: "l" },
+            name: { type: "string", short: "n" },
+            output: { type: "string", short: "o", default: "./resumes" },
+            templatesDir: { type: "string", default: "./workspace/templates" },
+            html: { type: "boolean", default: false },
+            htmlOnly: { type: "boolean", default: false },
+            noSpellCheck: { type: "boolean", default: false },
+            verbose: { type: "boolean", short: "V", default: false },
+            help: { type: "boolean", short: "h", default: false },
+            version: { type: "boolean", short: "v", default: false }
+        }
+    });
+
+    if (values.help) {
+        console.log(HELP);
+        process.exit(0);
+    }
+    if (values.version) {
+        console.log(readVersion());
+        process.exit(0);
+    }
+
+    const positionalFile = positionals[0];
     const resolvedFile = positionalFile
         ? /\.(yaml|yml|json)$/i.test(positionalFile)
             ? positionalFile
             : `${positionalFile}.yaml`
         : "resume.yaml";
-    const data = argv.data ?? join("./workspace/content", resolvedFile);
+    const data = values.data ?? join("./workspace/content", resolvedFile);
 
     return {
         data,
-        template: argv.template,
-        templatesDir: argv.templatesDir ?? "./workspace/templates",
-        output: argv.output ?? "./resumes",
-        language: argv.language,
-        name: argv.name,
-        html: argv.html ?? false,
-        htmlOnly: argv.htmlOnly ?? false,
-        noSpellCheck: argv.noSpellCheck ?? false,
-        verbose: argv.verbose ?? false
+        template: values.template,
+        templatesDir: values.templatesDir ?? "./workspace/templates",
+        output: values.output ?? "./resumes",
+        language: values.language,
+        name: values.name,
+        html: values.html ?? false,
+        htmlOnly: values.htmlOnly ?? false,
+        noSpellCheck: values.noSpellCheck ?? false,
+        verbose: values.verbose ?? false
     };
 };
 
