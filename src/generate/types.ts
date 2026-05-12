@@ -6,22 +6,20 @@ export interface ResumeMetadata {
 }
 
 export interface CommandLineArgs {
-    data: string;
-    template: string | undefined;
-    templatesDir: string;
-    output: string;
+    input: string;
+    templatePath: string | undefined;
+    outputPath: string;
     language: string | undefined;
-    name: string | undefined;
+    filename: string | undefined;
     browserPath: string | undefined;
-    html: boolean;
-    htmlOnly: boolean;
-    noSpellCheck: boolean;
+    keepHtml: boolean;
+    noPdf: boolean;
+    skipSpellCheck: boolean;
     verbose: boolean;
 }
 
 export interface GenerationResult {
     language: string;
-    templateName: string;
     outputDir: string;
     baseFileName: string;
     html: string;

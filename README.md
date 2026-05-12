@@ -48,69 +48,70 @@ Generated PDFs and HTML go to `./resumes/` at the project root.
 ## Usage
 
 ```bash
-resumint [file] [options]
+resumint [path] [options]
 
 # Or without global install
-npm start [file] [options]
+npm start [path] [options]
 ```
 
 ### Arguments
 
-- `file`: Data file name to look up in `./workspace/content/` (e.g. `example.yaml`). Accepts YAML or JSON. Omit the extension to default to `.yaml`. Omit entirely to use `resume.yaml`. Overridden by `--data`.
+- `path`: Full path (relative or absolute) to a YAML or JSON data file. Extension (`.yaml`, `.yml`, `.json`) is required. Defaults to `./workspace/content/resume.yaml` if omitted.
 
 ### Options
 
-| Flag             | Alias | Description                                                           | Default                         |
-| ---------------- | ----- | --------------------------------------------------------------------- | ------------------------------- |
-| `--data`         | `-d`  | Explicit path to a YAML or JSON file (overrides positional `file`)    | —                               |
-| `--language`     | `-l`  | Generate for a specific language only                                 | all languages in file           |
-| `--name`         | `-n`  | Output filename stem (e.g. `john-doe` → `2026-05-11-en-john-doe.pdf`) | data filename                   |
-| `--template`     | `-t`  | Template name to use                                                  | from file metadata or `default` |
-| `--output`       | `-o`  | Output directory                                                      | `./resumes`                     |
-| `--html`         |       | Save HTML alongside PDFs                                              | `false`                         |
-| `--htmlOnly`     |       | Generate HTML only, no PDFs                                           | `false`                         |
-| `--templatesDir` |       | Directory containing templates                                        | `./workspace/templates`         |
-| `--browserPath`  |       | Path to Chrome/Chromium executable                                    | auto-detected                   |
-| `--noSpellCheck` |       | Skip spell checking                                                   | `false`                         |
-| `--verbose`      | `-V`  | Print detailed logs and timing information                            | `false`                         |
+| Flag                 | Alias | Description                                                           | Default                                                                      |
+| -------------------- | ----- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `--language`         | `-l`  | Generate for a specific language only                                 | all languages in file                                                        |
+| `--filename`         | `-f`  | Output filename stem (e.g. `john-doe` → `2026-05-12-en-john-doe.pdf`) | content input filename                                                       |
+| `--template-path`    | `-t`  | Path to a template HTML file                                          | `metadata.template` in input file, else `./workspace/templates/default.html` |
+| `--output-path`      | `-o`  | Output directory                                                      | `./resumes`                                                                  |
+| `--browser-path`     | `-b`  | Path to Chrome/Chromium executable                                    | auto-detected                                                                |
+| `--keep-html`        | `-k`  | Keep rendered HTML alongside the PDF                                  | `false`                                                                      |
+| `--no-pdf`           | `-n`  | Render HTML only, do not produce a PDF                                | `false`                                                                      |
+| `--skip-spell-check` | `-s`  | Skip spell checking                                                   | `false`                                                                      |
+| `--verbose`          | `-V`  | Print detailed logs and timing information                            | `false`                                                                      |
 
 ### Examples
 
 ```bash
-# Generate from a file in ./workspace/content/
-resumint example.yaml
+# Use default ./workspace/content/resume.yaml
+resumint
+
+# Explicit data file path
+resumint ./workspace/content/example.yaml
 
 # English only
-resumint example.yaml --language en
+resumint ./workspace/content/example.yaml --language en
 
-# Custom template
-resumint example.yaml --template fancy
+# Custom template path
+resumint ./workspace/content/example.yaml -t ./workspace/templates/fancy.html
 
-# Save both HTML and PDF
-resumint example.yaml --html --output ./my-resumes
+# Keep HTML alongside the PDF, custom output dir
+resumint ./workspace/content/example.yaml -k -o ./my-resumes
 
-# File outside workspace/content/
-resumint --data ./path/to/resume.yaml
+# HTML only, no PDF
+resumint ./workspace/content/example.yaml --no-pdf
 
 # Skip spell checking
-resumint example.yaml --noSpellCheck
+resumint ./workspace/content/example.yaml -s
 
 # Custom output filename stem
-resumint example.yaml --name john-doe
+resumint ./workspace/content/example.yaml --filename john-doe
 
 # Verbose output with timings
-resumint example.yaml --verbose
+resumint ./workspace/content/example.yaml --verbose
 ```
 
 ### Browser detection
 
 ResuMint uses your system Chrome/Chromium to render PDFs. The executable is resolved in this order:
 
-1. `--browserPath` CLI argument
+1. `--browser-path` CLI argument
 2. `PUPPETEER_EXECUTABLE_PATH` environment variable
 3. Common system locations (`/usr/bin/google-chrome`, `/Applications/Google Chrome.app/...`, `C:\Program Files\Google\Chrome\...`, etc.)
 
-If none are found, generation fails with a hint to install Chrome or pass `--browserPath`.
+If none are found, generation fails with a hint to install Chrome or pass `--browser-path`.
 
 To set the browser path once for convenience, copy `.env.example` to `.env` and fill in the value:
 
@@ -129,23 +130,23 @@ Localized fields accept any language code that matches an entry in `languages`. 
 
 ## Templates
 
-Templates are plain HTML files in `./workspace/templates/`, named `[name].html`, with a small set of mustache-style tags. The default template is `default.html`.
+Templates are plain HTML files with a small set of mustache-style tags. The default template is `./workspace/templates/default.html`.
 
 To create a custom template:
 
-1. Copy `workspace/templates/default.html` to `workspace/templates/[name].html`
+1. Copy `workspace/templates/default.html` to a new file (any path)
 2. Edit the markup and styles as needed
-3. Set `metadata.template: [name]` in your data file, or pass `--template [name]`
+3. Set `metadata.template: ./path/to/your-template.html` in your data file, or pass `--template-path ./path/to/your-template.html`
 
 Supported template tags:
 
-| Syntax                              | Behavior                                                                             |
-| ----------------------------------- | ------------------------------------------------------------------------------------ |
-| `{{path.to.var}}`                   | HTML-escaped interpolation. Dotted paths supported.                                  |
-| `{{{path.to.var}}}`                 | Raw interpolation (no escaping). Use for trusted HTML like SVG.                      |
-| `{{#each arr}}...{{/each}}`         | Iterate. Inside: `{{this}}` for scalars, `{{@index}}`, `{{@first}}`, `{{@last}}`.    |
-| `{{#if path}}...{{/if}}`            | Render if value is truthy.                                                           |
-| `{{#unless path}}...{{/unless}}`    | Render if value is falsy.                                                            |
+| Syntax                           | Behavior                                                                          |
+| -------------------------------- | --------------------------------------------------------------------------------- |
+| `{{path.to.var}}`                | HTML-escaped interpolation. Dotted paths supported.                               |
+| `{{{path.to.var}}}`              | Raw interpolation (no escaping). Use for trusted HTML like SVG.                   |
+| `{{#each arr}}...{{/each}}`      | Iterate. Inside: `{{this}}` for scalars, `{{@index}}`, `{{@first}}`, `{{@last}}`. |
+| `{{#if path}}...{{/if}}`         | Render if value is truthy.                                                        |
+| `{{#unless path}}...{{/unless}}` | Render if value is falsy.                                                         |
 
 Localized strings are resolved before rendering: any object in your data file whose keys are all language codes (e.g. `{ en: "Hello", es: "Hola" }`) is replaced with the value for the active language. Templates see the resolved string directly — no helpers needed.
 

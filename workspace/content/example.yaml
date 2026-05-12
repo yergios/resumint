@@ -222,7 +222,6 @@ education:
         es: May 2015
 
 metadata:
-  template: default
   sections:
     en:
       experience: EXPERIENCE

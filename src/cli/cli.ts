@@ -1,35 +1,37 @@
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { parseArgs } from "node:util";
 import type { CommandLineArgs } from "../generate/types.js";
 
-const HELP = `Usage: resumint [file] [options]
+const DEFAULT_INPUT_PATH = "./workspace/content/resume.yaml";
+const VALID_EXTENSIONS = /\.(yaml|yml|json)$/i;
+
+const HELP = `Usage: resumint [path] [options]
 
 Arguments:
-  file                  Data file under ./workspace/content/ (e.g. example.yaml).
-                        Omit extension to default to .yaml. Overridden by --data.
+  path                       Path to a YAML or JSON data file (relative or absolute).
+                             Extension (.yaml, .yml, .json) is required.
+                             Defaults to ${DEFAULT_INPUT_PATH}.
 
 Options:
-  -d, --data <path>     Explicit path to a YAML or JSON data file
-  -t, --template <name> Template name to use
-  -l, --language <lang> Generate resume for specific language only
-  -n, --name <stem>     Output filename stem (e.g. john-doe)
-  -o, --output <dir>    Output directory                    [default: ./resumes]
-      --templatesDir <dir>  Directory containing templates  [default: ./workspace/templates]
-      --browserPath <path>  Path to Chrome/Chromium executable (auto-detected if omitted)
-      --html            Save HTML files along with PDFs
-      --htmlOnly        Generate only HTML files, not PDFs
-      --noSpellCheck    Skip spell checking
-  -V, --verbose         Print detailed logs and timing information
-  -h, --help            Show this help and exit
-  -v, --version         Show version and exit
+  -t, --template-path <path> Path to a template HTML file
+  -l, --language <lang>      Generate resume for specific language only
+  -f, --filename <stem>      Output filename stem (e.g. john-doe)
+  -o, --output-path <dir>    Output directory                       [default: ./resumes]
+  -b, --browser-path <path>  Path to Chrome/Chromium executable (auto-detected if omitted)
+  -k, --keep-html            Keep rendered HTML alongside the PDF
+  -n, --no-pdf               Render HTML only, do not produce a PDF
+  -s, --skip-spell-check     Skip spell checking
+  -V, --verbose              Print detailed logs and timing information
+  -h, --help                 Show this help and exit
+  -v, --version              Show version and exit
 
 Examples:
-  resumint example.yaml
-  resumint example.yaml --language en
-  resumint example.yaml --template fancy
-  resumint example.yaml --html --output ./my-resumes
-  resumint --data ./my-resume.yaml
+  resumint
+  resumint ./workspace/content/example.yaml
+  resumint ./workspace/content/example.yaml --language en
+  resumint ./workspace/content/example.yaml -k -o ./my-resumes
+  resumint ./workspace/content/example.yaml --no-pdf
+  resumint ./workspace/content/example.yaml -t ./workspace/templates/fancy.html
 `;
 
 function readVersion(): string {
@@ -42,16 +44,18 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
     const { values, positionals } = parseArgs({
         allowPositionals: true,
         options: {
-            data: { type: "string", short: "d" },
-            template: { type: "string", short: "t" },
+            "template-path": { type: "string", short: "t" },
             language: { type: "string", short: "l" },
-            name: { type: "string", short: "n" },
-            output: { type: "string", short: "o", default: "./resumes" },
-            templatesDir: { type: "string", default: "./workspace/templates" },
-            browserPath: { type: "string" },
-            html: { type: "boolean", default: false },
-            htmlOnly: { type: "boolean", default: false },
-            noSpellCheck: { type: "boolean", default: false },
+            filename: { type: "string", short: "f" },
+            "output-path": {
+                type: "string",
+                short: "o",
+                default: "./resumes"
+            },
+            "browser-path": { type: "string", short: "b" },
+            "keep-html": { type: "boolean", short: "k", default: false },
+            "no-pdf": { type: "boolean", short: "n", default: false },
+            "skip-spell-check": { type: "boolean", short: "s", default: false },
             verbose: { type: "boolean", short: "V", default: false },
             help: { type: "boolean", short: "h", default: false },
             version: { type: "boolean", short: "v", default: false }
@@ -67,25 +71,23 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
         process.exit(0);
     }
 
-    const positionalFile = positionals[0];
-    const resolvedFile = positionalFile
-        ? /\.(yaml|yml|json)$/i.test(positionalFile)
-            ? positionalFile
-            : `${positionalFile}.yaml`
-        : "resume.yaml";
-    const data = values.data ?? join("./workspace/content", resolvedFile);
+    const input = positionals[0] ?? DEFAULT_INPUT_PATH;
+    if (!VALID_EXTENSIONS.test(input)) {
+        throw new Error(
+            `Input file must end in .yaml, .yml, or .json: ${input}`
+        );
+    }
 
     return {
-        data,
-        template: values.template,
-        templatesDir: values.templatesDir ?? "./workspace/templates",
-        output: values.output ?? "./resumes",
+        input,
+        templatePath: values["template-path"],
+        outputPath: values["output-path"] ?? "./resumes",
         language: values.language,
-        name: values.name,
-        browserPath: values.browserPath,
-        html: values.html ?? false,
-        htmlOnly: values.htmlOnly ?? false,
-        noSpellCheck: values.noSpellCheck ?? false,
+        filename: values.filename,
+        browserPath: values["browser-path"],
+        keepHtml: values["keep-html"] ?? false,
+        noPdf: values["no-pdf"] ?? false,
+        skipSpellCheck: values["skip-spell-check"] ?? false,
         verbose: values.verbose ?? false
     };
 };

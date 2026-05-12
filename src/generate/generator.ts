@@ -5,7 +5,7 @@ import {
     unlinkSync,
     writeFileSync
 } from "node:fs";
-import { basename, extname, join, resolve } from "node:path";
+import { basename, dirname, extname, join, resolve } from "node:path";
 import { load as yamlLoad } from "js-yaml";
 import { type Browser, launch, type Page } from "puppeteer-core";
 import { createLogger } from "../logging/logger.js";
@@ -19,6 +19,8 @@ import type {
     GenerationResult,
     ResumeMetadata
 } from "./types.js";
+
+const DEFAULT_TEMPLATE_PATH = "./workspace/templates/default.html";
 
 function generateBaseFileName(
     date: string,
@@ -64,7 +66,7 @@ async function generateResumeForLanguage(
     const t = performance.now();
 
     let newPagePromise: Promise<Page> | undefined;
-    if (!options.htmlOnly) {
+    if (!options.noPdf) {
         newPagePromise = browser?.newPage();
     }
 
@@ -73,7 +75,7 @@ async function generateResumeForLanguage(
         `${generationResult.baseFileName}.html`
     );
 
-    const spellCheckPromise = options.noSpellCheck
+    const spellCheckPromise = options.skipSpellCheck
         ? undefined
         : runSpellCheck(
               generationResult.html,
@@ -84,7 +86,7 @@ async function generateResumeForLanguage(
     writeFileSync(htmlPath, generationResult.html);
 
     let pdfGenerationPromise: Promise<void> | undefined;
-    if (options.htmlOnly) {
+    if (options.noPdf) {
         logger.info(`HTML saved: ${htmlPath}`);
     } else {
         const pdfPath = join(
@@ -108,7 +110,7 @@ async function generateResumeForLanguage(
     await spellCheckPromise;
     await pdfGenerationPromise;
 
-    if (!options.html && !options.htmlOnly && generationResult.success) {
+    if (!options.noPdf && !options.keepHtml && generationResult.success) {
         unlinkSync(htmlPath);
     }
 
@@ -118,7 +120,7 @@ async function generateResumeForLanguage(
 export async function generateResumes(options: CommandLineArgs) {
     try {
         let browser: Browser | undefined;
-        if (!options.htmlOnly) {
+        if (!options.noPdf) {
             browser = await launch({
                 headless: true,
                 executablePath: resolveBrowserPath(options.browserPath),
@@ -131,22 +133,21 @@ export async function generateResumes(options: CommandLineArgs) {
         }
 
         const resumeData = yamlLoad(
-            readFileSync(options.data, "utf8")
+            readFileSync(options.input, "utf8")
         ) as ResumeMetadata & Record<string, unknown>;
 
-        const templateName =
-            options.template ?? resumeData.metadata?.template ?? "default";
         const templatePath = resolve(
             process.cwd(),
-            options.templatesDir,
-            `${templateName}.html`
+            options.templatePath ??
+                resumeData.metadata?.template ??
+                DEFAULT_TEMPLATE_PATH
         );
 
         if (!existsSync(templatePath)) {
             throw new Error(`Template not found: ${templatePath}`);
         }
 
-        const outputDir = resolve(process.cwd(), options.output);
+        const outputDir = resolve(process.cwd(), options.outputPath);
         if (!existsSync(outputDir)) {
             mkdirSync(outputDir, { recursive: true });
         }
@@ -162,8 +163,8 @@ export async function generateResumes(options: CommandLineArgs) {
 
         const currentDate = getCurrentDate();
         const templateSource = readFileSync(templatePath, "utf8");
-        const dataFileName = basename(options.data, extname(options.data));
-        const templatesAbsPath = resolve(process.cwd(), options.templatesDir);
+        const dataFileName = basename(options.input, extname(options.input));
+        const templatesAbsPath = dirname(templatePath);
         const totalStart = performance.now();
 
         await Promise.all(
@@ -171,12 +172,11 @@ export async function generateResumes(options: CommandLineArgs) {
                 const logger = createLogger(options.verbose);
                 const generationResult: GenerationResult = {
                     language,
-                    templateName,
                     outputDir,
                     baseFileName: generateBaseFileName(
                         currentDate,
                         language,
-                        options.name ?? dataFileName
+                        options.filename ?? dataFileName
                     ),
                     html: renderHtml(
                         templateSource,
