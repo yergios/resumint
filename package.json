@@ -1,7 +1,7 @@
 {
     "name": "resumint",
     "version": "1.0.0",
-    "description": "Generate multilingual resumes from JSON data",
+    "description": "CLI tool to generate PDF, multilingual resumes from YAML or JSON data using HTML templates styled with CSS.",
     "main": "./src/main.ts",
     "type": "module",
     "bin": {
