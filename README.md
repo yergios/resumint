@@ -19,7 +19,7 @@ git clone https://github.com/yergios/resumint.git
 cd resumint
 
 # Install dependencies
-npm install
+npm ci
 
 # Build TypeScript source
 npm run build

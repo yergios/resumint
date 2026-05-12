@@ -22,7 +22,7 @@ importers:
         version: 17.7.2
     devDependencies:
       '@biomejs/biome':
-        specifier: ^2.4.15
+        specifier: 2.4.15
         version: 2.4.15
       '@types/js-yaml':
         specifier: 4.0.9
