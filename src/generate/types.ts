@@ -1,5 +1,7 @@
 import type { Logger } from "../logging/types.js";
 
+export type OutputFormat = "pdf" | "html" | "both";
+
 export interface ResumeMetadata {
     languages?: string[];
     metadata?: { template?: string };
@@ -10,10 +12,9 @@ export interface CommandLineArgs {
     templatePath: string | undefined;
     outputPath: string;
     language: string | undefined;
-    filename: string | undefined;
+    name: string | undefined;
     browserPath: string | undefined;
-    keepHtml: boolean;
-    noPdf: boolean;
+    format: OutputFormat;
     skipSpellCheck: boolean;
     verbose: boolean;
 }

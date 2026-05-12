@@ -1,9 +1,10 @@
 import { readFileSync } from "node:fs";
 import { parseArgs } from "node:util";
-import type { CommandLineArgs } from "../generate/types.js";
+import type { CommandLineArgs, OutputFormat } from "../generate/types.js";
 
 const DEFAULT_INPUT_PATH = "./workspace/content/resume.yaml";
 const VALID_EXTENSIONS = /\.(yaml|yml|json)$/i;
+const VALID_FORMATS: readonly OutputFormat[] = ["pdf", "html", "both"];
 
 const HELP = `Usage: resumint [path] [options]
 
@@ -15,11 +16,10 @@ Arguments:
 Options:
   -t, --template-path <path> Path to a template HTML file
   -l, --language <lang>      Generate resume for specific language only
-  -f, --filename <stem>      Output filename stem (e.g. john-doe)
+  -n, --name <stem>          Output filename stem (e.g. john-doe)
   -o, --output-path <dir>    Output directory                       [default: ./resumes]
   -b, --browser-path <path>  Path to Chrome/Chromium executable (auto-detected if omitted)
-  -k, --keep-html            Keep rendered HTML alongside the PDF
-  -n, --no-pdf               Render HTML only, do not produce a PDF
+  -f, --format <pdf|html|both>  Output format                        [default: pdf]
   -s, --skip-spell-check     Skip spell checking
   -V, --verbose              Print detailed logs and timing information
   -h, --help                 Show this help and exit
@@ -29,8 +29,8 @@ Examples:
   resumint
   resumint ./workspace/content/example.yaml
   resumint ./workspace/content/example.yaml --language en
-  resumint ./workspace/content/example.yaml -k -o ./my-resumes
-  resumint ./workspace/content/example.yaml --no-pdf
+  resumint ./workspace/content/example.yaml -f both -o ./my-resumes
+  resumint ./workspace/content/example.yaml --format html
   resumint ./workspace/content/example.yaml -t ./workspace/templates/fancy.html
 `;
 
@@ -46,15 +46,14 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
         options: {
             "template-path": { type: "string", short: "t" },
             language: { type: "string", short: "l" },
-            filename: { type: "string", short: "f" },
+            name: { type: "string", short: "n" },
             "output-path": {
                 type: "string",
                 short: "o",
                 default: "./resumes"
             },
             "browser-path": { type: "string", short: "b" },
-            "keep-html": { type: "boolean", short: "k", default: false },
-            "no-pdf": { type: "boolean", short: "n", default: false },
+            format: { type: "string", short: "f", default: "pdf" },
             "skip-spell-check": { type: "boolean", short: "s", default: false },
             verbose: { type: "boolean", short: "V", default: false },
             help: { type: "boolean", short: "h", default: false },
@@ -78,15 +77,21 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
         );
     }
 
+    const format = values.format ?? "pdf";
+    if (!VALID_FORMATS.includes(format as OutputFormat)) {
+        throw new Error(
+            `Invalid --format value: ${format}. Expected one of: ${VALID_FORMATS.join(", ")}`
+        );
+    }
+
     return {
         input,
         templatePath: values["template-path"],
         outputPath: values["output-path"] ?? "./resumes",
         language: values.language,
-        filename: values.filename,
+        name: values.name,
         browserPath: values["browser-path"],
-        keepHtml: values["keep-html"] ?? false,
-        noPdf: values["no-pdf"] ?? false,
+        format: format as OutputFormat,
         skipSpellCheck: values["skip-spell-check"] ?? false,
         verbose: values.verbose ?? false
     };

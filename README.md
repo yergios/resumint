@@ -63,12 +63,11 @@ npm start [path] [options]
 | Flag                 | Alias | Description                                                           | Default                                                                      |
 | -------------------- | ----- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | `--language`         | `-l`  | Generate for a specific language only                                 | all languages in file                                                        |
-| `--filename`         | `-f`  | Output filename stem (e.g. `john-doe` → `2026-05-12-en-john-doe.pdf`) | content input filename                                                       |
+| `--name`             | `-n`  | Output filename stem (e.g. `john-doe` → `2026-05-12-en-john-doe.pdf`) | content input filename                                                       |
 | `--template-path`    | `-t`  | Path to a template HTML file                                          | `metadata.template` in input file, else `./workspace/templates/default.html` |
 | `--output-path`      | `-o`  | Output directory                                                      | `./resumes`                                                                  |
 | `--browser-path`     | `-b`  | Path to Chrome/Chromium executable                                    | auto-detected                                                                |
-| `--keep-html`        | `-k`  | Keep rendered HTML alongside the PDF                                  | `false`                                                                      |
-| `--no-pdf`           | `-n`  | Render HTML only, do not produce a PDF                                | `false`                                                                      |
+| `--format`           | `-f`  | Output format: `pdf`, `html`, or `both`                               | `pdf`                                                                        |
 | `--skip-spell-check` | `-s`  | Skip spell checking                                                   | `false`                                                                      |
 | `--verbose`          | `-V`  | Print detailed logs and timing information                            | `false`                                                                      |
 
@@ -88,16 +87,16 @@ resumint ./workspace/content/example.yaml --language en
 resumint ./workspace/content/example.yaml -t ./workspace/templates/fancy.html
 
 # Keep HTML alongside the PDF, custom output dir
-resumint ./workspace/content/example.yaml -k -o ./my-resumes
+resumint ./workspace/content/example.yaml -f both -o ./my-resumes
 
 # HTML only, no PDF
-resumint ./workspace/content/example.yaml --no-pdf
+resumint ./workspace/content/example.yaml --format html
 
 # Skip spell checking
 resumint ./workspace/content/example.yaml -s
 
 # Custom output filename stem
-resumint ./workspace/content/example.yaml --filename john-doe
+resumint ./workspace/content/example.yaml --name john-doe
 
 # Verbose output with timings
 resumint ./workspace/content/example.yaml --verbose

@@ -66,7 +66,7 @@ async function generateResumeForLanguage(
     const t = performance.now();
 
     let newPagePromise: Promise<Page> | undefined;
-    if (!options.noPdf) {
+    if (options.format !== "html") {
         newPagePromise = browser?.newPage();
     }
 
@@ -86,7 +86,7 @@ async function generateResumeForLanguage(
     writeFileSync(htmlPath, generationResult.html);
 
     let pdfGenerationPromise: Promise<void> | undefined;
-    if (options.noPdf) {
+    if (options.format === "html") {
         logger.info(`HTML saved: ${htmlPath}`);
     } else {
         const pdfPath = join(
@@ -110,7 +110,7 @@ async function generateResumeForLanguage(
     await spellCheckPromise;
     await pdfGenerationPromise;
 
-    if (!options.noPdf && !options.keepHtml && generationResult.success) {
+    if (options.format === "pdf" && generationResult.success) {
         unlinkSync(htmlPath);
     }
 
@@ -120,7 +120,7 @@ async function generateResumeForLanguage(
 export async function generateResumes(options: CommandLineArgs) {
     try {
         let browser: Browser | undefined;
-        if (!options.noPdf) {
+        if (options.format !== "html") {
             browser = await launch({
                 headless: true,
                 executablePath: resolveBrowserPath(options.browserPath),
@@ -176,7 +176,7 @@ export async function generateResumes(options: CommandLineArgs) {
                     baseFileName: generateBaseFileName(
                         currentDate,
                         language,
-                        options.filename ?? dataFileName
+                        options.name ?? dataFileName
                     ),
                     html: renderHtml(
                         templateSource,
