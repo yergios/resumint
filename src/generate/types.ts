@@ -2,8 +2,13 @@ import type { Logger } from "../logging/types.js";
 
 export type OutputFormat = "pdf" | "html" | "both";
 
+export interface Variant {
+    name: string;
+    language?: string;
+}
+
 export interface ResumeMetadata {
-    languages?: string[];
+    variants?: (string | Variant)[];
     metadata?: { template?: string };
 }
 
@@ -11,7 +16,7 @@ export interface CommandLineArgs {
     input: string;
     templatePath: string | undefined;
     outputPath: string;
-    language: string | undefined;
+    variant: string | undefined;
     name: string | undefined;
     browserPath: string | undefined;
     format: OutputFormat;
@@ -20,7 +25,7 @@ export interface CommandLineArgs {
 }
 
 export interface GenerationResult {
-    language: string;
+    variant: Variant;
     outputDir: string;
     baseFileName: string;
     html: string;

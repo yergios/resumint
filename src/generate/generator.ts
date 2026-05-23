@@ -17,17 +17,19 @@ import { generatePDF } from "./pdf.js";
 import type {
     CommandLineArgs,
     GenerationResult,
-    ResumeMetadata
+    ResumeMetadata,
+    Variant
 } from "./types.js";
+import { normalizeVariants } from "./variants.js";
 
 const DEFAULT_TEMPLATE_PATH = "./workspace/templates/default.html";
 
 function generateBaseFileName(
     date: string,
-    language: string,
+    variantName: string,
     name: string
 ): string {
-    return `${date}-${language}-${name
+    return `${date}-${variantName}-${name
         .toLowerCase()
         .replace(/\s+/g, "-")
         .replace(/[^a-z0-9-]/g, "")}`;
@@ -36,16 +38,17 @@ function generateBaseFileName(
 async function runSpellCheck(
     html: string,
     language: string,
+    variantName: string,
     generationResult: GenerationResult
 ): Promise<void> {
     const { logger } = generationResult;
     const t = performance.now();
     const result = await spellCheckHtml(html, language);
-    logger.perf(`Spell check (${language})`, performance.now() - t);
+    logger.perf(`Spell check (${variantName})`, performance.now() - t);
 
     if (result.misspelledCount > 0) {
         logger.warn(
-            `Found ${result.misspelledCount} misspelled words in '${language}' resume:`
+            `Found ${result.misspelledCount} misspelled words in '${variantName}' resume:`
         );
         result.misspelled.forEach(({ word, suggestions }) => {
             logger.warn(
@@ -53,16 +56,16 @@ async function runSpellCheck(
             );
         });
     } else {
-        logger.info(`No spelling errors found in ${language} resume`);
+        logger.info(`No spelling errors found in ${variantName} resume`);
     }
 }
 
-async function generateResumeForLanguage(
+async function generateResumeForVariant(
     browser: Browser | undefined,
     options: CommandLineArgs,
     generationResult: GenerationResult
 ) {
-    const { logger } = generationResult;
+    const { logger, variant } = generationResult;
     const t = performance.now();
 
     let newPagePromise: Promise<Page> | undefined;
@@ -75,13 +78,15 @@ async function generateResumeForLanguage(
         `${generationResult.baseFileName}.html`
     );
 
-    const spellCheckPromise = options.skipSpellCheck
-        ? undefined
-        : runSpellCheck(
-              generationResult.html,
-              generationResult.language,
-              generationResult
-          );
+    const spellCheckPromise =
+        !options.skipSpellCheck && variant.language
+            ? runSpellCheck(
+                  generationResult.html,
+                  variant.language,
+                  variant.name,
+                  generationResult
+              )
+            : undefined;
 
     writeFileSync(htmlPath, generationResult.html);
 
@@ -114,7 +119,7 @@ async function generateResumeForLanguage(
         unlinkSync(htmlPath);
     }
 
-    logger.perf(`Total (${generationResult.language})`, performance.now() - t);
+    logger.perf(`Total (${variant.name})`, performance.now() - t);
 }
 
 export async function generateResumes(options: CommandLineArgs) {
@@ -152,15 +157,26 @@ export async function generateResumes(options: CommandLineArgs) {
             mkdirSync(outputDir, { recursive: true });
         }
 
-        const languages = options.language
-            ? [options.language]
-            : resumeData.languages;
-        if (!languages || languages.length === 0) {
-            throw new Error(
-                "No languages specified in resume data or via --language"
-            );
+        const allVariants = normalizeVariants(resumeData.variants);
+        if (allVariants.length === 0) {
+            throw new Error("No variants declared in resume data");
         }
 
+        let variants: Variant[];
+        if (options.variant) {
+            const match = allVariants.find((v) => v.name === options.variant);
+            if (!match) {
+                const names = allVariants.map((v) => v.name).join(", ");
+                throw new Error(
+                    `Unknown variant: '${options.variant}'. Valid variants: ${names}`
+                );
+            }
+            variants = [match];
+        } else {
+            variants = allVariants;
+        }
+
+        const variantNames = allVariants.map((v) => v.name);
         const currentDate = getCurrentDate();
         const templateSource = readFileSync(templatePath, "utf8");
         const dataFileName = basename(options.input, extname(options.input));
@@ -168,29 +184,29 @@ export async function generateResumes(options: CommandLineArgs) {
         const totalStart = performance.now();
 
         await Promise.all(
-            languages.map((language) => {
+            variants.map((variant) => {
                 const logger = createLogger(options.verbose);
                 const generationResult: GenerationResult = {
-                    language,
+                    variant,
                     outputDir,
                     baseFileName: generateBaseFileName(
                         currentDate,
-                        language,
+                        variant.name,
                         options.name ?? dataFileName
                     ),
                     html: renderHtml(
                         templateSource,
                         resumeData,
-                        language,
-                        resumeData.languages ?? languages,
+                        variant.name,
+                        variantNames,
                         templatesAbsPath
                     ),
                     success: true,
                     logger
                 };
 
-                logger.info(`Generating '${language.toUpperCase()}' resume`);
-                return generateResumeForLanguage(
+                logger.info(`Generating '${variant.name.toUpperCase()}' resume`);
+                return generateResumeForVariant(
                     browser,
                     options,
                     generationResult

@@ -9,26 +9,26 @@ const VALID_FORMATS: readonly OutputFormat[] = ["pdf", "html", "both"];
 const HELP = `Usage: resumint [path] [options]
 
 Arguments:
-  path                       Path to a YAML or JSON data file (relative or absolute).
-                             Extension (.yaml, .yml, .json) is required.
-                             Defaults to ${DEFAULT_INPUT_PATH}.
+  path                          Path to a YAML or JSON data file (relative or absolute).
+                                Extension (.yaml, .yml, .json) is required.
+                                Defaults to ${DEFAULT_INPUT_PATH}.
 
 Options:
-  -t, --template-path <path> Path to a template HTML file
-  -l, --language <lang>      Generate resume for specific language only
-  -n, --name <stem>          Output filename stem (e.g. john-doe)
-  -o, --output-path <dir>    Output directory                       [default: ./resumes]
-  -b, --browser-path <path>  Path to Chrome/Chromium executable (auto-detected if omitted)
-  -f, --format <pdf|html|both>  Output format                        [default: pdf]
-  -s, --skip-spell-check     Skip spell checking
-  -V, --verbose              Print detailed logs and timing information
-  -h, --help                 Show this help and exit
-  -v, --version              Show version and exit
+  -t, --template-path <path>    Path to a template HTML file
+  -v, --variant <name>          Generate only this variant
+  -n, --name <stem>             Output filename stem (e.g. john-doe)
+  -o, --output-path <dir>       Output directory (default: ./resumes)
+  -b, --browser-path <path>     Path to Chrome/Chromium executable (auto-detected if omitted)
+  -f, --format <pdf|html|both>  Output format (default: pdf)
+  -s, --skip-spell-check        Skip spell checking
+  -V, --verbose                 Print detailed logs and timing information
+  -h, --help                    Show this help and exit
+      --version                 Show version and exit
 
 Examples:
   resumint
   resumint ./workspace/content/example.yaml
-  resumint ./workspace/content/example.yaml --language en
+  resumint ./workspace/content/example.yaml --variant en
   resumint ./workspace/content/example.yaml -f both -o ./my-resumes
   resumint ./workspace/content/example.yaml --format html
   resumint ./workspace/content/example.yaml -t ./workspace/templates/fancy.html
@@ -45,7 +45,7 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
         allowPositionals: true,
         options: {
             "template-path": { type: "string", short: "t" },
-            language: { type: "string", short: "l" },
+            variant: { type: "string", short: "v" },
             name: { type: "string", short: "n" },
             "output-path": {
                 type: "string",
@@ -57,7 +57,7 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
             "skip-spell-check": { type: "boolean", short: "s", default: false },
             verbose: { type: "boolean", short: "V", default: false },
             help: { type: "boolean", short: "h", default: false },
-            version: { type: "boolean", short: "v", default: false }
+            version: { type: "boolean", default: false }
         }
     });
 
@@ -88,7 +88,7 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
         input,
         templatePath: values["template-path"],
         outputPath: values["output-path"] ?? "./resumes",
-        language: values.language,
+        variant: values.variant,
         name: values.name,
         browserPath: values["browser-path"],
         format: format as OutputFormat,

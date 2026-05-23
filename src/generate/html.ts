@@ -1,5 +1,5 @@
 import { ICON_SVGS } from "./icons.js";
-import { localize } from "./localize.js";
+import { resolveVariants } from "./resolve-variants.js";
 import { renderTemplate } from "./template.js";
 
 function attachIcons(data: Record<string, unknown>): void {
@@ -20,16 +20,16 @@ function attachIcons(data: Record<string, unknown>): void {
 export function renderHtml(
     source: string,
     data: Record<string, unknown>,
-    language: string,
-    languages: string[],
+    variant: string,
+    variantNames: string[],
     templatesAbsPath: string
 ): string {
-    const localized = localize(data, languages, language) as Record<
+    const resolved = resolveVariants(data, variantNames, variant) as Record<
         string,
         unknown
     >;
-    attachIcons(localized);
-    const html = renderTemplate(source, { ...localized, language });
+    attachIcons(resolved);
+    const html = renderTemplate(source, { ...resolved, variant });
     const baseTag = `<base href="file://${templatesAbsPath}/">`;
     return html.replace("<head>", `<head>\n    ${baseTag}`);
 }
