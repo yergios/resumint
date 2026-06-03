@@ -1,37 +1,47 @@
-import type { LogEntry, Logger } from "./types.js";
+import { ANSI, type LogEntry, type Logger, LogLevel } from "./types.js";
 
 export function createLogger(): Logger {
     const logs: LogEntry[] = [];
 
     return {
-        info(message: string): void {
-            logs.push({ level: "info", message, timestamp: new Date() });
-        },
-
-        perf(label: string, ms: number): void {
+        debug(message: string): void {
             logs.push({
-                level: "perf",
-                message: `${label}: ${ms.toFixed(1)}ms`,
+                level: LogLevel.Debug,
+                message,
                 timestamp: new Date()
             });
         },
 
+        perf(label: string, ms: number): void {
+            logs.push({
+                level: LogLevel.Perf,
+                message: `${label}: ${ms.toFixed(2)}ms`,
+                timestamp: new Date()
+            });
+        },
+
+        info(message: string): void {
+            logs.push({ level: LogLevel.Info, message, timestamp: new Date() });
+        },
+
         warn(message: string): void {
-            logs.push({ level: "warn", message, timestamp: new Date() });
+            logs.push({ level: LogLevel.Warn, message, timestamp: new Date() });
         },
 
         error(message: string): void {
-            logs.push({ level: "error", message, timestamp: new Date() });
+            logs.push({
+                level: LogLevel.Error,
+                message,
+                timestamp: new Date()
+            });
         },
 
-        print(printDebugLogs: boolean): void {
+        print(threshold: number): void {
             for (const entry of logs) {
-                if (
-                    printDebugLogs ||
-                    entry.level === "error" ||
-                    entry.level === "warn"
-                ) {
-                    console.log(`[${entry.level}]: ${entry.message}`);
+                if (entry.level.value >= threshold) {
+                    entry.level.consoleFn(
+                        `${entry.level.color}[${entry.level.label}]${ANSI.white}: ${entry.message}`
+                    );
                 }
             }
         }

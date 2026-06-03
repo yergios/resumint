@@ -3,22 +3,22 @@
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { basename, dirname, extname, resolve } from "node:path";
 import { load as yamlLoad } from "js-yaml";
-import cli from "./cli/cli.js";
-import { createLogger } from "./logging/logger.js";
 import { type Browser, launch } from "puppeteer-core";
+import cli from "./cli/cli.js";
 import { resolveBrowserPath } from "./generate/browser.js";
+import {
+    generateBaseFileName,
+    generateResumeForVariant
+} from "./generate/generator.js";
 import { renderHtml } from "./generate/html.js";
-import { getCurrentDate, getErrorMessage } from "./utils.js";
-import { normalizeVariants } from "./generate/variants.js";
 import type {
     GenerationResult,
     ResumeMetadata,
     Variant
 } from "./generate/types.js";
-import {
-    generateBaseFileName,
-    generateResumeForVariant
-} from "./generate/generator.js";
+import { normalizeVariants } from "./generate/variants.js";
+import { createLogger } from "./logging/logger.js";
+import { getCurrentDate, getErrorMessage } from "./utils.js";
 
 const DEFAULT_TEMPLATE_PATH = "./workspace/templates/default.html";
 
@@ -113,7 +113,7 @@ async function main() {
                     logger
                 };
 
-                logger.info(
+                logger.debug(
                     `Generating '${variant.name.toUpperCase()}' resume`
                 );
                 return generateResumeForVariant(
@@ -132,7 +132,7 @@ async function main() {
 
     logger.perf("Resumes generation", performance.now() - t);
     logger.perf("Total overall", performance.now() - totalStart);
-    logger.print(options.verbose);
+    logger.print(options.verbose ? 0 : 1);
 }
 
 main();

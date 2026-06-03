@@ -40,7 +40,7 @@ function readVersion(): string {
     return pkg.version;
 }
 
-const parseArguments = (): CommandLineArgs => {
+function parseArguments(): CommandLineArgs {
     const { values, positionals } = parseArgs({
         allowPositionals: true,
         options: {
@@ -95,6 +95,6 @@ const parseArguments = (): CommandLineArgs => {
         skipSpellCheck: values["skip-spell-check"] ?? false,
         verbose: values.verbose ?? false
     };
-};
+}
 
 export default { parseArguments };

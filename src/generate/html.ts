@@ -5,11 +5,14 @@ import { renderTemplate } from "./template.js";
 function attachIcons(data: Record<string, unknown>): void {
     const basic = data["basic"] as Record<string, unknown> | undefined;
     const contactInfo = basic?.["contactInfo"];
+
     if (!Array.isArray(contactInfo)) return;
+
     for (const item of contactInfo) {
         if (item && typeof item === "object") {
             const entry = item as Record<string, unknown>;
             const type = entry["type"];
+
             if (typeof type === "string") {
                 entry["iconSvg"] = ICON_SVGS[type] ?? "";
             }
