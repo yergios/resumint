@@ -1,46 +1,39 @@
-import type { LogEntry, Logger, LogLevel } from "./types.js";
+import type { LogEntry, Logger } from "./types.js";
 
-export function createLogger(verbose: boolean): Logger {
-    const entries: LogEntry[] = [];
-    const errors: string[] = [];
-
-    function log(level: LogLevel, message: string): void {
-        entries.push({ level, message, timestamp: new Date() });
-        if (verbose || level !== "info") {
-            console.log(`[${level.toUpperCase()}]: ${message}`);
-        }
-    }
+export function createLogger(): Logger {
+    const logs: LogEntry[] = [];
 
     return {
         info(message: string): void {
-            log("info", message);
-        },
-
-        warn(message: string): void {
-            log("warn", message);
-        },
-
-        error(message: string): void {
-            errors.push(message);
-            log("error", message);
+            logs.push({ level: "info", message, timestamp: new Date() });
         },
 
         perf(label: string, ms: number): void {
-            if (verbose) {
-                console.log(`[PERF]: ${label}: ${ms.toFixed(1)}ms`);
+            logs.push({
+                level: "perf",
+                message: `${label}: ${ms.toFixed(1)}ms`,
+                timestamp: new Date()
+            });
+        },
+
+        warn(message: string): void {
+            logs.push({ level: "warn", message, timestamp: new Date() });
+        },
+
+        error(message: string): void {
+            logs.push({ level: "error", message, timestamp: new Date() });
+        },
+
+        print(printDebugLogs: boolean): void {
+            for (const entry of logs) {
+                if (
+                    printDebugLogs ||
+                    entry.level === "error" ||
+                    entry.level === "warn"
+                ) {
+                    console.log(`[${entry.level}]: ${entry.message}`);
+                }
             }
-        },
-
-        getEntries(): LogEntry[] {
-            return entries;
-        },
-
-        getErrors(): string[] {
-            return errors;
-        },
-
-        hasErrors(): boolean {
-            return errors.length > 0;
         }
     };
 }

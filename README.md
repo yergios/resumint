@@ -26,6 +26,9 @@ npm run build
 
 # (Optional) Make resumint available as a global CLI command
 npm link --global
+
+# Generate "en" resume variant in PDF
+resumint ./workspace/content/example.yaml --variant en
 ```
 
 ## Workspace layout

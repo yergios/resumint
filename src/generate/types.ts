@@ -15,9 +15,9 @@ export interface ResumeMetadata {
 export interface CommandLineArgs {
     input: string;
     templatePath: string | undefined;
-    outputPath: string;
     variant: string | undefined;
     name: string | undefined;
+    outputPath: string;
     browserPath: string | undefined;
     format: OutputFormat;
     skipSpellCheck: boolean;
@@ -26,8 +26,8 @@ export interface CommandLineArgs {
 
 export interface GenerationResult {
     variant: Variant;
-    outputDir: string;
     baseFileName: string;
+    outputDir: string;
     html: string;
     success: boolean;
     logger: Logger;

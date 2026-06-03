@@ -40,7 +40,7 @@ function readVersion(): string {
     return pkg.version;
 }
 
-const parseArguments = async (): Promise<CommandLineArgs> => {
+const parseArguments = (): CommandLineArgs => {
     const { values, positionals } = parseArgs({
         allowPositionals: true,
         options: {
@@ -87,9 +87,9 @@ const parseArguments = async (): Promise<CommandLineArgs> => {
     return {
         input,
         templatePath: values["template-path"],
-        outputPath: values["output-path"] ?? "./resumes",
         variant: values.variant,
         name: values.name,
+        outputPath: values["output-path"] ?? "./resumes",
         browserPath: values["browser-path"],
         format: format as OutputFormat,
         skipSpellCheck: values["skip-spell-check"] ?? false,
