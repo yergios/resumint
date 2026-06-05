@@ -5,7 +5,6 @@ import { basename, dirname, extname, resolve } from "node:path";
 import { load as yamlLoad } from "js-yaml";
 import { type Browser, launch } from "puppeteer-core";
 import cli from "./cli/cli.js";
-import { resolveBrowserPath } from "./generate/browser.js";
 import {
     generateBaseFileName,
     generateResumeForVariant
@@ -19,8 +18,6 @@ import type {
 import { normalizeVariants } from "./generate/variants.js";
 import { createLogger } from "./logging/logger.js";
 import { getCurrentDate, getErrorMessage } from "./utils.js";
-
-const DEFAULT_TEMPLATE_PATH = "./workspace/templates/default.html";
 
 if (existsSync(".env")) process.loadEnvFile(".env");
 
@@ -37,7 +34,7 @@ async function main() {
     if (options.format !== "html") {
         browser = await launch({
             headless: true,
-            executablePath: resolveBrowserPath(options.browserPath),
+            executablePath: options.browserPath,
             args: ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]
         });
     }
@@ -50,21 +47,6 @@ async function main() {
     logger.perf("Resume data loading", performance.now() - t);
 
     t = performance.now();
-    const templatePath = resolve(
-        process.cwd(),
-        options.templatePath ??
-            resumeData.metadata?.template ??
-            DEFAULT_TEMPLATE_PATH
-    );
-    if (!existsSync(templatePath)) {
-        throw new Error(`Template not found: ${templatePath}`);
-    }
-
-    const outputDir = resolve(process.cwd(), options.outputPath);
-    if (!existsSync(outputDir)) {
-        mkdirSync(outputDir, { recursive: true });
-    }
-
     const allVariants = normalizeVariants(resumeData.variants);
     if (allVariants.length === 0) {
         throw new Error("No variants declared in resume data");
@@ -88,15 +70,15 @@ async function main() {
     try {
         const variantNames = allVariants.map((v) => v.name);
         const currentDate = getCurrentDate();
-        const templateSource = readFileSync(templatePath, "utf8");
+        const templateSource = readFileSync(options.templatePath, "utf8");
         const dataFileName = basename(options.input, extname(options.input));
-        const templatesAbsPath = dirname(templatePath);
+        const templatesAbsPath = dirname(options.templatePath);
 
         await Promise.all(
             variants.map((variant) => {
                 const generationResult: GenerationResult = {
                     variant,
-                    outputDir,
+                    outputPath: options.outputPath,
                     baseFileName: generateBaseFileName(
                         currentDate,
                         variant.name,

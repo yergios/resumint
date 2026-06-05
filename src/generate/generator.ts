@@ -3,7 +3,8 @@ import { join } from "node:path";
 import type { Browser, Page } from "puppeteer-core";
 import { spellCheckHtml } from "../spell-check/spell-checker.js";
 import { generatePDF } from "./pdf.js";
-import type { CommandLineArgs, GenerationResult } from "./types.js";
+import type { CommandLineArgs } from "src/cli/types.js";
+import type { GenerationResult } from "./types.js";
 
 export function generateBaseFileName(
     date: string,
@@ -55,7 +56,7 @@ export async function generateResumeForVariant(
     }
 
     const htmlPath = join(
-        generationResult.outputDir,
+        generationResult.outputPath,
         `${generationResult.baseFileName}.html`
     );
 
@@ -76,7 +77,7 @@ export async function generateResumeForVariant(
         logger.info(`HTML saved: ${htmlPath}`);
     } else {
         const pdfPath = join(
-            generationResult.outputDir,
+            generationResult.outputPath,
             `${generationResult.baseFileName}.pdf`
         );
         const page = await newPagePromise;

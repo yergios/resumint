@@ -1,10 +1,30 @@
-import { readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { platform } from "node:os";
+import { resolve } from "node:path";
 import { parseArgs } from "node:util";
-import type { CommandLineArgs, OutputFormat } from "../generate/types.js";
+import type { CommandLineArgs, OutputFormat } from "./types.js";
 
+const DEFAULT_TEMPLATE_PATH = "./workspace/templates/default.html";
 const DEFAULT_INPUT_PATH = "./workspace/content/resume.yaml";
+const DEFAULT_OUTPUT_PATH = "./resumes";
 const VALID_EXTENSIONS = /\.(yaml|yml|json)$/i;
 const VALID_FORMATS: readonly OutputFormat[] = ["pdf", "html", "both"];
+const OS_BROWSER_CANDIDATES: Record<string, string[]> = {
+    linux: [
+        "/usr/bin/google-chrome-stable",
+        "/usr/bin/google-chrome",
+        "/usr/bin/chromium",
+        "/usr/bin/chromium-browser"
+    ],
+    darwin: [
+        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "/Applications/Chromium.app/Contents/MacOS/Chromium"
+    ],
+    win32: [
+        "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+        "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+    ]
+};
 
 const HELP = `Usage: resumint [path] [options]
 
@@ -38,6 +58,34 @@ function readVersion(): string {
     const pkgUrl = new URL("../../package.json", import.meta.url);
     const pkg = JSON.parse(readFileSync(pkgUrl, "utf8")) as { version: string };
     return pkg.version;
+}
+
+function resolveBrowserPath(cliPath?: string): string {
+    if (cliPath) {
+        if (!existsSync(cliPath)) {
+            throw new Error(`--browserPath does not exist: ${cliPath}`);
+        }
+        return cliPath;
+    }
+
+    const envPath = process.env["PUPPETEER_EXECUTABLE_PATH"];
+    if (envPath) {
+        if (!existsSync(envPath)) {
+            throw new Error(
+                `PUPPETEER_EXECUTABLE_PATH does not exist: ${envPath}`
+            );
+        }
+        return envPath;
+    }
+
+    const osBrowserCandidates = OS_BROWSER_CANDIDATES[platform()] ?? [];
+    for (const osBrowserPath of osBrowserCandidates) {
+        if (existsSync(osBrowserPath)) return osBrowserPath;
+    }
+
+    throw new Error(
+        "No Chrome/Chromium found. Install Chrome/Chromium or pass --browserPath /path/to/chrome."
+    );
 }
 
 function parseArguments(): CommandLineArgs {
@@ -77,6 +125,22 @@ function parseArguments(): CommandLineArgs {
         );
     }
 
+    const templatePath = resolve(
+        process.cwd(),
+        values["template-path"] ?? DEFAULT_TEMPLATE_PATH
+    );
+    if (!existsSync(templatePath)) {
+        throw new Error(`Template not found: ${templatePath}`);
+    }
+
+    const outputPath = resolve(
+        process.cwd(),
+        values["output-path"] ?? DEFAULT_OUTPUT_PATH
+    );
+    if (!existsSync(outputPath)) {
+        mkdirSync(outputPath, { recursive: true });
+    }
+
     const format = values.format ?? "pdf";
     if (!VALID_FORMATS.includes(format as OutputFormat)) {
         throw new Error(
@@ -84,13 +148,15 @@ function parseArguments(): CommandLineArgs {
         );
     }
 
+    const browserPath = resolveBrowserPath(values["browser-path"]);
+
     return {
         input,
-        templatePath: values["template-path"],
+        templatePath,
         variant: values.variant,
         name: values.name,
-        outputPath: values["output-path"] ?? "./resumes",
-        browserPath: values["browser-path"],
+        outputPath,
+        browserPath,
         format: format as OutputFormat,
         skipSpellCheck: values["skip-spell-check"] ?? false,
         verbose: values.verbose ?? false
