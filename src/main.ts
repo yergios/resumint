@@ -1,35 +1,31 @@
 #!/usr/bin/env node
 
-import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, extname, resolve } from "node:path";
 import { load as yamlLoad } from "js-yaml";
 import { type Browser, launch } from "puppeteer-core";
 import cli from "./cli/cli.js";
 import {
-    generateBaseFileName,
+    generateResumeBaseName as generateResumeBasename,
     generateResumeForVariant
 } from "./generate/generator.js";
 import { renderHtml } from "./generate/html.js";
-import type {
-    GenerationResult,
-    ResumeMetadata,
-    Variant
-} from "./generate/types.js";
-import { normalizeVariants } from "./generate/variants.js";
+import type { GenerationResult, ResumeMetadata } from "./generate/types.js";
+import { getVariants } from "./generate/variants.js";
 import { createLogger } from "./logging/logger.js";
 import { getCurrentDate, getErrorMessage } from "./utils.js";
 
 if (existsSync(".env")) process.loadEnvFile(".env");
 
 async function main() {
-    const totalStart = performance.now();
+    const totalStartT = performance.now();
     const logger = createLogger();
 
-    let t = performance.now();
+    const cliParsingT = performance.now();
     const options = cli.parseArguments();
-    logger.perf("CLI parsing", performance.now() - t);
+    logger.perf("CLI parsing", performance.now() - cliParsingT);
 
-    t = performance.now();
+    const browserStartupT = performance.now();
     let browser: Browser | undefined;
     if (options.format !== "html") {
         browser = await launch({
@@ -38,66 +34,59 @@ async function main() {
             args: ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]
         });
     }
-    logger.perf("Browser startup", performance.now() - t);
+    logger.perf("Browser startup", performance.now() - browserStartupT);
 
-    t = performance.now();
+    const resumeDataLoadingT = performance.now();
     const resumeData = yamlLoad(
         readFileSync(options.input, "utf8")
     ) as ResumeMetadata & Record<string, unknown>;
-    logger.perf("Resume data loading", performance.now() - t);
+    logger.perf("Resume data loading", performance.now() - resumeDataLoadingT);
 
-    t = performance.now();
-    const allVariants = normalizeVariants(resumeData.variants);
-    if (allVariants.length === 0) {
-        throw new Error("No variants declared in resume data");
-    }
-
-    let variants: Variant[];
-    if (options.variant) {
-        const match = allVariants.find((v) => v.name === options.variant);
-        if (!match) {
-            const names = allVariants.map((v) => v.name).join(", ");
-            throw new Error(
-                `Unknown variant: '${options.variant}'. Valid variants: ${names}`
-            );
-        }
-        variants = [match];
-    } else {
-        variants = allVariants;
-    }
-    logger.perf("Prepping for resume generation", performance.now() - t);
+    const resumesGenerationT = performance.now();
+    const variants = getVariants(resumeData.variants, options.variant);
+    const variantNames = variants.map((v) => v.name);
+    const currentDate = getCurrentDate();
+    const resumeTemplate = readFileSync(options.templatePath, "utf8");
+    const templatesAbsPath = dirname(options.templatePath);
 
     try {
-        const variantNames = allVariants.map((v) => v.name);
-        const currentDate = getCurrentDate();
-        const templateSource = readFileSync(options.templatePath, "utf8");
-        const dataFileName = basename(options.input, extname(options.input));
-        const templatesAbsPath = dirname(options.templatePath);
-
         await Promise.all(
             variants.map((variant) => {
+                const resumeBasenameT = performance.now();
+                const resumeBasename = generateResumeBasename(
+                    variant.name,
+                    currentDate,
+                    options.input,
+                    options.name
+                );
+                logger.perf(
+                    `Resume basename variant '${variant.name}'`,
+                    performance.now() - resumeBasenameT
+                );
+
+                const renderHtmlT = performance.now();
+                const html = renderHtml(
+                    resumeTemplate,
+                    resumeData,
+                    variant.name,
+                    variantNames,
+                    templatesAbsPath
+                );
+                logger.perf(
+                    `HTML rendering for variant '${variant.name}'`,
+                    performance.now() - renderHtmlT
+                );
+
                 const generationResult: GenerationResult = {
                     variant,
                     outputPath: options.outputPath,
-                    baseFileName: generateBaseFileName(
-                        currentDate,
-                        variant.name,
-                        options.name ?? dataFileName
-                    ),
-                    html: renderHtml(
-                        templateSource,
-                        resumeData,
-                        variant.name,
-                        variantNames,
-                        templatesAbsPath
-                    ),
-                    success: true,
+                    resumeBasename,
+                    html,
                     logger
                 };
 
-                logger.debug(
-                    `Generating '${variant.name.toUpperCase()}' resume`
-                );
+                logger.debug(`Generating '${variant.name}' resume`);
+
                 return generateResumeForVariant(
                     browser,
                     options,
@@ -112,8 +101,8 @@ async function main() {
         process.exit(1);
     }
 
-    logger.perf("Resumes generation", performance.now() - t);
-    logger.perf("Total overall", performance.now() - totalStart);
+    logger.perf("Resumes generation", performance.now() - resumesGenerationT);
+    logger.perf("Total overall", performance.now() - totalStartT);
     logger.print(options.verbose ? 0 : 1);
 }
 

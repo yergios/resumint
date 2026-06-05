@@ -1,5 +1,5 @@
 import { ICON_SVGS } from "./icons.js";
-import { resolveVariants } from "./resolve-variants.js";
+import { resolveVariants } from "./variants.js";
 import { renderTemplate } from "./template.js";
 
 function attachIcons(data: Record<string, unknown>): void {
@@ -31,8 +31,12 @@ export function renderHtml(
         string,
         unknown
     >;
+
     attachIcons(resolved);
+
     const html = renderTemplate(source, { ...resolved, variant });
+
     const baseTag = `<base href="file://${templatesAbsPath}/">`;
+
     return html.replace("<head>", `<head>\n    ${baseTag}`);
 }

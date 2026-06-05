@@ -11,9 +11,8 @@ export interface ResumeMetadata {
 
 export interface GenerationResult {
     variant: Variant;
-    baseFileName: string;
+    resumeBasename: string;
     outputPath: string;
     html: string;
-    success: boolean;
     logger: Logger;
 }

@@ -36,11 +36,13 @@ function tokenize(src: string): Token[] {
     let pos = 0;
     TAG_RE.lastIndex = 0;
     let m: RegExpExecArray | null;
+
     // biome-ignore lint/suspicious/noAssignInExpressions: standard regex iteration
     while ((m = TAG_RE.exec(src)) !== null) {
         if (m.index > pos) {
             out.push({ type: "text", value: src.slice(pos, m.index) });
         }
+
         if (m[1] !== undefined) {
             out.push({ type: "raw", path: m[1].trim() });
         } else {
@@ -73,14 +75,20 @@ function tokenize(src: string): Token[] {
                 out.push({ type: "var", path: inner });
             }
         }
+
         pos = m.index + m[0].length;
     }
-    if (pos < src.length) out.push({ type: "text", value: src.slice(pos) });
+
+    if (pos < src.length) {
+        out.push({ type: "text", value: src.slice(pos) });
+    }
+
     return out;
 }
 
 function parse(tokens: Token[]): Node[] {
     let i = 0;
+
     function parseBlock(closeBlock?: "each" | "if" | "unless"): Node[] {
         const nodes: Node[] = [];
         while (i < tokens.length) {
@@ -103,9 +111,14 @@ function parse(tokens: Token[]): Node[] {
                 i++;
             }
         }
-        if (closeBlock) throw new Error(`Unclosed {{#${closeBlock}}}`);
+
+        if (closeBlock) {
+            throw new Error(`Unclosed {{#${closeBlock}}}`);
+        }
+
         return nodes;
     }
+
     return parseBlock();
 }
 
@@ -114,34 +127,51 @@ function resolve(path: string, frame: Frame): unknown {
     if (path === "@index") return frame.index;
     if (path === "@first") return frame.first;
     if (path === "@last") return frame.last;
+
     let cur: unknown = frame.data;
     for (const seg of path.split(".")) {
         if (cur === null || cur === undefined || typeof cur !== "object") {
             return undefined;
         }
+
         cur = (cur as Record<string, unknown>)[seg];
     }
+
     return cur;
 }
 
 function truthy(v: unknown): boolean {
-    if (v === undefined || v === null || v === false || v === 0) return false;
-    if (typeof v === "string" && v.length === 0) return false;
-    if (Array.isArray(v) && v.length === 0) return false;
+    if (v === undefined || v === null || v === false || v === 0) {
+        return false;
+    }
+
+    if (typeof v === "string" && v.length === 0) {
+        return false;
+    }
+
+    if (Array.isArray(v) && v.length === 0) {
+        return false;
+    }
+
     return true;
 }
 
 function render(nodes: Node[], frame: Frame): string {
     let out = "";
+
     for (const node of nodes) {
         if (node.type === "text") {
             out += node.value;
         } else if (node.type === "var") {
             const v = resolve(node.path, frame);
-            if (v !== undefined && v !== null) out += escape(String(v));
+            if (v !== undefined && v !== null) {
+                out += escape(String(v));
+            }
         } else if (node.type === "raw") {
             const v = resolve(node.path, frame);
-            if (v !== undefined && v !== null) out += String(v);
+            if (v !== undefined && v !== null) {
+                out += String(v);
+            }
         } else if (node.type === "if") {
             if (truthy(resolve(node.path, frame))) {
                 out += render(node.children, frame);
@@ -164,6 +194,7 @@ function render(nodes: Node[], frame: Frame): string {
             }
         }
     }
+
     return out;
 }
 

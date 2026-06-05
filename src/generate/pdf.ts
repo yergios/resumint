@@ -32,7 +32,6 @@ export async function generatePDF(
     }
 
     if (contentHeight > A4_HEIGHT_PX) {
-        generationResult.success = false;
         logger.error(
             `Content height exceeds A4 maximum (${contentHeight}px > ${A4_HEIGHT_PX}px)`
         );
@@ -47,7 +46,7 @@ export async function generatePDF(
         margin: { top: "0", right: "0", bottom: "0", left: "0" }
     });
     logger.perf(
-        `PDF render (${generationResult.variant.name})`,
+        `PDF render '${generationResult.variant.name}'`,
         performance.now() - t
     );
     logger.info(`PDF generated: ${outputPath}`);

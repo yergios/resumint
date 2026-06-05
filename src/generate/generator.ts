@@ -1,17 +1,20 @@
 import { unlinkSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { basename, extname, join } from "node:path";
 import type { Browser, Page } from "puppeteer-core";
 import { spellCheckHtml } from "../spell-check/spell-checker.js";
 import { generatePDF } from "./pdf.js";
 import type { CommandLineArgs } from "src/cli/types.js";
 import type { GenerationResult } from "./types.js";
 
-export function generateBaseFileName(
+export function generateResumeBaseName(
+    variant: string,
     date: string,
-    variantName: string,
-    name: string
+    input: string,
+    name?: string
 ): string {
-    return `${date}-${variantName}-${name
+    const resumeBasename = name || basename(input, extname(input));
+
+    return `${date}-${variant}-${resumeBasename
         .toLowerCase()
         .replace(/\s+/g, "-")
         .replace(/[^a-z0-9-]/g, "")}`;
@@ -26,7 +29,7 @@ export async function runSpellCheck(
     const { logger } = generationResult;
     const t = performance.now();
     const result = await spellCheckHtml(html, language);
-    logger.perf(`Spell check (${variantName})`, performance.now() - t);
+    logger.perf(`Spell check '${variantName}'`, performance.now() - t);
 
     if (result.misspelledCount > 0) {
         logger.warn(
@@ -38,7 +41,7 @@ export async function runSpellCheck(
             );
         });
     } else {
-        logger.info(`No spelling errors found in ${variantName} resume`);
+        logger.info(`No spelling errors found in '${variantName}' resume`);
     }
 }
 
@@ -57,7 +60,7 @@ export async function generateResumeForVariant(
 
     const htmlPath = join(
         generationResult.outputPath,
-        `${generationResult.baseFileName}.html`
+        `${generationResult.resumeBasename}.html`
     );
 
     const spellCheckPromise =
@@ -78,11 +81,10 @@ export async function generateResumeForVariant(
     } else {
         const pdfPath = join(
             generationResult.outputPath,
-            `${generationResult.baseFileName}.pdf`
+            `${generationResult.resumeBasename}.pdf`
         );
         const page = await newPagePromise;
         if (!page) {
-            generationResult.success = false;
             logger.error("Browser page was not created");
             return;
         }
@@ -97,9 +99,9 @@ export async function generateResumeForVariant(
     await spellCheckPromise;
     await pdfGenerationPromise;
 
-    if (options.format === "pdf" && generationResult.success) {
+    if (options.format === "pdf") {
         unlinkSync(htmlPath);
     }
 
-    logger.perf(`Total (${variant.name})`, performance.now() - t);
+    logger.perf(`Total '${variant.name}'`, performance.now() - t);
 }
