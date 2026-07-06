@@ -1,24 +1,14 @@
 import { unlinkSync, writeFileSync } from "node:fs";
-import { basename, extname, join } from "node:path";
+import { basename, dirname, extname, join } from "node:path";
 import type { Browser, Page } from "puppeteer-core";
 import { spellCheckHtml } from "../spell-check/spell-checker.js";
 import { generatePDF } from "./pdf.js";
 import type { CommandLineArgs } from "src/cli/types.js";
-import type { GenerationResult } from "./types.js";
-
-export function generateResumeBaseName(
-    variant: string,
-    date: string,
-    input: string,
-    name?: string
-): string {
-    const resumeBasename = name || basename(input, extname(input));
-
-    return `${date}-${variant}-${resumeBasename
-        .toLowerCase()
-        .replace(/\s+/g, "-")
-        .replace(/[^a-z0-9-]/g, "")}`;
-}
+import type { GenerationResult, Variant } from "./types.js";
+import { createLogger } from "../logging/logger.js";
+import { getCurrentDate } from "../utils.js";
+import { renderHtml } from "./html.js";
+import type { ResumeMetadata } from "./types.js";
 
 export async function runSpellCheck(
     html: string,
@@ -46,11 +36,41 @@ export async function runSpellCheck(
 }
 
 export async function generateResumeForVariant(
-    browser: Browser | undefined,
+    variant: Variant,
+    template: string,
+    data: ResumeMetadata & Record<string, unknown>,
     options: CommandLineArgs,
-    generationResult: GenerationResult
+    browser: Browser | undefined
 ) {
-    const { logger, variant } = generationResult;
+    const logger = createLogger();
+
+    const resumeBasenameT = performance.now();
+    const resumeBasename = `${getCurrentDate()}-${variant}-${
+        options.name ||
+        basename(options.input, extname(options.input))
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9-]/g, "")
+    }`;
+    logger.perf(
+        `Resume basename variant '${variant.name}'`,
+        performance.now() - resumeBasenameT
+    );
+
+    const renderHtmlT = performance.now();
+    const templatesAbsPath = dirname(options.templatePath);
+    const html = renderHtml(
+        template,
+        data,
+        variant.name,
+        variantNames,
+        templatesAbsPath
+    );
+    logger.perf(
+        `HTML rendering for variant '${variant.name}'`,
+        performance.now() - renderHtmlT
+    );
+
     const t = performance.now();
 
     let newPagePromise: Promise<Page> | undefined;
@@ -58,10 +78,7 @@ export async function generateResumeForVariant(
         newPagePromise = browser?.newPage();
     }
 
-    const htmlPath = join(
-        generationResult.outputPath,
-        `${generationResult.resumeBasename}.html`
-    );
+    const htmlPath = join(`${generationResult.resumeBasename}.html`);
 
     const spellCheckPromise =
         !options.skipSpellCheck && variant.language
