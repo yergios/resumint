@@ -6,7 +6,7 @@ import { type Browser, launch } from "puppeteer-core";
 import cli from "./cli/cli.js";
 import { generateResumeForVariant } from "./generate/generator.js";
 import type { ResumeMetadata } from "./generate/types.js";
-import { getVariantsToRun } from "./generate/variants.js";
+import { getVariantsToRun, resolveVariantData } from "./generate/variants.js";
 import { createLogger } from "./logging/logger.js";
 import { getErrorMessage } from "./utils.js";
 
@@ -48,6 +48,7 @@ async function main() {
             resumeData.variants,
             options.variant
         );
+        const resolvedVariants = resolveVariantData(resumeData, variantsToRun);
         logger.perf(
             "Resume data loading",
             performance.now() - resumeDataLoadingT
@@ -59,11 +60,11 @@ async function main() {
 
         const resumesGenerationT = performance.now();
         await Promise.all(
-            variantsToRun.map((variant) => {
+            resolvedVariants.map(({ variant, data }) => {
                 return generateResumeForVariant(
                     variant,
                     template,
-                    resumeData,
+                    data,
                     options,
                     browser,
                     logger.forVariant(variant.name)

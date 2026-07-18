@@ -7,12 +7,12 @@ import { runSpellCheck } from "../spell-check/spell-checker.js";
 import { getCurrentDate } from "../utils.js";
 import { renderHtml } from "./html.js";
 import { generatePDF } from "./pdf.js";
-import type { ResumeMetadata, Variant } from "./types.js";
+import type { Variant } from "./types.js";
 
 export async function generateResumeForVariant(
     variant: Variant,
     template: string,
-    data: ResumeMetadata & Record<string, unknown>,
+    data: Record<string, unknown>,
     options: CommandLineArgs,
     browser: Browser | undefined,
     logger: Logger

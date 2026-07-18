@@ -1,4 +1,4 @@
-import type { Variant } from "./types.js";
+import type { ResumeMetadata, Variant } from "./types.js";
 
 export function getVariantsToRun(
     raw?: (string | Variant)[],
@@ -50,7 +50,27 @@ export function getVariantsToRun(
     return variantsToRun;
 }
 
-export function resolveVariants<T>(
+// Resolve the variant-keyed source data into a standalone copy per variant,
+// once, up front — so rendering just consumes a plain, already-resolved object
+// instead of re-walking the tree for every variant at render time.
+export function resolveVariantData(
+    data: ResumeMetadata & Record<string, unknown>,
+    variantsToRun: Variant[]
+): { variant: Variant; data: Record<string, unknown> }[] {
+    const variantNames = (data.variants ?? []).map((v) =>
+        typeof v === "string" ? v : v.name
+    );
+
+    return variantsToRun.map((variant) => ({
+        variant,
+        data: resolveVariants(data, variantNames, variant.name) as Record<
+            string,
+            unknown
+        >
+    }));
+}
+
+function resolveVariants<T>(
     data: T,
     variantNames: string[],
     active: string
