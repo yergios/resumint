@@ -2,9 +2,7 @@ import type { Logger } from "../logging/types.js";
 import type { Variant } from "../generate/types.js";
 import { getErrorMessage } from "../utils.js";
 import { loadDictionary } from "./dictionary.js";
-import type { MisspelledWord, SpellCheckResult } from "./types.js";
-
-const MAX_SUGGESTIONS = 5;
+import type { SpellCheckResult } from "./types.js";
 
 function extractText(html: string): string {
     return html
@@ -40,23 +38,27 @@ export async function spellCheckHtml(
     logger?: Logger
 ): Promise<SpellCheckResult> {
     try {
+        const dictT = performance.now();
         const spell = await loadDictionary(language, logger);
+        logger?.perf("Dictionary load", performance.now() - dictT);
+
+        const scanT = performance.now();
         const words = extractText(html).split(/\s+/).filter(Boolean);
-        const misspelled: MisspelledWord[] = [];
+        const misspelled: string[] = [];
+        // Check each distinct word once. Suggestions are intentionally not
+        // computed: nspell's suggest() dominates the scan and isn't used.
+        const checked = new Set<string>();
 
         for (const rawWord of words) {
             if (shouldSkip(rawWord)) continue;
             const cleanedWord = cleanWord(rawWord);
+            if (checked.has(cleanedWord)) continue;
+            checked.add(cleanedWord);
             if (!spell.correct(cleanedWord)) {
-                misspelled.push({
-                    word: rawWord,
-                    cleanedWord,
-                    suggestions: spell
-                        .suggest(cleanedWord)
-                        .slice(0, MAX_SUGGESTIONS)
-                });
+                misspelled.push(rawWord);
             }
         }
+        logger?.perf("Word scan", performance.now() - scanT);
 
         return { language, misspelledCount: misspelled.length, misspelled };
     } catch (error) {
@@ -85,10 +87,8 @@ export async function runSpellCheck(
 
     if (result.misspelledCount > 0) {
         logger.warn(`Found ${result.misspelledCount} misspelled words:`);
-        result.misspelled.forEach(({ word, suggestions }) => {
-            logger.warn(
-                `\t- "${word}" -> Suggestions: ${suggestions.join(", ")}`
-            );
+        result.misspelled.forEach((word) => {
+            logger.warn(`\t- "${word}"`);
         });
     } else {
         logger.info("No spelling errors found");

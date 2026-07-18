@@ -14,7 +14,7 @@ export interface SpellInstance {
     add(word: string): void;
 }
 
-const dictionaryCache: Record<string, SpellInstance> = {};
+const dictionaryCache: Record<string, Promise<SpellInstance>> = {};
 
 async function addWhitelistedTerms(
     spell: SpellInstance,
@@ -44,12 +44,27 @@ async function addWhitelistedTerms(
     }
 }
 
-export async function loadDictionary(
+export function loadDictionary(
     language: string,
     logger?: Logger
 ): Promise<SpellInstance> {
-    if (dictionaryCache[language]) return dictionaryCache[language];
+    // Cache the in-flight promise, not the resolved instance: variants run
+    // concurrently, so two sharing a language would otherwise both pass the
+    // empty-cache check before either finished building, and each would rebuild
+    // the dictionary and re-apply its whitelist. Storing the promise up front,
+    // before the first await, collapses them onto a single build.
+    const cached = dictionaryCache[language];
+    if (cached) return cached;
 
+    const built = buildDictionary(language, logger);
+    dictionaryCache[language] = built;
+    return built;
+}
+
+async function buildDictionary(
+    language: string,
+    logger?: Logger
+): Promise<SpellInstance> {
     const dictionariesDir = join(process.cwd(), DICTIONARIES_DIR);
 
     try {
@@ -62,7 +77,6 @@ export async function loadDictionary(
             const aff = readFileSync(join(dictionariesDir, affFile), "utf8");
             const spell = nspell(aff, dic) as SpellInstance;
             await addWhitelistedTerms(spell, language, logger);
-            dictionaryCache[language] = spell;
             return spell;
         }
     } catch (error) {
@@ -73,11 +87,9 @@ export async function loadDictionary(
     const notFoundMsg = `No dictionary found for '${language}', all words will pass spell check`;
     logger?.info(notFoundMsg) ?? console.info(notFoundMsg);
 
-    const dummy: SpellInstance = {
+    return {
         correct: () => true,
         suggest: () => [],
         add: () => {}
     };
-    dictionaryCache[language] = dummy;
-    return dummy;
 }
