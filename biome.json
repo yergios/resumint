@@ -41,7 +41,8 @@
                 "noUnusedVariables": "error"
             },
             "complexity": {
-                "useArrowFunction": "off"
+                "useArrowFunction": "off",
+                "useLiteralKeys": "off"
             }
         }
     },

@@ -22,7 +22,7 @@ interface Frame {
 
 const TAG_RE = /\{\{\{([^}]+)\}\}\}|\{\{([^}]+)\}\}/g;
 
-function escape(s: string): string {
+function escapeHtml(s: string): string {
     return s
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -165,7 +165,7 @@ function render(nodes: Node[], frame: Frame): string {
         } else if (node.type === "var") {
             const v = resolve(node.path, frame);
             if (v !== undefined && v !== null) {
-                out += escape(String(v));
+                out += escapeHtml(String(v));
             }
         } else if (node.type === "raw") {
             const v = resolve(node.path, frame);
