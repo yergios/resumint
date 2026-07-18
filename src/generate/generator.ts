@@ -1,6 +1,6 @@
 import { unlinkSync, writeFileSync } from "node:fs";
 import { basename, extname, join } from "node:path";
-import type { Browser, Page } from "puppeteer-core";
+import type { Browser } from "puppeteer-core";
 import type { CommandLineArgs } from "src/cli/types.js";
 import type { Logger } from "../logging/types.js";
 import { runSpellCheck } from "../spell-check/spell-checker.js";
@@ -14,7 +14,7 @@ export async function generateResumeForVariant(
     template: string,
     data: Record<string, unknown>,
     options: CommandLineArgs,
-    browser: Browser | undefined,
+    browserPromise: Promise<Browser> | undefined,
     logger: Logger
 ) {
     const variantT = performance.now();
@@ -31,13 +31,10 @@ export async function generateResumeForVariant(
     const html = renderHtml(options.templatePath, template, data, variant.name);
     logger.perf("HTML rendering", performance.now() - renderHtmlT);
 
-    let newPagePromise: Promise<Page> | undefined;
-    if (browser) {
-        newPagePromise = browser?.newPage();
-    }
-
     const htmlPath = join(`${resumeBasename}.html`);
 
+    // Kick off spell check first so its worker runs while the browser finishes
+    // launching and while the PDF renders.
     const spellCheckPromise = !options.skipSpellCheck
         ? runSpellCheck(html, variant, logger)
         : undefined;
@@ -51,12 +48,13 @@ export async function generateResumeForVariant(
 
     let pdfGenerationPromise: Promise<void> | undefined;
     if (options.format !== "html") {
-        const pdfPath = join(options.outputPath, `${resumeBasename}.pdf`);
-        const page = await newPagePromise;
-        if (!page) {
-            logger.error("Browser page was not created");
+        const browser = await browserPromise;
+        if (!browser) {
+            logger.error("Browser was not created");
             return;
         }
+        const pdfPath = join(options.outputPath, `${resumeBasename}.pdf`);
+        const page = await browser.newPage();
         pdfGenerationPromise = generatePDF(page, htmlPath, pdfPath, logger);
     }
 

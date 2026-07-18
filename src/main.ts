@@ -4,18 +4,34 @@ import { existsSync, readFileSync } from "node:fs";
 import { load as yamlLoad } from "js-yaml";
 import { type Browser, launch } from "puppeteer-core";
 import cli from "./cli/cli.js";
+import type { CommandLineArgs } from "./cli/types.js";
 import { generateResumeForVariant } from "./generate/generator.js";
 import type { ResumeMetadata } from "./generate/types.js";
 import { getVariantsToRun, resolveVariantData } from "./generate/variants.js";
 import { createLogger } from "./logging/logger.js";
+import type { Logger } from "./logging/types.js";
 import { getErrorMessage } from "./utils.js";
 
 if (existsSync(".env")) process.loadEnvFile(".env");
 
+async function launchBrowser(
+    options: CommandLineArgs,
+    logger: Logger
+): Promise<Browser> {
+    const t = performance.now();
+    const browser = await launch({
+        headless: true,
+        executablePath: options.browserPath,
+        args: ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]
+    });
+    logger.perf("Browser startup", performance.now() - t);
+    return browser;
+}
+
 async function main() {
     const totalStartT = performance.now();
     const logger = createLogger();
-    let browser: Browser | undefined;
+    let browserPromise: Promise<Browser> | undefined;
     // Default to info; raised to debug once we know whether --verbose was
     // passed. Kept outside the try so the finally block can always flush.
     let threshold = 1;
@@ -26,19 +42,12 @@ async function main() {
         threshold = options.verbose ? 0 : 1;
         logger.perf("CLI parsing", performance.now() - cliParsingT);
 
-        const browserStartupT = performance.now();
+        // Start the browser launching but don't await it here: data loading,
+        // rendering and spell-check all run while the browser subprocess spins
+        // up, so its ~180ms overlaps that work instead of stacking before it.
         if (options.format !== "html") {
-            browser = await launch({
-                headless: true,
-                executablePath: options.browserPath,
-                args: [
-                    "--no-sandbox",
-                    "--disable-dev-shm-usage",
-                    "--disable-gpu"
-                ]
-            });
+            browserPromise = launchBrowser(options, logger);
         }
-        logger.perf("Browser startup", performance.now() - browserStartupT);
 
         const resumeDataLoadingT = performance.now();
         const resumeData = yamlLoad(
@@ -66,7 +75,7 @@ async function main() {
                     template,
                     data,
                     options,
-                    browser,
+                    browserPromise,
                     logger.forVariant(variant.name)
                 );
             })
@@ -79,11 +88,16 @@ async function main() {
         logger.error(getErrorMessage(error));
         process.exitCode = 1;
     } finally {
-        // Guard the close so a failure here can't swallow the log flush.
-        try {
-            await browser?.close();
-        } catch (error) {
-            logger.error(`Browser close failed: ${getErrorMessage(error)}`);
+        // The browser may still be launching (or have failed to); settle it
+        // before closing. A launch failure is already reported by the catch
+        // above, so swallow it here and only flag genuine close failures.
+        const browser = await browserPromise?.catch(() => undefined);
+        if (browser) {
+            try {
+                await browser.close();
+            } catch (error) {
+                logger.error(`Browser close failed: ${getErrorMessage(error)}`);
+            }
         }
         logger.perf("Total overall", performance.now() - totalStartT);
         logger.print(threshold);
