@@ -1,4 +1,5 @@
 import type { Logger } from "../logging/types.js";
+import type { Variant } from "../generate/types.js";
 import { getErrorMessage } from "../utils.js";
 import { loadDictionary } from "./dictionary.js";
 import type { MisspelledWord, SpellCheckResult } from "./types.js";
@@ -70,4 +71,31 @@ export async function spellCheckHtml(
     }
 }
 
-export default { spellCheckHtml };
+export async function runSpellCheck(
+    html: string,
+    variant: Variant,
+    logger: Logger
+): Promise<void> {
+    if (!variant.language) return;
+
+    const t = performance.now();
+
+    const result = await spellCheckHtml(html, variant.language);
+    logger.perf(
+        `Spell check for variant '${variant.name}'`,
+        performance.now() - t
+    );
+
+    if (result.misspelledCount > 0) {
+        logger.warn(
+            `Found ${result.misspelledCount} misspelled words in '${variant.name}' resume:`
+        );
+        result.misspelled.forEach(({ word, suggestions }) => {
+            logger.warn(
+                `\t- "${word}" -> Suggestions: ${suggestions.join(", ")}`
+            );
+        });
+    } else {
+        logger.info(`No spelling errors found in '${variant.name}' resume`);
+    }
+}

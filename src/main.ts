@@ -6,7 +6,7 @@ import { type Browser, launch } from "puppeteer-core";
 import cli from "./cli/cli.js";
 import { generateResumeForVariant } from "./generate/generator.js";
 import type { ResumeMetadata } from "./generate/types.js";
-import { getVariants } from "./generate/variants.js";
+import { getVariantsToRun } from "./generate/variants.js";
 import { createLogger } from "./logging/logger.js";
 
 if (existsSync(".env")) process.loadEnvFile(".env");
@@ -34,7 +34,10 @@ async function main() {
     const resumeData = yamlLoad(
         readFileSync(options.input, "utf8")
     ) as ResumeMetadata & Record<string, unknown>;
-    const variants = getVariants(resumeData.variants, options.variant);
+    const variantsToRun = getVariantsToRun(
+        resumeData.variants,
+        options.variant
+    );
     logger.perf("Resume data loading", performance.now() - resumeDataLoadingT);
 
     const templateLoadingT = performance.now();
@@ -43,13 +46,14 @@ async function main() {
 
     const resumesGenerationT = performance.now();
     await Promise.all(
-        variants.map((variant) => {
+        variantsToRun.map((variant) => {
             return generateResumeForVariant(
                 variant,
                 template,
                 resumeData,
                 options,
-                browser
+                browser,
+                logger
             );
         })
     );

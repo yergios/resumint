@@ -1,6 +1,8 @@
 import { ICON_SVGS } from "./icons.js";
 import { resolveVariants } from "./variants.js";
 import { renderTemplate } from "./template.js";
+import { dirname } from "node:path";
+import type { ResumeMetadata } from "./types.js";
 
 function attachIcons(data: Record<string, unknown>): void {
     const basic = data["basic"] as Record<string, unknown> | undefined;
@@ -21,21 +23,25 @@ function attachIcons(data: Record<string, unknown>): void {
 }
 
 export function renderHtml(
-    source: string,
-    data: Record<string, unknown>,
-    variant: string,
-    variantNames: string[],
-    templatesAbsPath: string
+    templatePath: string,
+    template: string,
+    data: ResumeMetadata & Record<string, unknown>,
+    activeVariant: string
 ): string {
-    const resolved = resolveVariants(data, variantNames, variant) as Record<
-        string,
-        unknown
-    >;
+    const variantNames = (data.variants ?? []).map((v) =>
+        typeof v === "string" ? v : v.name
+    );
+    const resolved = resolveVariants(
+        data,
+        variantNames,
+        activeVariant
+    ) as Record<string, unknown>;
 
     attachIcons(resolved);
 
-    const html = renderTemplate(source, { ...resolved, variant });
+    const html = renderTemplate(template, { ...resolved, activeVariant });
 
+    const templatesAbsPath = dirname(templatePath);
     const baseTag = `<base href="file://${templatesAbsPath}/">`;
 
     return html.replace("<head>", `<head>\n    ${baseTag}`);

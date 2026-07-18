@@ -1,6 +1,6 @@
 import type { Variant } from "./types.js";
 
-export function getVariants(
+export function getVariantsToRun(
     raw?: (string | Variant)[],
     chosenVariant?: string
 ): Variant[] {

@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import type { Page } from "puppeteer-core";
-import type { GenerationResult } from "./types.js";
+import type { Logger } from "../logging/types.js";
 
 // A4 at 96 DPI is ~1123px; 1200 gives headroom for subpixel rounding and browser zoom
 export const A4_HEIGHT_PX = 1200;
@@ -9,9 +9,10 @@ export async function generatePDF(
     page: Page,
     htmlPath: string,
     outputPath: string,
-    generationResult: GenerationResult
+    logger: Logger
 ) {
-    const { logger } = generationResult;
+    const t = performance.now();
+
     const absoluteHtmlPath = `file://${resolve(htmlPath)}`;
     await page.emulateMediaType("print");
     await page.goto(absoluteHtmlPath, { waitUntil: "networkidle0" });
@@ -38,16 +39,12 @@ export async function generatePDF(
         return;
     }
 
-    const t = performance.now();
     await page.pdf({
         path: outputPath,
         format: "A4",
         printBackground: true,
         margin: { top: "0", right: "0", bottom: "0", left: "0" }
     });
-    logger.perf(
-        `PDF render '${generationResult.variant.name}'`,
-        performance.now() - t
-    );
-    logger.info(`PDF generated: ${outputPath}`);
+    logger.info(`PDF generated: '${outputPath}'`);
+    logger.perf(`PDF render '${outputPath}'`, performance.now() - t);
 }
