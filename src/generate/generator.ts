@@ -42,12 +42,15 @@ export async function generateResumeForVariant(
         ? runSpellCheck(html, variant, logger)
         : undefined;
 
+    // The PDF renderer navigates this file so a file:// origin can load the
+    // template's local assets; it's kept as output only when HTML is wanted.
     writeFileSync(htmlPath, html);
+    if (options.format !== "pdf") {
+        logger.info(`HTML saved: ${htmlPath}`);
+    }
 
     let pdfGenerationPromise: Promise<void> | undefined;
-    if (options.format === "html") {
-        logger.info(`HTML saved: ${htmlPath}`);
-    } else {
+    if (options.format !== "html") {
         const pdfPath = join(options.outputPath, `${resumeBasename}.pdf`);
         const page = await newPagePromise;
         if (!page) {

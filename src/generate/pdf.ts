@@ -15,7 +15,8 @@ export async function generatePDF(
 
     const navT = performance.now();
     await page.emulateMediaType("print");
-    await page.goto(absoluteHtmlPath, { waitUntil: "networkidle0" });
+    await page.goto(absoluteHtmlPath, { waitUntil: "load" });
+    await page.evaluate(() => document.fonts.ready.then(() => undefined));
     logger.perf("Page navigation", performance.now() - navT);
 
     const { contentHeight, containerFound } = await page.evaluate(() => {
