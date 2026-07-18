@@ -37,6 +37,7 @@ export interface LogEntry {
     level: (typeof LogLevel)[keyof typeof LogLevel];
     message: string;
     timestamp: Date;
+    variant?: string | undefined;
 }
 
 export interface Logger {
@@ -45,5 +46,8 @@ export interface Logger {
     info(message: string): void;
     warn(message: string): void;
     error(message: string): void;
+    // Returns a child logger whose entries are tagged with this variant, so
+    // concurrent variants can be grouped when printed. Shares the parent buffer.
+    forVariant(name: string): Logger;
     print(threshold: number): void;
 }

@@ -25,17 +25,11 @@ export async function generateResumeForVariant(
             .replace(/\s+/g, "-")
             .replace(/[^a-z0-9-]/g, "")
     }`;
-    logger.perf(
-        `Resume basename for variant '${variant.name}'`,
-        performance.now() - resumeBasenameT
-    );
+    logger.perf("Resume basename", performance.now() - resumeBasenameT);
 
     const renderHtmlT = performance.now();
     const html = renderHtml(options.templatePath, template, data, variant.name);
-    logger.perf(
-        `HTML rendering for variant '${variant.name}'`,
-        performance.now() - renderHtmlT
-    );
+    logger.perf("HTML rendering", performance.now() - renderHtmlT);
 
     let newPagePromise: Promise<Page> | undefined;
     if (browser) {

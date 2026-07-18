@@ -46,5 +46,5 @@ export async function generatePDF(
         margin: { top: "0", right: "0", bottom: "0", left: "0" }
     });
     logger.info(`PDF generated: '${outputPath}'`);
-    logger.perf(`PDF render '${outputPath}'`, performance.now() - t);
+    logger.perf("PDF render", performance.now() - t);
 }

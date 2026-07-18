@@ -80,22 +80,17 @@ export async function runSpellCheck(
 
     const t = performance.now();
 
-    const result = await spellCheckHtml(html, variant.language);
-    logger.perf(
-        `Spell check for variant '${variant.name}'`,
-        performance.now() - t
-    );
+    const result = await spellCheckHtml(html, variant.language, logger);
+    logger.perf("Spell check", performance.now() - t);
 
     if (result.misspelledCount > 0) {
-        logger.warn(
-            `Found ${result.misspelledCount} misspelled words in '${variant.name}' resume:`
-        );
+        logger.warn(`Found ${result.misspelledCount} misspelled words:`);
         result.misspelled.forEach(({ word, suggestions }) => {
             logger.warn(
                 `\t- "${word}" -> Suggestions: ${suggestions.join(", ")}`
             );
         });
     } else {
-        logger.info(`No spelling errors found in '${variant.name}' resume`);
+        logger.info("No spelling errors found");
     }
 }
