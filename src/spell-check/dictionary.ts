@@ -3,14 +3,27 @@ import { readdir } from "node:fs/promises";
 import { join } from "node:path";
 // @ts-expect-error - nspell has no type definitions
 import nspell from "nspell";
-import type { Logger } from "../logging/types.js";
 import { getErrorMessage } from "../utils.js";
 
 const DICTIONARIES_DIR = "workspace/dictionaries";
 
+// Sink for the handful of load-time notices (missing dictionary, read errors).
+// The caller (a worker) collects these and replays them on the main thread's
+// scoped logger, so dictionary code stays decoupled from the logging module.
+type MessageSink = (level: "info" | "error", message: string) => void;
+
+function report(
+    sink: MessageSink | undefined,
+    level: "info" | "error",
+    message: string
+): void {
+    if (sink) sink(level, message);
+    else if (level === "error") console.error(message);
+    else console.info(message);
+}
+
 export interface SpellInstance {
     correct(word: string): boolean;
-    suggest(word: string): string[];
     add(word: string): void;
 }
 
@@ -19,7 +32,7 @@ const dictionaryCache: Record<string, Promise<SpellInstance>> = {};
 async function addWhitelistedTerms(
     spell: SpellInstance,
     language: string,
-    logger?: Logger
+    sink?: MessageSink
 ): Promise<void> {
     const whitelistDir = join(process.cwd(), DICTIONARIES_DIR);
     if (!existsSync(whitelistDir)) return;
@@ -40,13 +53,13 @@ async function addWhitelistedTerms(
         }
     } catch (error) {
         const msg = `Error loading whitelist: ${getErrorMessage(error)}`;
-        logger?.error(msg) ?? console.error(msg);
+        report(sink, "error", msg);
     }
 }
 
 export function loadDictionary(
     language: string,
-    logger?: Logger
+    sink?: MessageSink
 ): Promise<SpellInstance> {
     // Cache the in-flight promise, not the resolved instance: variants run
     // concurrently, so two sharing a language would otherwise both pass the
@@ -56,14 +69,14 @@ export function loadDictionary(
     const cached = dictionaryCache[language];
     if (cached) return cached;
 
-    const built = buildDictionary(language, logger);
+    const built = buildDictionary(language, sink);
     dictionaryCache[language] = built;
     return built;
 }
 
 async function buildDictionary(
     language: string,
-    logger?: Logger
+    sink?: MessageSink
 ): Promise<SpellInstance> {
     const dictionariesDir = join(process.cwd(), DICTIONARIES_DIR);
 
@@ -76,20 +89,19 @@ async function buildDictionary(
             const dic = readFileSync(join(dictionariesDir, dicFile), "utf8");
             const aff = readFileSync(join(dictionariesDir, affFile), "utf8");
             const spell = nspell(aff, dic) as SpellInstance;
-            await addWhitelistedTerms(spell, language, logger);
+            await addWhitelistedTerms(spell, language, sink);
             return spell;
         }
     } catch (error) {
         const msg = `Error loading dictionary for ${language}: ${getErrorMessage(error)}`;
-        logger?.error(msg) ?? console.error(msg);
+        report(sink, "error", msg);
     }
 
     const notFoundMsg = `No dictionary found for '${language}', all words will pass spell check`;
-    logger?.info(notFoundMsg) ?? console.info(notFoundMsg);
+    report(sink, "info", notFoundMsg);
 
     return {
         correct: () => true,
-        suggest: () => [],
         add: () => {}
     };
 }

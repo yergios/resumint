@@ -1,96 +1,60 @@
-import type { Logger } from "../logging/types.js";
+import { Worker } from "node:worker_threads";
 import type { Variant } from "../generate/types.js";
+import type { Logger } from "../logging/types.js";
 import { getErrorMessage } from "../utils.js";
-import { loadDictionary } from "./dictionary.js";
-import type { SpellCheckResult } from "./types.js";
+import type { SpellCheckResponse } from "./types.js";
 
-function extractText(html: string): string {
-    return html
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
-        .replace(/<[^>]*>/g, " ")
-        .replace(/&nbsp;/g, " ")
-        .replace(/&amp;/g, "&")
-        .replace(/&lt;/g, "<")
-        .replace(/&gt;/g, ">")
-        .replace(/\s+/g, " ")
-        .trim();
-}
-
-function cleanWord(word: string): string {
-    return word.replace(
-        /^[.,!?;:()[\]{}\-—–""'']+|[.,!?;:()[\]{}\-—–""'']+$/g,
-        ""
-    );
-}
-
-function shouldSkip(word: string): boolean {
-    return (
-        /[0-9]/.test(word) ||
-        !/[a-zA-ZÀ-ž]/.test(word) ||
-        cleanWord(word).length <= 1
-    );
-}
-
-export async function spellCheckHtml(
-    html: string,
-    language: string,
-    logger?: Logger
-): Promise<SpellCheckResult> {
-    try {
-        const dictT = performance.now();
-        const spell = await loadDictionary(language, logger);
-        logger?.perf("Dictionary load", performance.now() - dictT);
-
-        const scanT = performance.now();
-        const words = extractText(html).split(/\s+/).filter(Boolean);
-        const misspelled: string[] = [];
-        // Check each distinct word once. Suggestions are intentionally not
-        // computed: nspell's suggest() dominates the scan and isn't used.
-        const checked = new Set<string>();
-
-        for (const rawWord of words) {
-            if (shouldSkip(rawWord)) continue;
-            const cleanedWord = cleanWord(rawWord);
-            if (checked.has(cleanedWord)) continue;
-            checked.add(cleanedWord);
-            if (!spell.correct(cleanedWord)) {
-                misspelled.push(rawWord);
-            }
-        }
-        logger?.perf("Word scan", performance.now() - scanT);
-
-        return { language, misspelledCount: misspelled.length, misspelled };
-    } catch (error) {
-        const errorMessage = getErrorMessage(error);
-        (logger ?? console).error(`Spell check error: ${errorMessage}`);
-        return {
-            language,
-            misspelledCount: 0,
-            misspelled: [],
-            error: errorMessage
-        };
-    }
-}
-
-export async function runSpellCheck(
+// Runs a variant's spell check on its own worker thread and logs the result on
+// the variant's scoped logger. A failure is non-fatal: it's logged and the
+// promise still resolves so it can't abort the run.
+export function runSpellCheck(
     html: string,
     variant: Variant,
     logger: Logger
 ): Promise<void> {
-    if (!variant.language) return;
+    if (!variant.language) return Promise.resolve();
 
+    const language = variant.language;
     const t = performance.now();
 
-    const result = await spellCheckHtml(html, variant.language, logger);
-    logger.perf("Spell check", performance.now() - t);
-
-    if (result.misspelledCount > 0) {
-        logger.warn(`Found ${result.misspelledCount} misspelled words:`);
-        result.misspelled.forEach((word) => {
-            logger.warn(`\t- "${word}"`);
+    return new Promise<void>((resolve) => {
+        const worker = new Worker(new URL("./worker.js", import.meta.url), {
+            workerData: { html, language }
         });
-    } else {
-        logger.info("No spelling errors found");
-    }
+
+        worker.once("message", (response: SpellCheckResponse) => {
+            worker.terminate();
+
+            for (const { level, message } of response.messages) {
+                if (level === "error") logger.error(message);
+                else logger.info(message);
+            }
+
+            logger.perf("Dictionary load", response.dictMs);
+            logger.perf("Word scan", response.scanMs);
+            logger.perf("Spell check", performance.now() - t);
+
+            const { result } = response;
+            if (result.error) {
+                logger.error(`Spell check error: ${result.error}`);
+            } else if (result.misspelledCount > 0) {
+                logger.warn(
+                    `Found ${result.misspelledCount} misspelled words:`
+                );
+                for (const word of result.misspelled) {
+                    logger.warn(`\t- "${word}"`);
+                }
+            } else {
+                logger.info("No spelling errors found");
+            }
+
+            resolve();
+        });
+
+        worker.once("error", (error) => {
+            worker.terminate();
+            logger.error(`Spell check error: ${getErrorMessage(error)}`);
+            resolve();
+        });
+    });
 }
