@@ -17,7 +17,8 @@ export async function generateResumeForVariant(
     browser: Browser | undefined,
     logger: Logger
 ) {
-    const resumeBasenameT = performance.now();
+    const variantT = performance.now();
+
     const resumeBasename = `${getCurrentDate()}-${variant.name}-${
         options.name ||
         basename(options.input, extname(options.input))
@@ -25,7 +26,6 @@ export async function generateResumeForVariant(
             .replace(/\s+/g, "-")
             .replace(/[^a-z0-9-]/g, "")
     }`;
-    logger.perf("Resume basename", performance.now() - resumeBasenameT);
 
     const renderHtmlT = performance.now();
     const html = renderHtml(options.templatePath, template, data, variant.name);
@@ -63,4 +63,6 @@ export async function generateResumeForVariant(
     if (options.format === "pdf") {
         unlinkSync(htmlPath);
     }
+
+    logger.perf("Variant total", performance.now() - variantT);
 }

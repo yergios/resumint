@@ -11,11 +11,12 @@ export async function generatePDF(
     outputPath: string,
     logger: Logger
 ) {
-    const t = performance.now();
-
     const absoluteHtmlPath = `file://${resolve(htmlPath)}`;
+
+    const navT = performance.now();
     await page.emulateMediaType("print");
     await page.goto(absoluteHtmlPath, { waitUntil: "networkidle0" });
+    logger.perf("Page navigation", performance.now() - navT);
 
     const { contentHeight, containerFound } = await page.evaluate(() => {
         const container = document.querySelector(".resume-container");
@@ -39,12 +40,14 @@ export async function generatePDF(
         return;
     }
 
+    const pdfT = performance.now();
     await page.pdf({
         path: outputPath,
         format: "A4",
         printBackground: true,
         margin: { top: "0", right: "0", bottom: "0", left: "0" }
     });
+    logger.perf("PDF generation", performance.now() - pdfT);
+
     logger.info(`PDF generated: '${outputPath}'`);
-    logger.perf("PDF render", performance.now() - t);
 }
