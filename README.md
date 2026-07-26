@@ -1,4 +1,4 @@
-# ResuMint
+# Resumint
 
 Generate multilingual, multi-variant PDF resumes from a single YAML or JSON file — using tools you already know. Write your content, get clean PDFs. Bring your own HTML/CSS template for pixel-perfect control, or use the default.
 
@@ -30,7 +30,7 @@ pnpm install
 pnpm build
 ```
 
-Point ResuMint at your browser. Auto-detection handles common locations, so this is only needed if it fails:
+Point Resumint at your browser. Auto-detection handles common locations, so this is only needed if it fails:
 
 ```bash
 cp .env.example .env
@@ -125,13 +125,13 @@ resumint ./workspace/content/example.yaml -s --verbose
 
 ## Data file
 
-ResuMint accepts YAML or JSON. YAML is recommended — it's less noisy for deeply nested data. See [`workspace/content/example.yaml`](workspace/content/example.yaml) for a complete example.
+Resumint accepts YAML or JSON. YAML is recommended — it's less noisy for deeply nested data. See [`workspace/content/example.yaml`](workspace/content/example.yaml) for a complete example.
 
 Contact items are displayed in the order they appear in the file.
 
 ## Variants
 
-A **variant** is one output of your data file — a single PDF or HTML resume. ResuMint generates one resume per entry in the top-level `variants:` list. Pick whatever axis you like: language, role, length, audience.
+A **variant** is one output of your data file — a single PDF or HTML resume. Resumint generates one resume per entry in the top-level `variants:` list. Pick whatever axis you like: language, role, length, audience.
 
 Declare variants as a list of strings, or as objects with an optional `language:` for spell-checking:
 
@@ -263,7 +263,7 @@ To replace or add a font:
    }
    ```
 
-Only download the weights you actually use. ResuMint currently uses **400** (body), **600** (headings), and **700** (company names, institutions).
+Only download the weights you actually use. Resumint currently uses **400** (body), **600** (headings), and **700** (company names, institutions).
 
 ## Icons
 
@@ -315,13 +315,13 @@ workspace/
 
 ## Browser detection
 
-ResuMint uses your system Chrome/Chromium to render PDFs. The executable is resolved in this order:
+Resumint uses your system Chrome/Chromium to render PDFs. The executable is resolved in this order:
 
 1. `--browser-path` CLI argument
 2. `PUPPETEER_EXECUTABLE_PATH` environment variable
 3. Common system locations (`/usr/bin/google-chrome`, `/Applications/Google Chrome.app/...`, `C:\Program Files\Google\Chrome\...`, etc.)
 
-If none are found, generation fails with a hint to install Chrome or pass `--browser-path`. To set the path once, put it in `.env` (copied from `.env.example`); ResuMint loads `.env` automatically on startup. Live preview (`--serve`) needs no browser at all.
+If none are found, generation fails with a hint to install Chrome or pass `--browser-path`. To set the path once, put it in `.env` (copied from `.env.example`); Resumint loads `.env` automatically on startup. Live preview (`--serve`) needs no browser at all.
 
 ## License
 
