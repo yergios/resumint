@@ -115,14 +115,29 @@ function resolveRoots(templateRoot: string): {
     return { root: cwd, baseHref: `/${rel.split(sep).join("/")}/` };
 }
 
+// Map a request path to a file inside `root`, or null if it escapes the root or
+// can't be decoded. This is the path-traversal guard, exported so it can be
+// unit-tested directly — a hole here would let the dev server hand out any file
+// on disk.
+export function resolveSafePath(root: string, urlPath: string): string | null {
+    let decoded: string;
+    try {
+        decoded = decodeURIComponent(urlPath);
+    } catch {
+        // Malformed percent-encoding — treat as not found rather than throwing.
+        return null;
+    }
+
+    const filePath = normalize(join(root, decoded.replace(/^\/+/, "")));
+    if (filePath !== root && !filePath.startsWith(root + sep)) return null;
+    return filePath;
+}
+
 // Serve a template-relative asset (CSS, fonts, images) from the template
 // directory, which is what the "/" <base href> resolves requests against.
 function serveStatic(root: string, urlPath: string, res: ServerResponse): void {
-    const relative = decodeURIComponent(urlPath).replace(/^\/+/, "");
-    const filePath = normalize(join(root, relative));
-
-    // Path-traversal guard: the resolved path must stay inside the root.
-    if (filePath !== root && !filePath.startsWith(root + sep)) {
+    const filePath = resolveSafePath(root, urlPath);
+    if (filePath === null) {
         res.writeHead(403).end("Forbidden");
         return;
     }
@@ -150,7 +165,7 @@ function serveStatic(root: string, urlPath: string, res: ServerResponse): void {
 // (which is listed) reloads the page and re-fetches everything anyway.
 const REF_RE = /(?:href|src)\s*=\s*"([^"]+)"/g;
 
-function collectAssetDirs(
+export function collectAssetDirs(
     html: string,
     root: string,
     baseHref: string

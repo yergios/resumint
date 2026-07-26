@@ -50,6 +50,7 @@
         "includes": [
             "**",
             "!dist",
+            "!dist-test",
             "!types",
             "!node_modules",
             "!resumes",

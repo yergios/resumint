@@ -10,12 +10,12 @@
     "scripts": {
         "start": "node ./dist/main.js",
         "build": "tsc",
+        "test": "tsc -p tsconfig.test.json && node --test \"dist-test/tests/**/*.test.js\"",
         "demo": "node ./dist/main.js ./workspace/content/example.yaml",
-        "lint": "biome lint .",
-        "lint:fix": "biome lint --write .",
-        "format": "biome format .",
-        "format:fix": "biome format --write .",
-        "style": "biome check --write ."
+        "lint": "biome lint --write .",
+        "lint:check": "biome lint .",
+        "format": "biome format --write .",
+        "format:check": "biome format ."
     },
     "keywords": [
         "resume",

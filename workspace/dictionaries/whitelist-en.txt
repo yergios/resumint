@@ -73,6 +73,7 @@ SCRUM
 plugins
 e-commerce
 high-traffic
+self-service
 
 # Abbreviations
 Inc
@@ -92,6 +93,7 @@ Sept
 Oct
 Nov
 Dec
+CMS
 
 # Places
 EE.UU
