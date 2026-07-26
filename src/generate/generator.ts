@@ -1,5 +1,5 @@
 import { unlinkSync, writeFileSync } from "node:fs";
-import { basename, extname, join } from "node:path";
+import { basename, dirname, extname, join } from "node:path";
 import type { Browser } from "puppeteer-core";
 import type { CommandLineArgs } from "src/cli/types.js";
 import type { Logger } from "../logging/types.js";
@@ -28,7 +28,8 @@ export async function generateResumeForVariant(
     }`;
 
     const renderHtmlT = performance.now();
-    const html = renderHtml(options.templatePath, template, data, variant.name);
+    const baseHref = `file://${dirname(options.templatePath)}/`;
+    const html = renderHtml(template, data, variant.name, baseHref);
     logger.perf("HTML rendering", performance.now() - renderHtmlT);
 
     const htmlPath = join(`${resumeBasename}.html`);

@@ -1,4 +1,3 @@
-import { dirname } from "node:path";
 import { ICON_SVGS } from "./icons.js";
 import { renderTemplate } from "./template.js";
 
@@ -20,18 +19,20 @@ function attachIcons(data: Record<string, unknown>): void {
     }
 }
 
+// `baseHref` sets the document's <base>: the PDF path passes a file:// URL so
+// Chrome can load the template's local assets, while the preview server passes
+// "/" so those same assets resolve against the HTTP static handler.
 export function renderHtml(
-    templatePath: string,
     template: string,
     data: Record<string, unknown>,
-    activeVariant: string
+    activeVariant: string,
+    baseHref: string
 ): string {
     attachIcons(data);
 
     const html = renderTemplate(template, { ...data, activeVariant });
 
-    const templatesAbsPath = dirname(templatePath);
-    const baseTag = `<base href="file://${templatesAbsPath}/">`;
+    const baseTag = `<base href="${baseHref}">`;
 
     return html.replace("<head>", `<head>\n    ${baseTag}`);
 }

@@ -10,6 +10,7 @@ import type { ResumeMetadata } from "./generate/types.js";
 import { getVariantsToRun, resolveVariantData } from "./generate/variants.js";
 import { createLogger } from "./logging/logger.js";
 import type { Logger } from "./logging/types.js";
+import { serve } from "./serve/server.js";
 import { getErrorMessage } from "./utils.js";
 
 if (existsSync(".env")) process.loadEnvFile(".env");
@@ -32,8 +33,6 @@ async function main() {
     const totalStartT = performance.now();
     const logger = createLogger();
     let browserPromise: Promise<Browser> | undefined;
-    // Default to info; raised to debug once we know whether --verbose was
-    // passed. Kept outside the try so the finally block can always flush.
     let threshold = 1;
 
     try {
@@ -42,9 +41,14 @@ async function main() {
         threshold = options.verbose ? 0 : 1;
         logger.perf("CLI parsing", performance.now() - cliParsingT);
 
-        // Start the browser launching but don't await it here: data loading,
-        // rendering and spell-check all run while the browser subprocess spins
-        // up, so its ~180ms overlaps that work instead of stacking before it.
+        // The preview server is a long-running mode of its own: it renders HTML,
+        // never touches Chrome, and logs live instead of buffering. Hand off and
+        // let its http server + watchers keep the process alive.
+        if (options.serve) {
+            serve(options);
+            return;
+        }
+
         if (options.format !== "html") {
             browserPromise = launchBrowser(options, logger);
         }

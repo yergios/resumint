@@ -10,4 +10,5 @@ export interface CommandLineArgs {
     format: OutputFormat;
     skipSpellCheck: boolean;
     verbose: boolean;
+    serve: boolean;
 }
