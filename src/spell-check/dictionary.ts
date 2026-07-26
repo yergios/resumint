@@ -27,6 +27,17 @@ export interface SpellInstance {
     add(word: string): void;
 }
 
+// A whitelist file applies to a language when it has no language suffix
+// (whitelist.txt — shared across languages) or its suffix matches the language
+// (whitelist-en.txt for "en").
+export function whitelistAppliesTo(
+    fileName: string,
+    language: string
+): boolean {
+    const langMatch = fileName.match(/^.*-([a-z]{2})\.txt$/);
+    return !langMatch || langMatch[1] === language;
+}
+
 const dictionaryCache: Record<string, Promise<SpellInstance>> = {};
 
 async function addWhitelistedTerms(
@@ -40,8 +51,7 @@ async function addWhitelistedTerms(
     try {
         const files = await readdir(whitelistDir);
         for (const file of files.filter((f) => f.endsWith(".txt"))) {
-            const langMatch = file.match(/^.*-([a-z]{2})\.txt$/);
-            if (langMatch && langMatch[1] !== language) continue;
+            if (!whitelistAppliesTo(file, language)) continue;
 
             const content = readFileSync(join(whitelistDir, file), "utf8");
             for (const line of content.split("\n")) {

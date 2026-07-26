@@ -11,7 +11,7 @@ import type {
     SpellMessage
 } from "./types.js";
 
-function extractText(html: string): string {
+export function extractText(html: string): string {
     return html
         .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
         .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
@@ -24,14 +24,14 @@ function extractText(html: string): string {
         .trim();
 }
 
-function cleanWord(word: string): string {
+export function cleanWord(word: string): string {
     return word.replace(
         /^[.,!?;:()[\]{}\-—–""'']+|[.,!?;:()[\]{}\-—–""'']+$/g,
         ""
     );
 }
 
-function shouldSkip(word: string): boolean {
+export function shouldSkip(word: string): boolean {
     return (
         /[0-9]/.test(word) ||
         !/[a-zA-ZÀ-ž]/.test(word) ||
@@ -95,6 +95,12 @@ async function run({
     }
 }
 
-run(workerData as SpellCheckInput).then((response) => {
-    parentPort?.postMessage(response);
-});
+// Only self-run when actually on a worker thread (parentPort is set there).
+// Guarding this lets the pure helpers above be imported and unit-tested from the
+// main thread without kicking off a spurious run.
+if (parentPort) {
+    const port = parentPort;
+    run(workerData as SpellCheckInput).then((response) => {
+        port.postMessage(response);
+    });
+}
