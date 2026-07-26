@@ -1,132 +1,129 @@
 # ResuMint
 
-A refreshing tool for web developers who maintain multiple resume variants — multilingual (English, Spanish, ...), role-flavored (fullstack, backend, frontend, ...), or any axis you choose. It uses exactly what you already know. No need to learn yet another syntax.
+Generate multilingual, multi-variant PDF resumes from a single YAML or JSON file — using tools you already know. Write your content, get clean PDFs. Bring your own HTML/CSS template for pixel-perfect control, or use the default.
 
-No more clunky Word docs, figuring out Canva nor need to learn Adobe. Just write your content in a YAML or JSON file and get your PDF resumes generated. ResuMint may even check out spelling for you.
+## Contents
 
-For those who may want further customization and pixel-perfect control, you can create your own HTML templates and style them with CSS.
+- [Try it out](#try-it-out) — clone, run the example, use your own resume
+- [Live preview](#live-preview) — edit content and styles with instant reload
+- [Options and flags](#options-and-flags) — every flag, with examples
+- [Data file](#data-file)
+- [Variants](#variants)
+- [Templates](#templates)
+- [Spell checking](#spell-checking)
+- [Fonts](#fonts)
+- [Icons](#icons)
+- [Workspace layout](#workspace-layout)
+- [Browser detection](#browser-detection)
+- [License](#license)
 
-## Prerequisites
+## Try it out
 
-- **Node.js 20+** — [nodejs.org](https://nodejs.org)
-- **Chromium** — required for PDF generation. ResuMint uses your system browser. Skip if you only use `--format html`.
+**Prerequisites:** [Node.js 20+](https://nodejs.org) and Chrome/Chromium (used to render PDFs).
 
-## Getting Started
+Clone and build:
 
 ```bash
-# Clone the repository
 git clone https://github.com/yergios/resumint.git
 cd resumint
-
-# Install dependencies
-npm ci
-
-# Build TypeScript source
-npm run build
-
-# (Optional) Make resumint available as a global CLI command
-npm link --global
-
-# Generate "en" resume variant in PDF
-resumint ./workspace/content/example.yaml --variant en
+pnpm install
+pnpm build
 ```
 
-## Workspace layout
+Point ResuMint at your browser. Auto-detection handles common locations, so this is only needed if it fails:
 
-All user-facing files live under `workspace/`. Everything else is implementation.
-
-```
-workspace/
-├── content/       ← your YAML/JSON input files
-├── styles/        ← CSS for templates
-├── templates/     ← HTML templates
-├── assets/
-│   ├── fonts/     ← vendored woff2 font files
-│   └── images/    ← profile photos and other images
-└── dictionaries/  ← spell-check dictionaries and whitelists
+```bash
+cp .env.example .env
+# edit .env and set PUPPETEER_EXECUTABLE_PATH to your Chrome/Chromium executable
 ```
 
-Generated PDFs and HTML go to `./resumes/` at the project root.
+Generate the bundled example:
 
-## Usage
+```bash
+pnpm demo
+```
+
+The PDFs land in `./resumes/`. Done.
+
+### Use your own resume
+
+Put your data at `./workspace/content/resume.yaml` (the default input path), then run:
+
+```bash
+pnpm start
+```
+
+To call `resumint` directly instead of `pnpm start`, link it globally once:
+
+```bash
+pnpm link --global
+resumint          # equivalent to: pnpm start
+```
+
+The quickest start is to copy [`workspace/content/example.yaml`](workspace/content/example.yaml) to `resume.yaml` and edit it.
+
+## Live preview
+
+Develop your content and template with instant feedback, like a frontend dev server. `--serve` renders the resume to HTML and reloads your browser automatically whenever you save a change to the content, the template, or its stylesheet:
+
+```bash
+resumint --serve                                    # default input
+resumint ./workspace/content/example.yaml --serve -v en
+```
+
+Open **http://localhost:3000** and edit away — the page reloads on every save.
+
+- **HTML only** — no PDF is produced and no browser is launched, so `--serve` works even without Chrome installed. The preview renders in screen mode; use your browser's print preview to check page breaks.
+- **One variant at a time** — `--serve` honors `-v` and otherwise previews the first variant in the file.
+- **Error-tolerant** — a broken YAML or template shows an error page instead of crashing the server, and recovers on your next valid save.
+
+## Options and flags
 
 ```bash
 resumint [path] [options]
-
-# Or without global install
-npm start [path] [options]
 ```
 
-### Arguments
+`path` is a YAML or JSON data file (relative or absolute); the extension (`.yaml`, `.yml`, `.json`) is required. Defaults to `./workspace/content/resume.yaml`.
 
-- `path`: Full path (relative or absolute) to a YAML or JSON data file. Extension (`.yaml`, `.yml`, `.json`) is required. Defaults to `./workspace/content/resume.yaml` if omitted.
+| Flag                 | Alias | Description                                                            | Default                           |
+| -------------------- | ----- | --------------------------------------------------------------------- | --------------------------------- |
+| `--serve`            |       | Start a live-preview server (HTML only, auto-reload)                  | `false`                           |
+| `--variant`          | `-v`  | Generate one variant only                                             | all variants in file              |
+| `--format`           | `-f`  | Output format: `pdf`, `html`, or `both`                               | `pdf`                             |
+| `--output-path`      | `-o`  | Output directory for PDFs                                             | `./resumes`                       |
+| `--name`             | `-n`  | Output filename stem (e.g. `john-doe` → `20260512-en-john-doe.pdf`)   | input filename                    |
+| `--template-path`    | `-t`  | Path to a template HTML file                                          | `./workspace/templates/default.html` |
+| `--browser-path`     | `-b`  | Path to Chrome/Chromium executable                                    | auto-detected                     |
+| `--skip-spell-check` | `-s`  | Skip spell checking                                                   | `false`                           |
+| `--verbose`          | `-V`  | Print detailed logs and timing information                            | `false`                           |
+| `--help`             | `-h`  | Show usage and exit                                                   |                                   |
+| `--version`          |       | Show version and exit                                                 |                                   |
 
-### Options
-
-| Flag                 | Alias | Description                                                           | Default                                                                      |
-| -------------------- | ----- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `--variant`          | `-v`  | Generate for a specific variant only                                  | all variants in file                                                         |
-| `--name`             | `-n`  | Output filename stem (e.g. `john-doe` → `2026-05-12-en-john-doe.pdf`) | content input filename                                                       |
-| `--template-path`    | `-t`  | Path to a template HTML file                                          | `metadata.template` in input file, else `./workspace/templates/default.html` |
-| `--output-path`      | `-o`  | Output directory                                                      | `./resumes`                                                                  |
-| `--browser-path`     | `-b`  | Path to Chrome/Chromium executable                                    | auto-detected                                                                |
-| `--format`           | `-f`  | Output format: `pdf`, `html`, or `both`                               | `pdf`                                                                        |
-| `--skip-spell-check` | `-s`  | Skip spell checking                                                   | `false`                                                                      |
-| `--verbose`          | `-V`  | Print detailed logs and timing information                            | `false`                                                                      |
-| `--help`             | `-h`  | Show usage and exit                                                   |                                                                              |
-| `--version`          |       | Show version and exit                                                 |                                                                              |
+PDFs are written to `./resumes` (or `--output-path`). With `--format html` or `both`, the HTML file is written to the current working directory.
 
 ### Examples
 
 ```bash
-# Use default ./workspace/content/resume.yaml
+# Default input, all variants, PDF
 resumint
 
-# Explicit data file path
-resumint ./workspace/content/example.yaml
-
-# English variant only
+# One variant of a specific file
 resumint ./workspace/content/example.yaml --variant en
 
-# Custom template path
-resumint ./workspace/content/example.yaml -t ./workspace/templates/fancy.html
-
-# Keep HTML alongside the PDF, custom output dir
+# HTML and PDF, into a custom directory
 resumint ./workspace/content/example.yaml -f both -o ./my-resumes
 
 # HTML only, no PDF
 resumint ./workspace/content/example.yaml --format html
 
-# Skip spell checking
-resumint ./workspace/content/example.yaml -s
+# Custom template and output filename
+resumint ./workspace/content/example.yaml -t ./workspace/templates/fancy.html -n john-doe
 
-# Custom output filename stem
-resumint ./workspace/content/example.yaml --name john-doe
-
-# Verbose output with timings
-resumint ./workspace/content/example.yaml --verbose
+# Skip spell checking, with timings
+resumint ./workspace/content/example.yaml -s --verbose
 ```
 
-### Browser detection
-
-ResuMint uses your system Chrome/Chromium to render PDFs. The executable is resolved in this order:
-
-1. `--browser-path` CLI argument
-2. `PUPPETEER_EXECUTABLE_PATH` environment variable
-3. Common system locations (`/usr/bin/google-chrome`, `/Applications/Google Chrome.app/...`, `C:\Program Files\Google\Chrome\...`, etc.)
-
-If none are found, generation fails with a hint to install Chrome or pass `--browser-path`.
-
-To set the browser path once for convenience, copy `.env.example` to `.env` and fill in the value:
-
-```bash
-cp .env.example .env
-# then edit .env and set PUPPETEER_EXECUTABLE_PATH to your browser path
-```
-
-ResuMint loads `.env` automatically on startup if the file exists.
-
-## Data File
+## Data file
 
 ResuMint accepts YAML or JSON. YAML is recommended — it's less noisy for deeply nested data. See [`workspace/content/example.yaml`](workspace/content/example.yaml) for a complete example.
 
@@ -173,17 +170,17 @@ basic:
 
 For multilingual variants this is the familiar `{ en: "...", es: "..." }` pattern — it works the same way, the keys are just variant names now.
 
-The output filename includes the variant name: `2026-05-12-fullstack-john-doe.pdf`.
+The output filename includes the variant name: `20260512-fullstack-john-doe.pdf`.
 
 ## Templates
 
-Templates are plain HTML files with a small set of mustache-style tags. The default template is `./workspace/templates/default.html`.
+Templates are plain HTML files with a small set of mustache-style tags. The default is `./workspace/templates/default.html`.
 
-To create a custom template:
+To use a custom template:
 
-1. Copy `workspace/templates/default.html` to a new file (any path)
-2. Edit the markup and styles as needed
-3. Set `metadata.template: ./path/to/your-template.html` in your data file, or pass `--template-path ./path/to/your-template.html`
+1. Copy `workspace/templates/default.html` to a new file (any path).
+2. Edit the markup and styles.
+3. Pass it with `--template-path ./path/to/your-template.html`.
 
 Supported template tags:
 
@@ -199,7 +196,41 @@ Variant-keyed strings are resolved before rendering: any object whose keys are a
 
 Each `contactInfo` item gets an `iconSvg` field auto-attached (inline SVG looked up by `type`). Use `{{{iconSvg}}}` in custom templates.
 
-## Vendoring Fonts
+## Spell checking
+
+Spell checking runs by default and reports the misspelled words it finds. Use `--skip-spell-check` (`-s`) to skip it.
+
+It is driven by `variant.language`. Variants declared without a `language:` (e.g. `- name: backend`) are skipped silently — useful for role-flavor variants where the dictionary doesn't matter.
+
+### Adding dictionaries
+
+English and Spanish dictionaries are included. To add another language:
+
+1. Download the `.aff` and `.dic` files for your language from [wooorm/dictionaries](https://github.com/wooorm/dictionaries/tree/main/dictionaries).
+2. Name them with the language code (e.g. `fr.aff`, `fr.dic`).
+3. Place both files in `./workspace/dictionaries/`.
+
+### Custom whitelist
+
+Add terms to suppress false positives. Place text files directly in `./workspace/dictionaries/`:
+
+- `whitelist.txt` — applies to all languages
+- `whitelist-en.txt` — English only
+- `whitelist-es.txt` — Spanish only
+
+One term per line; lines starting with `#` are comments.
+
+```text
+# Technical terms
+TypeScript
+PostgreSQL
+
+# Brand names
+GitHub
+LinkedIn
+```
+
+## Fonts
 
 Fonts are vendored locally in `./workspace/assets/fonts/` and declared in `workspace/styles/styles.css` via `@font-face`. This avoids network requests during PDF generation.
 
@@ -225,6 +256,7 @@ To replace or add a font:
    ```
 
 3. Update the `--font-main` variable if switching families:
+
    ```css
    :root {
      --font-main: "Your Font", sans-serif;
@@ -233,9 +265,9 @@ To replace or add a font:
 
 Only download the weights you actually use. ResuMint currently uses **400** (body), **600** (headings), and **700** (company names, institutions).
 
-## Vendoring Icons
+## Icons
 
-Icons are inline SVGs rendered by the `getIconSvg` Handlebars helper, defined in `src/icons.ts`. No external scripts or CDN requests are needed.
+Icons are inline SVGs defined in the `ICON_SVGS` record in `src/generate/icons.ts`. No external scripts or CDN requests are needed.
 
 To add a new icon type:
 
@@ -245,7 +277,7 @@ To add a new icon type:
    curl -s "https://cdn.jsdelivr.net/npm/ionicons@7.1.0/dist/svg/heart-outline.svg"
    ```
 
-2. Add an entry to the `ICON_SVGS` record in `src/icons.ts`:
+2. Add an entry to `ICON_SVGS` in `src/generate/icons.ts`:
 
    ```typescript
    export const ICON_SVGS: Record<string, string> = {
@@ -262,43 +294,34 @@ To add a new icon type:
        value: some value
    ```
 
-4. Rebuild: `npm run build`
+4. Rebuild: `pnpm build`.
 
 The SVG inherits `color: currentColor` from the `.contact-item svg` CSS rule, so it matches the surrounding text color automatically.
 
-## Spell Checking
+## Workspace layout
 
-Spell checking runs by default and reports misspelled words with suggestions. Use `--skip-spell-check` (`-s`) to skip it globally.
+All user-facing files live under `workspace/`. Everything else is implementation.
 
-Spell-check is driven by `variant.language`. Variants declared without a `language:` (e.g. `- name: backend`) are skipped silently — useful for role-flavor variants where the dictionary doesn't matter.
-
-### Adding Dictionaries
-
-English and Spanish dictionaries are included. To add another language:
-
-1. Download the `.aff` and `.dic` files for your language from [wooorm/dictionaries](https://github.com/wooorm/dictionaries/tree/main/dictionaries)
-2. Name them using the language code (e.g. `fr.aff`, `fr.dic` for French)
-3. Place both files in `./workspace/dictionaries/`
-
-### Custom Whitelist
-
-Add terms to suppress false positives. Place text files directly in `./workspace/dictionaries/`:
-
-- `whitelist.txt` — applies to all languages
-- `whitelist-en.txt` — English only
-- `whitelist-es.txt` — Spanish only
-
-One term per line; lines starting with `#` are comments.
-
-```text
-# Technical terms
-TypeScript
-PostgreSQL
-
-# Brand names
-GitHub
-LinkedIn
 ```
+workspace/
+├── content/       ← your YAML/JSON input files
+├── styles/        ← CSS for templates
+├── templates/     ← HTML templates
+├── assets/
+│   ├── fonts/     ← vendored woff2 font files
+│   └── images/    ← profile photos and other images
+└── dictionaries/  ← spell-check dictionaries and whitelists
+```
+
+## Browser detection
+
+ResuMint uses your system Chrome/Chromium to render PDFs. The executable is resolved in this order:
+
+1. `--browser-path` CLI argument
+2. `PUPPETEER_EXECUTABLE_PATH` environment variable
+3. Common system locations (`/usr/bin/google-chrome`, `/Applications/Google Chrome.app/...`, `C:\Program Files\Google\Chrome\...`, etc.)
+
+If none are found, generation fails with a hint to install Chrome or pass `--browser-path`. To set the path once, put it in `.env` (copied from `.env.example`); ResuMint loads `.env` automatically on startup. Live preview (`--serve`) needs no browser at all.
 
 ## License
 

@@ -77,8 +77,9 @@ function buildHtml(
     options: CommandLineArgs,
     baseHref: string
 ): { variant: string; html: string } {
-    const resumeData = yamlLoad(readFileSync(options.input, "utf8")) as
-        | (ResumeMetadata & Record<string, unknown>);
+    const resumeData = yamlLoad(
+        readFileSync(options.input, "utf8")
+    ) as ResumeMetadata & Record<string, unknown>;
     const variantsToRun = getVariantsToRun(
         resumeData.variants,
         options.variant
@@ -101,7 +102,10 @@ function buildHtml(
 // gets this for free since the whole filesystem is reachable there. If the
 // template lives outside the working dir we fall back to serving its own dir,
 // which only covers assets at or below the template.
-function resolveRoots(templateRoot: string): { root: string; baseHref: string } {
+function resolveRoots(templateRoot: string): {
+    root: string;
+    baseHref: string;
+} {
     const cwd = process.cwd();
     const rel = relative(cwd, templateRoot);
 
@@ -113,11 +117,7 @@ function resolveRoots(templateRoot: string): { root: string; baseHref: string } 
 
 // Serve a template-relative asset (CSS, fonts, images) from the template
 // directory, which is what the "/" <base href> resolves requests against.
-function serveStatic(
-    root: string,
-    urlPath: string,
-    res: ServerResponse
-): void {
+function serveStatic(root: string, urlPath: string, res: ServerResponse): void {
     const relative = decodeURIComponent(urlPath).replace(/^\/+/, "");
     const filePath = normalize(join(root, relative));
 
