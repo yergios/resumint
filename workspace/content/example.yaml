@@ -1,12 +1,14 @@
 variants:
-  - en
-  - es
+  - name: staff
+    language: en
+  - name: cto
+    language: en
 
 basic:
   name: John Doe
   title:
-    en: Staff Software Engineer
-    es: Ingeniero de Software Staff
+    staff: Staff Software Engineer
+    cto: Chief Technology Officer
   contactInfo:
     - type: email
       value: john.doe@example.com
@@ -23,209 +25,158 @@ basic:
   profileImage: ../assets/images/john-doe-profile-picture.png
 
 experience:
-  - company: TheStartup (multi-billion)
-    location:
-      en: San Francisco, USA
-      es: San Francisco, EE.UU.
-    positions:
-      - position:
-          en: Staff Engineer
-          es: Ingeniero Staff
-        date:
-          start:
-            en: Jan 2022
-            es: Ene 2022
-          end:
-            en: Present
-            es: Presente
-        techStack:
-          - Go
-          - TypeScript
-          - Kubernetes
-          - Docker
-          - PostgreSQL
-          - Redis
-          - Terraform
-          - OpenTelemetry
-          - AI copilots
-          - YAML
-        responsibilities:
-          en:
-            - Survived strategic organizational flattening, inheriting ownership of three services and half a platform.
-            - Practiced selective vibe coding to meet ambitious roadmap commitments after headcount optimization.
-            - Increased individual impact following transition to a "lean, founder-mode" engineering structure.
-            - Helped transform engineering velocity into measurable progress on the quarterly investor deck.
-            - Maintained production uptime despite architectural decisions made primarily for fundraising narratives.
-            - Reduced operational incidents by 45% through improved observability, automated remediation, and fewer available humans.
-            - Removed over 120,000 lines of obsolete code while quietly resisting similar optimization of headcount.
-            - Established engineering standards emphasizing simplicity, reliability, and skepticism toward productivity theater.
-          es:
-            - Sobrevivió al aplanamiento organizativo estratégico, heredando la responsabilidad de tres servicios y media plataforma.
-            - Practicó "vibe coding" selectivo para cumplir objetivos ambiciosos tras la optimización de plantilla.
-            - Incrementó su impacto individual tras la transición a una estructura de ingeniería más "lean" y orientada al fundador.
-            - Ayudó a convertir la velocidad de ingeniería en progreso medible para la presentación trimestral a inversores.
-            - Mantuvo la disponibilidad del sistema pese a decisiones arquitectónicas tomadas principalmente para narrativa de fundraising.
-            - Redujo incidentes operativos en un 45% mediante mejor observabilidad, remediación automatizada y menos humanos disponibles.
-            - Eliminó más de 120.000 líneas de código obsoleto mientras resistía discretamente una optimización similar de plantilla.
-            - Estableció estándares centrados en simplicidad, fiabilidad y escepticismo frente al teatro de productividad.
+  staff:
+    - company: TheStartup (multi-billion)
+      location: San Francisco, USA
+      techStack:
+        - Go
+        - TypeScript
+        - Kubernetes
+        - PostgreSQL
+        - Terraform
+        - OpenTelemetry
+        - YAML
+      positions:
+        - position: Staff Engineer
+          date:
+            start: Jan 2022
+            end: Present
+          responsibilities:
+            - Vibe coded a critical service with an AI copilot in one weekend, then spent two quarters discovering what it actually does.
+            - Burned $4,000 in LLM tokens debugging a single incident; the $12 lunch reimbursement needed VP approval.
+            - Shipped 120,000 lines of code in one quarter, hitting the performance review target well before anyone read them.
 
-  - company: Acme Distributed Systems Inc.
-    location:
-      en: San Francisco, USA
-      es: San Francisco, EE.UU.
-    positions:
-      - position:
-          en: Senior Software Engineer
-          es: Ingeniero de Software Senior
-        date:
-          start:
-            en: Mar 2019
-            es: Mar 2019
-          end:
-            en: Dec 2021
-            es: Dic 2021
-        techStack:
-          - TypeScript
-          - Node.js
-          - PostgreSQL
-          - Redis
-          - Kafka
-          - Docker
-          - Kubernetes
-          - OpenTelemetry
-          - CI/CD
-          - AWS
-        responsibilities:
-          en:
-            - Designed and implemented microservices supporting 10K+ requests per second across mission-critical production systems.
-            - Reduced deployment time from 45 minutes to under 10 through CI/CD pipeline optimization and infrastructure automation.
-            - Built distributed tracing and observability tooling that made debugging feasible—and occasionally pleasant.
-            - Improved service reliability to 99.95% through performance tuning and failure-mode analysis.
-            - Refactored large monolithic components into modular systems with clear ownership boundaries.
-            - Mentored junior engineers in software design, debugging methodology, and responsible use of "temporary" fixes.
-          es:
-            - Diseñó e implementó microservicios que soportan más de 10K solicitudes por segundo en sistemas críticos de producción.
-            - Redujo el tiempo de despliegue de 45 minutos a menos de 10 mediante optimización de CI/CD y automatización de infraestructura.
-            - Construyó herramientas de trazabilidad distribuida y observabilidad que hicieron la depuración viable—e incluso agradable.
-            - Mejoró la fiabilidad de servicios hasta 99,95% mediante optimización de rendimiento y análisis de fallos.
-            - Refactorizó componentes monolíticos hacia sistemas modulares con límites claros de responsabilidad.
-            - Mentorizó ingenieros junior en diseño de software, metodologías de depuración y uso responsable de arreglos "temporales".
+    - company: Acme Distributed Systems Inc.
+      location: San Francisco, USA
+      techStack:
+        - JavaScript
+        - TypeScript
+        - React
+        - Node.js
+        - PHP
+        - MySQL
+      positions:
+        - position: Senior Software Engineer
+          date:
+            start: Mar 2019
+            end: Dec 2021
+          responsibilities:
+            - Estimated the migration at two weeks; delivered it in five months, precisely on schedule per the fourth revised estimate.
+            - Sat through fourteen story-pointing sessions to reach consensus that everything was, in fact, a 5.
+            - Mentored engineers on debugging, data structures, and why the SLA never matches the SLO.
 
-      - position:
-          en: Software Engineer
-          es: Ingeniero de Software
-        date:
-          start:
-            en: Jul 2017
-            es: Jul 2017
-          end:
-            en: Feb 2019
-            es: Feb 2019
-        techStack:
-          - JavaScript
-          - TypeScript
-          - React
-          - Node.js
-          - PHP
-          - MySQL
-          - HTML
-          - CSS
-        responsibilities:
-          en:
-            - Developed customer-facing web applications with focus on performance, usability, and maintainable frontend architecture.
-            - Migrated legacy JavaScript codebases to TypeScript, reducing runtime errors and increasing developer confidence.
-            - Diagnosed and resolved complex production defects, including several caused by assumptions about asynchronous behavior.
-            - Introduced automated testing and code review practices that improved release quality across the team.
+        - position: Software Engineer
+          date:
+            start: Jul 2017
+            end: Feb 2019
+          responsibilities:
+            - Survived the Q4 death march to ship the closed-scope redesign.
+            - Migrated legacy JavaScript to TypeScript, trading runtime errors for compile-time arguments.
             - Learned that there is nothing more permanent than a temporary workaround.
-          es:
-            - Desarrolló aplicaciones web orientadas al cliente con foco en rendimiento, usabilidad y arquitectura mantenible.
-            - Migró bases de código JavaScript heredadas a TypeScript, reduciendo errores en tiempo de ejecución.
-            - Diagnosticó y resolvió defectos complejos en producción, incluyendo varios causados por supuestos sobre comportamiento asíncrono.
-            - Introdujo pruebas automatizadas y revisiones de código que mejoraron la calidad de entrega del equipo.
-            - Aprendió que no hay nada más permanente que una solución temporal.
 
-  - company: Enterprise Solutions Global
-    location:
-      en: Remote
-      es: Remoto
-    positions:
-      - position:
-          en: Software Engineering Intern
-          es: Becario de Ingeniería de Software
-        date:
-          start:
-            en: Jun 2015
-            es: Jun 2015
-          end:
-            en: Aug 2015
-            es: Ago 2015
-        techStack:
-          - Java
-          - Spring
-          - Oracle SQL
-          - XML
-          - Jenkins
-          - Linux
-          - Vim
-          - Stack Overflow
-        responsibilities:
-          en:
-            - Changed a single line in production and triggered a deployment approval process involving seven stakeholders.
-            - Learned that "enterprise-grade" usually means "too critical to rewrite."
-            - Closed 47 browser tabs while debugging, only to discover the answer was in the first one.
-            - Added logging statements that remained the primary observability platform for several years.
-            - Asked whether the monolith could be split into services and was politely advised not to.
-            - Accidentally fixed a decade-old bug while renaming a variable.
-            - Began a lifelong habit of saying "this should be simple" before losing an entire afternoon.
-          es:
-            - Cambió una sola línea en producción y activó un proceso de aprobación con siete responsables.
-            - Aprendió que "enterprise-grade" suele significar "demasiado crítico para reescribir."
-            - Cerró 47 pestañas del navegador depurando, solo para descubrir que la respuesta estaba en la primera.
-            - Añadió logs que permanecieron como principal plataforma de observabilidad durante varios años.
-            - Preguntó si el monolito podía dividirse en servicios y recibió una recomendación amable de no hacerlo.
-            - Arregló accidentalmente un bug de una década al renombrar una variable.
-            - Comenzó el hábito de decir "esto debería ser sencillo" antes de perder toda una tarde.
+    - company: Enterprise Solutions Global
+      location: Remote
+      techStack:
+        - Java
+        - Spring
+        - Oracle SQL
+        - XML
+        - Jenkins
+        - Vim
+      positions:
+        - position: Software Engineering Intern
+          date:
+            start: Jun 2015
+            end: Aug 2015
+          responsibilities:
+            - Changed one line in production and triggered an approval process involving seven stakeholders.
+            - Closed 47 browser tabs while debugging a bug that stubbornly refused to reproduce anywhere but production.
+            - Learned that changing a config value required a change ticket, a risk assessment, and a form to request the form.
+
+  cto:
+    - company: TheStartup (multi-billion)
+      location: San Francisco, USA
+      techStack:
+        - PowerPoint
+        - OKRs
+        - Board Decks
+        - Slack (VP channels only)
+        - Google Calendar
+      positions:
+        - position: Chief Technology Officer
+          date:
+            start: Jan 2023
+            end: Present
+          responsibilities:
+            - Rebranded a full outage as an unplanned resilience exercise for the board deck.
+            - Championed an org-wide AI-first strategy, personally validated by a keynote slide featuring a rocket ship.
+            - Presented ARR growth to the board while instructing engineering not to look too closely at the churn number.
+
+    - company: GrowthCo (Series B)
+      location: San Francisco, USA
+      techStack:
+        - Notion
+        - OKRs
+        - Offsite Facilitation
+        - Zoom
+      positions:
+        - position: VP of Engineering
+          date:
+            start: Feb 2021
+            end: Dec 2022
+          responsibilities:
+            - Flattened the org chart by inventing three new director titles and giving them to the same two people.
+            - Ran an innovation offsite in Tahoe that produced one Slack channel and zero shipped features.
+            - Hit 100% OKR completion for the quarter by redefining the OKRs in December.
+
+    - company: BigTech Corp
+      location: Mountain View, USA
+      techStack:
+        - Java
+        - Internal Tools Nobody Outside Could Name
+        - Promo Packets
+      positions:
+        - position: Senior Engineering Manager
+          date:
+            start: Jun 2017
+            end: Jan 2021
+          responsibilities:
+            - Managed 40 engineers and perfected the pre-meeting sync required before the actual sync.
+            - Wrote a promotion packet longer than the feature it documented, and got promoted anyway.
+            - Left eight months before the reorg, a decision colleagues now describe as visionary.
 
 education:
-  - institution:
-      en: Massachusetts Institute of Technology
-      es: Instituto Tecnológico de Massachusetts
-    degree:
-      en: Master of Science in Computer Science
-      es: Maestría en Ciencias de la Computación
-    location:
-      en: Cambridge, USA
-      es: Cambridge, EE.UU.
-    date:
-      start:
-        en: Sep 2015
-        es: Sep 2015
-      end:
-        en: Jun 2017
-        es: Jun 2017
+  staff:
+    - institution: Massachusetts Institute of Technology
+      degree: Master of Science in Computer Science
+      location: Cambridge, USA
+      date:
+        start: Sep 2015
+        end: Jun 2017
 
-  - institution:
-      en: University of California, Berkeley
-      es: Universidad de California, Berkeley
-    degree:
-      en: Bachelor of Science in Computer Science
-      es: Licenciatura en Ciencias de la Computación
-    location:
-      en: Berkeley, USA
-      es: Berkeley, EE.UU.
-    date:
-      start:
-        en: Sep 2011
-        es: Sep 2011
-      end:
-        en: May 2015
-        es: May 2015
+    - institution: University of California, Berkeley
+      degree: Bachelor of Science in Computer Science
+      location: Berkeley, USA
+      date:
+        start: Sep 2011
+        end: May 2015
+
+  cto:
+    - institution: Massachusetts Institute of Technology
+      degree: Master of Science in Computer Science
+      location: Cambridge, USA
+      date:
+        start: Sep 2015
+        end: Jun 2017
+
+    - institution: Stanford Graduate School of Business
+      degree: Executive Education Certificate, Leading Through Ambiguity
+      location: Stanford, USA
+      date:
+        start: Mar 2022
+        end: Mar 2022
 
 metadata:
   sections:
-    en:
-      experience: EXPERIENCE
-      education: EDUCATION
-    es:
-      experience: EXPERIENCIA
-      education: EDUCACIÓN
+    experience: EXPERIENCE
+    education: EDUCATION

@@ -7,9 +7,16 @@ linkedin.com/in/johndoe
 TechCorp
 WebSolutions
 StartApp
+johndoe.dev
+TheStartup
+multi-billion
+GrowthCo
+BigTech
 
 # Technologies
 Kubernetes
+OpenTelemetry
+YAML
 Node.js
 jQuery
 AWS
@@ -73,12 +80,35 @@ SCRUM
 plugins
 e-commerce
 high-traffic
-self-service
+compile-time
+vibe
+FAANG
+ex-FAANG
+SLA
+SLO
+story-pointing
+Slack
+LLM
+PowerPoint
+OKRs
+OKR
+ARR
+Notion
+Zoom
+Tahoe
+promo
+org
+org-wide
+offsite
+AI-first
+pre-meeting
+Rebranded
+closed-scope
+config
 
 # Abbreviations
 Inc
 Ltd
-Dic
 Tech
 Jan
 Feb
@@ -93,13 +123,12 @@ Sept
 Oct
 Nov
 Dec
-CMS
 
 # Places
-EE.UU
 Boston
 Massachusetts
 Cambridge
 
 # Other
 Curriculum
+reimbursement

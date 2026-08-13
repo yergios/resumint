@@ -7,9 +7,25 @@ linkedin.com/in/johndoe
 TechCorp
 WebSolutions
 StartApp
+johndoe.dev
+TheStartup
+multi-billion
+Acme
+Distributed
+Systems
+Enterprise
+Solutions
+Staff
 
 # Technologies
 Kubernetes
+Go
+OpenTelemetry
+YAML
+Spring
+XML
+Jenkins
+Vim
 Node.js
 jQuery
 AWS
@@ -74,6 +90,15 @@ SCRUM
 plugins
 e-commerce
 high-traffic
+observabilidad
+vibe
+coding
+FAANG
+ex-FAANG
+story-pointing
+Slack
+SLA
+SLO
 
 # Abbreviations
 Inc
