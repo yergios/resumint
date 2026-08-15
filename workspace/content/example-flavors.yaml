@@ -22,7 +22,7 @@ basic:
       value: San Francisco, USA
     - type: linkedin
       value: linkedin.com/in/janedoe
-  profileImage: ../assets/images/john-doe-profile-picture.png
+  profileImage: ../assets/images/jane-doe-profile-picture.webp
 
 experience:
   staff:

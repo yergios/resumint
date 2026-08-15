@@ -19,7 +19,7 @@ basic:
       value: San Francisco, USA
     - type: linkedin
       value: linkedin.com/in/johndoe
-  profileImage: ../assets/images/john-doe-profile-picture.png
+  profileImage: ../assets/images/john-doe-profile-picture.jpg
 
 experience:
   staff:
