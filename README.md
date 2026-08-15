@@ -60,7 +60,7 @@ pnpm link --global
 resumint          # equivalent to: pnpm start
 ```
 
-The quickest start is to copy [`workspace/content/example.yaml`](workspace/content/example.yaml) to `resume.yaml` and edit it.
+The quickest start is to copy [`workspace/content/example.yaml`](workspace/content/example.yaml) to `resume.yaml` and edit it. You'll find other example files in this directory as well.
 
 ## Live preview
 

@@ -1,11 +1,14 @@
 variants:
   - name: staff
     language: en
+  - name: cto
+    language: en
 
 basic:
   name: John Doe
   title:
     staff: Staff Software Engineer
+    cto: Chief Technology Officer
   contactInfo:
     - type: email
       value: john.doe@example.com
@@ -90,21 +93,72 @@ experience:
             - Closed 47 browser tabs while debugging a bug that stubbornly refused to reproduce anywhere but production.
             - Learned that changing a config value required a change ticket, a risk assessment, and a form to request the form.
 
-education:
-  staff:
-    - institution: Massachusetts Institute of Technology
-      degree: Master of Science in Computer Science
-      location: Cambridge, USA
-      date:
-        start: Sep 2015
-        end: Jun 2017
+  cto:
+    - company: TheStartup (multi-billion)
+      location: San Francisco, USA
+      techStack:
+        - PowerPoint
+        - OKRs
+        - Board Decks
+        - Slack (VP channels only)
+        - Google Calendar
+      positions:
+        - position: Chief Technology Officer
+          date:
+            start: Jan 2023
+            end: Present
+          responsibilities:
+            - Rebranded a full outage as an unplanned resilience exercise for the board deck.
+            - Championed an org-wide AI-first strategy, personally validated by a keynote slide featuring a rocket ship.
+            - Presented ARR growth to the board while instructing engineering not to look too closely at the churn number.
 
-    - institution: University of California, Berkeley
-      degree: Bachelor of Science in Computer Science
-      location: Berkeley, USA
-      date:
-        start: Sep 2011
-        end: May 2015
+    - company: GrowthCo (Series B)
+      location: San Francisco, USA
+      techStack:
+        - Notion
+        - OKRs
+        - Offsite Facilitation
+        - Zoom
+      positions:
+        - position: VP of Engineering
+          date:
+            start: Feb 2021
+            end: Dec 2022
+          responsibilities:
+            - Flattened the org chart by inventing three new director titles and giving them to the same two people.
+            - Ran an innovation offsite in Tahoe that produced one Slack channel and zero shipped features.
+            - Hit 100% OKR completion for the quarter by redefining the OKRs in December.
+
+    - company: BigTech Corp
+      location: Mountain View, USA
+      techStack:
+        - Java
+        - Internal Tools Nobody Outside Could Name
+        - Promo Packets
+      positions:
+        - position: Senior Engineering Manager
+          date:
+            start: Jun 2017
+            end: Jan 2021
+          responsibilities:
+            - Managed 40 engineers and perfected the pre-meeting sync required before the actual sync.
+            - Wrote a promotion packet longer than the feature it documented, and got promoted anyway.
+            - Left eight months before the reorg, a decision colleagues now describe as visionary.
+
+education:
+  - institution: Massachusetts Institute of Technology
+    degree: Master of Science in Computer Science
+    location: Cambridge, USA
+    date:
+      start: Sep 2015
+      end: Jun 2017
+
+  - institution: University of California, Berkeley
+    degree: Bachelor of Science in Computer Science
+    location: Berkeley, USA
+    date:
+      start: Sep 2011
+      end: May 2015
 
 metadata:
   sections:

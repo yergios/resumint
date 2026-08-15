@@ -1,0 +1,202 @@
+variants:
+  - name: staff-en
+    language: en
+  - name: staff-es
+    language: es
+
+basic:
+  name: John Doe
+  title:
+    staff: Staff Software Engineer
+    staff-es: Ingeniero de Software Staff
+  contactInfo:
+    - type: email
+      value: john.doe@example.com
+    - type: web
+      value: johndoe.dev
+    - type: phone
+      value: +1 555-123-4567
+    - type: github
+      value: github.com/johndoe
+    - type: location
+      value: San Francisco, USA
+    - type: linkedin
+      value: linkedin.com/in/johndoe
+  profileImage: ../assets/images/john-doe-profile-picture.png
+
+experience:
+  staff:
+    - company: TheStartup (multi-billion)
+      location: San Francisco, USA
+      techStack:
+        - Go
+        - TypeScript
+        - Kubernetes
+        - PostgreSQL
+        - Terraform
+        - OpenTelemetry
+        - YAML
+      positions:
+        - position: Staff Engineer
+          date:
+            start: Jan 2022
+            end: Present
+          responsibilities:
+            - Vibe coded a critical service with an AI copilot in one weekend, then spent two quarters discovering what it actually does.
+            - Burned $4,000 in LLM tokens debugging a single incident; the $12 lunch reimbursement needed VP approval.
+            - Shipped 120,000 lines of code in one quarter, hitting the performance review target well before anyone read them.
+
+    - company: Acme Distributed Systems Inc.
+      location: San Francisco, USA
+      techStack:
+        - JavaScript
+        - TypeScript
+        - React
+        - Node.js
+        - PHP
+        - MySQL
+      positions:
+        - position: Senior Software Engineer
+          date:
+            start: Mar 2019
+            end: Dec 2021
+          responsibilities:
+            - Estimated the migration at two weeks; delivered it in five months, precisely on schedule per the fourth revised estimate.
+            - Sat through fourteen story-pointing sessions to reach consensus that everything was, in fact, a 5.
+            - Mentored engineers on debugging, data structures, and why the SLA never matches the SLO.
+
+        - position: Software Engineer
+          date:
+            start: Jul 2017
+            end: Feb 2019
+          responsibilities:
+            - Survived the Q4 death march to ship the closed-scope redesign.
+            - Migrated legacy JavaScript to TypeScript, trading runtime errors for compile-time arguments.
+            - Learned that there is nothing more permanent than a temporary workaround.
+
+    - company: Enterprise Solutions Global
+      location: Remote
+      techStack:
+        - Java
+        - Spring
+        - Oracle SQL
+        - XML
+        - Jenkins
+        - Vim
+      positions:
+        - position: Software Engineering Intern
+          date:
+            start: Jun 2015
+            end: Aug 2015
+          responsibilities:
+            - Changed one line in production and triggered an approval process involving seven stakeholders.
+            - Closed 47 browser tabs while debugging a bug that stubbornly refused to reproduce anywhere but production.
+            - Learned that changing a config value required a change ticket, a risk assessment, and a form to request the form.
+
+  staff-es:
+    - company: TheStartup (multi-billion)
+      location: San Francisco, USA
+      techStack:
+        - Go
+        - TypeScript
+        - Kubernetes
+        - PostgreSQL
+        - Terraform
+        - OpenTelemetry
+        - YAML
+      positions:
+        - position: Ingeniero de Software Staff
+          date:
+            start: Jan 2022
+            end: Present
+          responsibilities:
+            - Desarrollo de un servicio crítico junto a agentes de IA en un fin de semana, y posterior descubrimiento durante dos trimestres de lo que realmente hacía.
+            - Consumo de $4,000 en tokens de LLM depurando un único incidente; el reembolso de $12 del almuerzo requirió aprobación de un vicepresidente.
+            - Entrega de 120,000 líneas de código en un trimestre, superando el objetivo de la evaluación de desempeño mucho antes de que alguien las leyera.
+
+    - company: Acme Distributed Systems Inc.
+      location: San Francisco, USA
+      techStack:
+        - JavaScript
+        - TypeScript
+        - React
+        - Node.js
+        - PHP
+        - MySQL
+      positions:
+        - position: Ingeniero de Software Senior
+          date:
+            start: Mar 2019
+            end: Dec 2021
+          responsibilities:
+            - Estimación de la migración en dos semanas; entrega en cinco meses, exactamente a tiempo según la cuarta revisión de la estimación.
+            - Asistencia a catorce sesiones de estimación de historias para alcanzar el consenso de que todo, en efecto, era un 5.
+            - Mentoría a ingenieros en depuración, estructuras de datos y por qué el SLA nunca coincide con el SLO.
+
+        - position: Ingeniero de Software
+          date:
+            start: Jul 2017
+            end: Feb 2019
+          responsibilities:
+            - Supervivencia a la marcha forzada del cuarto trimestre para entregar el rediseño de alcance cerrado.
+            - Migración de JavaScript heredado a TypeScript, cambiando errores en tiempo de ejecución por discusiones en tiempo de compilación.
+            - Aprendizaje de que no hay nada más permanente que una solución temporal.
+
+    - company: Enterprise Solutions Global
+      location: Remote
+      techStack:
+        - Java
+        - Spring
+        - Oracle SQL
+        - XML
+        - Jenkins
+        - Vim
+      positions:
+        - position: Practicante de Ingeniería de Software
+          date:
+            start: Jun 2015
+            end: Aug 2015
+          responsibilities:
+            - Modificación de una línea en producción, desencadenando un proceso de aprobación con siete partes interesadas.
+            - Cierre de 47 pestañas del navegador mientras se depuraba un error que se negaba obstinadamente a reproducirse en cualquier lugar que no fuera producción.
+            - Aprendizaje de que modificar un valor de configuración requería un ticket de cambio, una evaluación de riesgo y un formulario para solicitar el formulario.
+
+education:
+  staff:
+    - institution: Massachusetts Institute of Technology
+      degree: Master of Science in Computer Science
+      location: Cambridge, USA
+      date:
+        start: Sep 2015
+        end: Jun 2017
+
+    - institution: University of California, Berkeley
+      degree: Bachelor of Science in Computer Science
+      location: Berkeley, USA
+      date:
+        start: Sep 2011
+        end: May 2015
+
+  staff-es:
+    - institution: Massachusetts Institute of Technology
+      degree: Maestría en Ciencias de la Computación
+      location: Cambridge, USA
+      date:
+        start: Sep 2015
+        end: Jun 2017
+
+    - institution: University of California, Berkeley
+      degree: Licenciatura en Ciencias de la Computación
+      location: Berkeley, USA
+      date:
+        start: Sep 2011
+        end: May 2015
+
+metadata:
+  sections:
+    experience:
+      staff: EXPERIENCE
+      staff-es: EXPERIENCIA
+    education:
+      staff: EDUCATION
+      staff-es: EDUCACIÓN
