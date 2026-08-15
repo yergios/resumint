@@ -9,6 +9,7 @@ import { generateResumeForVariant } from "./generate/generator.js";
 import type { ResumeMetadata } from "./generate/types.js";
 import { getVariantsToRun, resolveVariantData } from "./generate/variants.js";
 import { createLogger } from "./logging/logger.js";
+import { type Spinner, startSpinner } from "./logging/spinner.js";
 import type { Logger } from "./logging/types.js";
 import { serve } from "./serve/server.js";
 import { getErrorMessage } from "./utils.js";
@@ -33,6 +34,7 @@ async function main() {
     const totalStartT = performance.now();
     const logger = createLogger();
     let browserPromise: Promise<Browser> | undefined;
+    let spinner: Spinner | undefined;
     let threshold = 1;
 
     try {
@@ -48,6 +50,8 @@ async function main() {
             serve(options);
             return;
         }
+
+        spinner = startSpinner("Generating resume(s)...");
 
         if (options.format !== "html") {
             browserPromise = launchBrowser(options, logger);
@@ -104,6 +108,7 @@ async function main() {
             }
         }
         logger.perf("Total overall", performance.now() - totalStartT);
+        spinner?.stop();
         logger.print(threshold);
     }
 }
