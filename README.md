@@ -1,6 +1,6 @@
 # Resumint
 
-Generate multilingual, multi-variant PDF resumes from a single YAML or JSON file — using tools you already know. Write your content, get clean PDFs. Bring your own HTML/CSS template for pixel-perfect control, or use the default.
+Generate multilingual, multi-variant PDF resumes from a single YAML file. Write your content, get clean PDFs. Bring your own HTML/CSS template for pixel-perfect control, or use the default.
 
 ## Contents
 
