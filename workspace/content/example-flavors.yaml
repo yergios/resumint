@@ -5,23 +5,23 @@ variants:
     language: en
 
 basic:
-  name: John Doe
+  name: Jane Doe
   title:
     staff: Staff Software Engineer
     cto: Chief Technology Officer
   contactInfo:
     - type: email
-      value: john.doe@example.com
+      value: jane.doe@example.com
     - type: web
-      value: johndoe.dev
+      value: janedoe.dev
     - type: phone
       value: +1 555-123-4567
     - type: github
-      value: github.com/johndoe
+      value: github.com/janedoe
     - type: location
       value: San Francisco, USA
     - type: linkedin
-      value: linkedin.com/in/johndoe
+      value: linkedin.com/in/janedoe
   profileImage: ../assets/images/john-doe-profile-picture.png
 
 experience:
