@@ -9,6 +9,7 @@ export interface CommandLineArgs {
     browserPath: string;
     format: OutputFormat;
     skipSpellCheck: boolean;
+    atsCheck: boolean;
     verbose: boolean;
     serve: boolean;
 }

@@ -5,12 +5,14 @@ import type { Logger } from "../logging/types.js";
 // A4 at 96 DPI is ~1123px; 1200 gives headroom for subpixel rounding and browser zoom
 export const A4_HEIGHT_PX = 1200;
 
+// Resolves to whether a PDF was written; an over-height page is reported and
+// skipped, and later steps (the ATS check) must not read a stale file.
 export async function generatePDF(
     page: Page,
     htmlPath: string,
     outputPath: string,
     logger: Logger
-) {
+): Promise<boolean> {
     const absoluteHtmlPath = `file://${resolve(htmlPath)}`;
 
     const navT = performance.now();
@@ -38,7 +40,7 @@ export async function generatePDF(
         logger.error(
             `Content height exceeds A4 maximum (${contentHeight}px > ${A4_HEIGHT_PX}px)`
         );
-        return;
+        return false;
     }
 
     const pdfT = performance.now();
@@ -51,4 +53,5 @@ export async function generatePDF(
     logger.perf("PDF generation", performance.now() - pdfT);
 
     logger.info(`PDF generated: '${outputPath}'`);
+    return true;
 }

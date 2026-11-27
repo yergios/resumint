@@ -126,9 +126,11 @@ b {
 
 .contact-info {
     display: grid;
-    grid-template-rows: repeat(2, auto);
-    grid-auto-flow: column;
-    /* grid-auto-columns: 1fr; */
+    /* Fill row by row so the visual reading order matches the DOM order.
+       Position-based PDF text extractors (used by ATS parsers) read left to
+       right, top to bottom; a column-flowed grid scrambles the contact list. */
+    grid-template-columns: repeat(3, auto);
+    grid-auto-flow: row;
     column-gap: 15px;
     row-gap: 3px;
     list-style: none;
@@ -172,7 +174,10 @@ section {
 
 .item-header {
     display: flex;
-    align-items: center;
+    /* A shared baseline keeps the left-hand text first for extractors that
+       order blocks by their top edge (poppler read "Remote" before the
+       company when the smaller, centered location sat higher). */
+    align-items: baseline;
     justify-content: space-between;
 }
 

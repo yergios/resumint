@@ -7,7 +7,7 @@ variants:
 basic:
   name: John Doe
   title:
-    staff: Staff Software Engineer
+    staff-en: Staff Software Engineer
     staff-es: Ingeniero de Software Staff
   contactInfo:
     - type: email
@@ -25,7 +25,7 @@ basic:
   profileImage: ../assets/images/john-doe-profile-picture.png
 
 experience:
-  staff:
+  staff-en:
     - company: TheStartup (multi-billion)
       location: San Francisco, USA
       techStack:
@@ -162,7 +162,7 @@ experience:
             - Aprendizaje de que modificar un valor de configuración requería un ticket de cambio, una evaluación de riesgo y un formulario para solicitar el formulario.
 
 education:
-  staff:
+  staff-en:
     - institution: Massachusetts Institute of Technology
       degree: Master of Science in Computer Science
       location: Cambridge, USA
@@ -195,8 +195,8 @@ education:
 metadata:
   sections:
     experience:
-      staff: EXPERIENCE
+      staff-en: EXPERIENCE
       staff-es: EXPERIENCIA
     education:
-      staff: EDUCATION
+      staff-en: EDUCATION
       staff-es: EDUCACIÓN

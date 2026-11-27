@@ -12,6 +12,7 @@
         "build": "tsc",
         "test": "tsc -p tsconfig.test.json && node --test \"dist-test/tests/**/*.test.js\"",
         "demo": "node ./dist/main.js ./workspace/content/example.yaml",
+        "ats:compare": "node ./scripts/compare-extractors.mjs",
         "lint": "biome lint --write .",
         "lint:check": "biome lint .",
         "format": "biome format --write .",
@@ -29,6 +30,7 @@
     "packageManager": "pnpm@10.29.3",
     "dependencies": {
         "nspell": "2.1.5",
+        "pdfjs-dist": "6.5.438",
         "puppeteer-core": "24.40.0"
     },
     "devDependencies": {
@@ -38,6 +40,6 @@
         "typescript": "5.9.2"
     },
     "engines": {
-        "node": ">=20.0.0"
+        "node": ">=22.13.0"
     }
 }
