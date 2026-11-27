@@ -19,7 +19,7 @@ Generate multilingual, multi-variant PDF resumes from a single YAML file. Write 
 
 ## Try it out
 
-**Prerequisites:** [Node.js 20+](https://nodejs.org) and Chrome/Chromium (used to render PDFs).
+**Prerequisites:** [Node.js 22.13+](https://nodejs.org) and Chrome/Chromium (used to render PDFs).
 
 Clone and build:
 
