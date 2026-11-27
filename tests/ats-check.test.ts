@@ -26,7 +26,11 @@ function item(str: string, x: number, y: number, height = 10): TextItem {
 // --- normalize / contentUnits ---
 
 test("normalize folds case, whitespace and soft hyphens", () => {
-    assert.equal(normalize("  EXPE­RIENCE \n Now "), "experience now");
+    assert.equal(normalize("  EXPE\u00adRIENCE \n Now "), "experience now");
+});
+
+test("normalize folds length-changing case mappings like CSS uppercase", () => {
+    assert.equal(normalize("Straße"), normalize("STRASSE"));
 });
 
 test("contentUnits drops separator-only units", () => {
@@ -136,6 +140,14 @@ test("flags a first line that doesn't start with the first unit", () => {
     assert.equal(checkFirstLine(["john doe"], lines).length, 1);
 });
 
+test("reports a name wrapped onto two lines as split", () => {
+    const lines = buildLayoutLines([
+        [item("Johnathan", 0, 700), item("Bartholomew", 0, 680)]
+    ]);
+    const findings = checkFirstLine(["johnathan bartholomew"], lines);
+    assert.match(findings[0]?.message ?? "", /split across lines/);
+});
+
 test("accepts a first line starting with the name", () => {
     const lines = buildLayoutLines([[item("John Doe", 0, 700)]]);
     assert.deepEqual(checkFirstLine(["john doe"], lines), []);
@@ -208,4 +220,45 @@ test("warns on ambiguous numeric dates", () => {
 
 test("ignores prose that merely contains a year", () => {
     assert.deepEqual(checkDates(["Led the migration since 2019"]), []);
+});
+
+test("phone numbers, GPAs and version numbers are not dates", () => {
+    assert.deepEqual(
+        checkDates([
+            "555-123-4567",
+            "555.123.4567",
+            "3.8",
+            "3.8/4",
+            "1.2.3",
+            "10-15"
+        ]),
+        []
+    );
+});
+
+test("unspaced year ranges are split and accepted", () => {
+    assert.deepEqual(
+        checkDates(["2015-2019", "Jan 2020-Dec 2021", "2020-Present"]),
+        []
+    );
+});
+
+test("a lone word plus year is not judged outside a range", () => {
+    assert.deepEqual(
+        checkDates(["Office 2019", "Since 2019", "Windows 2000"]),
+        []
+    );
+});
+
+test("trailing notes and punctuation are ignored", () => {
+    assert.deepEqual(
+        checkDates(["Sep 2024 - June 2028 (expected)", "Jan 2020 – present."]),
+        []
+    );
+});
+
+test("a dated range end is not told to use Present", () => {
+    const findings = checkDates(["Jan 2020 — 2021-03"]);
+    assert.equal(findings.length, 1);
+    assert.doesNotMatch(findings[0]?.message ?? "", /use Present/);
 });

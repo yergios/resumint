@@ -16,8 +16,15 @@ export interface Reading {
 
 // Case is folded because CSS text-transform changes what lands in the PDF
 // ("Experience" renders as "EXPERIENCE") without changing what a parser reads.
+// Uppercasing first applies the same length-changing mappings CSS uppercase
+// does, so "Straße" and the PDF's "STRASSE" fold to the same text.
 export function normalize(text: string): string {
-    return text.replace(/­/g, "").replace(/\s+/g, " ").trim().toLowerCase();
+    return text
+        .replace(/\u00ad/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toUpperCase()
+        .toLowerCase();
 }
 
 function hasWordCharacter(text: string): boolean {
@@ -99,6 +106,9 @@ function longestIncreasing(values: number[]): Set<number> {
 // a short unit that also appears inside longer ones ("go" in "google") still
 // lines up. Units outside the longest in-order run are the ones read out of
 // place; using that run keeps one moved block from flagging everything after.
+// The reference is DOM order, the order the template writes things in. When a
+// unit containing a short one is itself moved, the short unit can be matched
+// to the wrong copy and flagged too; that only adds noise to a real finding.
 export function checkOrder(units: string[], reading: Reading): Finding[] {
     const expected = units.join(" ");
     const located: { unit: string; position: number }[] = [];
@@ -131,6 +141,14 @@ export function checkFirstLine(
     if (!first || !firstLine) return [];
     const lineText = normalize(buildLayoutText([firstLine]));
     if (lineText.startsWith(first)) return [];
+    if (first.startsWith(lineText)) {
+        return [
+            {
+                kind: "order",
+                message: `${quote(first)} is split across lines; parsers usually take the name from the first line only`
+            }
+        ];
+    }
     return [
         {
             kind: "order",
@@ -223,10 +241,23 @@ const ENGLISH_MONTHS = new Set([
 ]);
 const ONGOING_WORDS = new Set(["present", "current", "now"]);
 
-const MONTH_YEAR = /^(?:(\p{L}+)\.?\s+)?((?:19|20)\d{2})$/u;
-const NUMERIC_DATE = /^\d{1,4}[/.-]\d{1,4}(?:[/.-]\d{1,4})?$/;
-const SAFE_NUMERIC = /^(?:0[1-9]|1[0-2])\/(?:19|20)\d{2}$/;
-const RANGE_SEPARATOR = /\s+[-–—]\s+|\s*[–—]\s*/;
+const YEAR = "(?:19|20)\\d{2}";
+const MONTH_YEAR = new RegExp(`^(?:(\\p{L}+)\\.?\\s+)?(${YEAR})$`, "u");
+// Numeric dates must contain a plausible year, so phone numbers, GPAs and
+// version numbers ("555-123-4567", "3.8/4", "1.2.3") are not mistaken for one.
+const NUMERIC_DATE = new RegExp(
+    `^(?:\\d{1,2}[/.-]){1,2}${YEAR}$|^${YEAR}[/.-]\\d{1,2}(?:[/.-]\\d{1,2})?$`
+);
+const SAFE_NUMERIC = new RegExp(`^(?:0[1-9]|1[0-2])/${YEAR}$`);
+// Spaced dashes, unspaced en/em dashes, and a bare hyphen right after a year
+// when a month word or another year follows ("2015-2019", "2020-Present").
+// "2020-01" stays whole: a year-month date, not a range.
+const RANGE_SEPARATOR = new RegExp(
+    `\\s+[-–—]\\s+|\\s*[–—]\\s*|(?<=${YEAR})-(?=\\p{L}|${YEAR}$|\\d{1,2}/${YEAR}$)`,
+    "u"
+);
+// "June 2028 (expected)" or "present." should be judged on the date itself.
+const TRAILING_NOTE = /\s*\([^)]*\)$|[.,;:]+$/;
 
 type DatePart = "safe" | "unsafe" | "not-a-date";
 
@@ -241,26 +272,35 @@ function classifyDatePart(part: string): DatePart {
 }
 
 // Only units that are a date or a date range on their own are considered, so
-// prose like "since 2019" is left alone.
+// prose like "Led the migration since 2019" is left alone. A lone "word year"
+// ("Office 2019", "Since 2019") is only judged as a date inside a range, where
+// the separator makes the intent clear.
 export function checkDates(units: string[]): Finding[] {
     const findings: Finding[] = [];
     for (const unit of new Set(
         units.map((u) => u.replace(/\s+/g, " ").trim())
     )) {
-        const parts = unit.split(RANGE_SEPARATOR);
+        const parts = unit
+            .split(RANGE_SEPARATOR)
+            .map((part) => part.replace(TRAILING_NOTE, ""));
         if (parts.length > 2) continue;
         const [start, end] = parts as [string, string | undefined];
         const startKind = classifyDatePart(start);
         if (startKind === "not-a-date") continue;
+        const isRange = end !== undefined;
+        if (!isRange && !NUMERIC_DATE.test(start) && /\p{L}/u.test(start)) {
+            continue;
+        }
 
         const problems: string[] = [];
         if (startKind === "unsafe") problems.push(quote(start));
-        if (end !== undefined) {
+        if (isRange) {
             const endKind = classifyDatePart(end);
             const ongoing = ONGOING_WORDS.has(end.toLowerCase());
             if (endKind === "unsafe") problems.push(quote(end));
             else if (endKind === "not-a-date" && !ongoing) {
-                problems.push(`${quote(end)} (use Present)`);
+                const hint = /\d/.test(end) ? "" : " (use Present)";
+                problems.push(`${quote(end)}${hint}`);
             }
         }
         if (problems.length === 0) continue;

@@ -21,9 +21,9 @@ const KIND_LABELS: Record<FindingKind, string> = {
     date: "Date formats"
 };
 
-// Reads the visible text off the page the PDF was printed from. Must run on
-// the same page, after printing, so it sees the print-media layout.
-export function collectRenderedText(page: Page): Promise<RenderedText> {
+// Reads the visible text off the page the PDF was printed from. It must use
+// that same page after navigation, so it sees the same document and fonts.
+function collectRenderedText(page: Page): Promise<RenderedText> {
     return page.evaluate(() => {
         const units: string[] = [];
         const walker = document.createTreeWalker(
@@ -36,9 +36,14 @@ export function collectRenderedText(page: Page): Promise<RenderedText> {
             if (!text || !parent || parent.closest("svg, style, script")) {
                 continue;
             }
-            if (!parent.checkVisibility({ visibilityProperty: true })) {
-                continue;
-            }
+            // Chrome leaves transparent text out of the PDF, and screen-reader
+            // only text is clipped to a 1px box; neither is "shown".
+            const visible = parent.checkVisibility({
+                visibilityProperty: true,
+                opacityProperty: true
+            });
+            const box = parent.getBoundingClientRect();
+            if (!visible || box.width <= 1 || box.height <= 1) continue;
             units.push(text);
         }
         return { units, fullText: document.body.innerText };
@@ -67,12 +72,13 @@ function report(findings: Finding[], logger: Logger): void {
 // Non-fatal like the spell check: a failure is logged, never thrown, so the
 // generated PDF is still reported as produced.
 export async function runAtsCheck(
+    page: Page,
     pdfPath: string,
-    rendered: RenderedText,
     logger: Logger
 ): Promise<void> {
     const t = performance.now();
     try {
+        const rendered = await collectRenderedText(page);
         const pages = await extractTextItems(pdfPath);
         logger.perf("PDF text extraction", performance.now() - t);
 

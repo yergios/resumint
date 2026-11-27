@@ -247,7 +247,7 @@ The text is read two ways: in the order the PDF stores it (as "raw" extractors r
 
 - **Missing text**: something shown on the page that can't be found in the extracted text.
 - **Merged text**: neighboring values that sit so close they extract without a space, e.g. `john@doe.com+1 555`.
-- **Reading order**: values read in a different order than the page shows them, or a first line that doesn't start with your name (parsers usually take the name from there).
+- **Reading order**: values read in a different order than the template writes them in the HTML, or a first line that doesn't start with your name (parsers usually take the name from there). Layouts that reorder content visually (floats, flex `order`, column-flowed grids) show up here because extractors disagree on them.
 - **Unreadable characters**: ligatures, icon-font glyphs, or other characters a parser may not map back to letters.
 - **Date formats**: dates that aren't `MM/YYYY`, an English month (`Jan 2022`, `January 2022`), or a bare year, and ranges ending in a word other than `Present`, `Current`, or `Now`. Corporate ATS parsers handle these most reliably.
 

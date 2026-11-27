@@ -2,7 +2,7 @@ import { unlinkSync, writeFileSync } from "node:fs";
 import { basename, dirname, extname, join } from "node:path";
 import type { Browser } from "puppeteer-core";
 import type { CommandLineArgs } from "src/cli/types.js";
-import { collectRenderedText, runAtsCheck } from "../ats-check/ats-check.js";
+import { runAtsCheck } from "../ats-check/ats-check.js";
 import type { Logger } from "../logging/types.js";
 import { runSpellCheck } from "../spell-check/spell-checker.js";
 import { getCurrentDate } from "../utils.js";
@@ -63,9 +63,9 @@ export async function generateResumeForVariant(
             pdfPath,
             logger
         ).then(async (written) => {
-            if (!written || !options.atsCheck) return;
-            const rendered = await collectRenderedText(page);
-            await runAtsCheck(pdfPath, rendered, logger);
+            if (written && options.atsCheck) {
+                await runAtsCheck(page, pdfPath, logger);
+            }
         });
     }
 
