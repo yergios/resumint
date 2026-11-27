@@ -11,6 +11,7 @@ Generate multilingual, multi-variant PDF resumes from a single YAML file. Write 
 - [Variants](#variants)
 - [Templates](#templates)
 - [Spell checking](#spell-checking)
+- [ATS check](#ats-check) — verify the PDF text reads cleanly for applicant tracking systems
 - [Fonts](#fonts)
 - [Icons](#icons)
 - [Workspace layout](#workspace-layout)
@@ -95,6 +96,7 @@ resumint [path] [options]
 | `--template-path`    | `-t`  | Path to a template HTML file                                          | `./workspace/templates/default.html` |
 | `--browser-path`     | `-b`  | Path to Chrome/Chromium executable                                    | auto-detected                     |
 | `--skip-spell-check` | `-s`  | Skip spell checking                                                   | `false`                           |
+| `--ats-check`        |       | Check that the PDF text extracts cleanly (PDF output only)            | `false`                           |
 | `--verbose`          | `-V`  | Print detailed logs and timing information                            | `false`                           |
 | `--help`             | `-h`  | Show usage and exit                                                   |                                   |
 | `--version`          |       | Show version and exit                                                 |                                   |
@@ -121,6 +123,9 @@ resumint ./workspace/content/example.yaml -t ./workspace/templates/fancy.html -n
 
 # Skip spell checking, with timings
 resumint ./workspace/content/example.yaml -s --verbose
+
+# Check the PDF reads cleanly for applicant tracking systems
+resumint ./workspace/content/example.yaml --ats-check
 ```
 
 ## Data file
@@ -229,6 +234,37 @@ PostgreSQL
 GitHub
 LinkedIn
 ```
+
+## ATS check
+
+Most employers run resumes through an applicant tracking system (ATS) that extracts the PDF's text and parses it into fields. `--ats-check` extracts the text of each generated PDF and compares it with what the page actually showed, so you can catch problems before a parser does:
+
+```bash
+resumint ./workspace/content/example.yaml --ats-check
+```
+
+The text is read two ways: in the order the PDF stores it (as "raw" extractors read it) and rebuilt line by line from positions on the page (as most parsers read it). The check warns about:
+
+- **Missing text**: something shown on the page that can't be found in the extracted text.
+- **Merged text**: neighboring values that sit so close they extract without a space, e.g. `john@doe.com+1 555`.
+- **Reading order**: values read in a different order than the page shows them, or a first line that doesn't start with your name (parsers usually take the name from there).
+- **Unreadable characters**: ligatures, icon-font glyphs, or other characters a parser may not map back to letters.
+- **Date formats**: dates that aren't `MM/YYYY`, an English month (`Jan 2022`, `January 2022`), or a bare year, and ranges ending in a word other than `Present`, `Current`, or `Now`. Corporate ATS parsers handle these most reliably.
+
+It runs only when asked, needs PDF output (it can't be combined with `--serve` or `--format html`), and only ever warns.
+
+A clean result means the text extracts cleanly; it is not a guarantee for any specific vendor's parser. The check reads whatever the template rendered, so it works with custom templates too, but it can't judge content: the default template is designed to pass, and custom templates are at your own risk.
+
+### Comparing against poppler
+
+To cross-check the check's own readings against an independent extractor, install poppler (`apt install poppler-utils` or `brew install poppler`) and run:
+
+```bash
+pnpm build
+pnpm ats:compare ./resumes/<file>.pdf
+```
+
+It prints a diff of each reading against `pdftotext`. Differences point either at a layout real parsers may disagree on or at a gap in the check.
 
 ## Fonts
 

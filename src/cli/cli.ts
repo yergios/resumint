@@ -41,6 +41,8 @@ Options:
   -b, --browser-path <path>     Path to Chrome/Chromium executable (auto-detected if omitted)
   -f, --format <pdf|html|both>  Output format (default: pdf)
   -s, --skip-spell-check        Skip spell checking
+      --ats-check               Check that the PDF text extracts cleanly for
+                                applicant tracking systems (PDF output only)
       --serve                   Start a live-preview server that re-renders on
                                 template or content changes (HTML only, no PDF)
   -V, --verbose                 Print detailed logs and timing information
@@ -55,6 +57,7 @@ Examples:
   resumint ./workspace/content/example.yaml --format html
   resumint ./workspace/content/example.yaml -t ./workspace/templates/fancy.html
   resumint ./workspace/content/example.yaml --serve -v en
+  resumint ./workspace/content/example.yaml --ats-check
 `;
 
 function readVersion(): string {
@@ -106,6 +109,7 @@ function parseArguments(): CommandLineArgs {
             "browser-path": { type: "string", short: "b" },
             format: { type: "string", short: "f", default: "pdf" },
             "skip-spell-check": { type: "boolean", short: "s", default: false },
+            "ats-check": { type: "boolean", default: false },
             serve: { type: "boolean", default: false },
             verbose: { type: "boolean", short: "V", default: false },
             help: { type: "boolean", short: "h", default: false },
@@ -154,6 +158,13 @@ function parseArguments(): CommandLineArgs {
 
     const serve = values.serve ?? false;
 
+    const atsCheck = values["ats-check"] ?? false;
+    if (atsCheck && (serve || format === "html")) {
+        throw new Error(
+            "--ats-check needs a PDF to read; it can't be combined with --serve or --format html"
+        );
+    }
+
     // The preview server renders HTML only, so it never launches Chrome; skip
     // browser detection so a machine without Chrome can still run --serve.
     const browserPath = serve ? "" : resolveBrowserPath(values["browser-path"]);
@@ -167,6 +178,7 @@ function parseArguments(): CommandLineArgs {
         browserPath,
         format: format as OutputFormat,
         skipSpellCheck: values["skip-spell-check"] ?? false,
+        atsCheck,
         verbose: values.verbose ?? false,
         serve
     };
