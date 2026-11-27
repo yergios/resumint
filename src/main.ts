@@ -76,16 +76,23 @@ async function main() {
         logger.perf("Template loading", performance.now() - templateLoadingT);
 
         const resumesGenerationT = performance.now();
+        // Each variant's failure is caught on its own: letting one reject the
+        // Promise.all would close the browser and print the log while the
+        // other variants are still running, losing their output.
         await Promise.all(
             resolvedVariants.map(({ variant, data }) => {
+                const variantLogger = logger.forVariant(variant.name);
                 return generateResumeForVariant(
                     variant,
                     template,
                     data,
                     options,
                     browserPromise,
-                    logger.forVariant(variant.name)
-                );
+                    variantLogger
+                ).catch((error) => {
+                    variantLogger.error(getErrorMessage(error));
+                    process.exitCode = 1;
+                });
             })
         );
         logger.perf(
