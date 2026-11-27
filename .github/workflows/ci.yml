@@ -1,0 +1,42 @@
+name: CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+
+permissions:
+    contents: read
+
+# A newer push to the same branch makes the older run pointless.
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    ci:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
+
+            # Reads the pnpm version from package.json's packageManager field.
+            - uses: pnpm/action-setup@v6
+
+            # The oldest supported major (engines: >=22.13.0).
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: 22
+                  cache: pnpm
+
+            - run: pnpm install --frozen-lockfile
+            - run: pnpm lint:check
+            - run: pnpm format:check
+            - run: pnpm build
+            - run: pnpm test
+
+            # End-to-end smoke test: the runner image ships Google Chrome at a
+            # path the CLI auto-detects, so this renders a real PDF.
+            - name: Generate example PDF
+              run: |
+                  node dist/main.js workspace/content/example.yaml --ats-check
+                  ls resumes/*-staff-example.pdf
