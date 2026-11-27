@@ -48,32 +48,32 @@ export async function generateResumeForVariant(
         logger.info(`HTML saved: ${htmlPath}`);
     }
 
-    let pdfGenerationPromise: Promise<void> | undefined;
-    if (options.format !== "html") {
-        const browser = await browserPromise;
-        if (!browser) {
-            logger.error("Browser was not created");
-            return;
-        }
-        const pdfPath = join(options.outputPath, `${resumeBasename}.pdf`);
-        const page = await browser.newPage();
-        pdfGenerationPromise = generatePDF(
-            page,
-            htmlPath,
-            pdfPath,
-            logger
-        ).then(async (written) => {
+    // The PDF is awaited directly rather than held as a promise while the spell
+    // check finishes: a held promise that rejects first has no handler yet, and
+    // Node aborts the process on the unhandled rejection, skipping the logger,
+    // the browser close and this cleanup.
+    try {
+        if (options.format !== "html") {
+            const browser = await browserPromise;
+            if (!browser) {
+                logger.error("Browser was not created");
+                return;
+            }
+            const pdfPath = join(options.outputPath, `${resumeBasename}.pdf`);
+            const page = await browser.newPage();
+            const written = await generatePDF(page, htmlPath, pdfPath, logger);
             if (written && options.atsCheck) {
                 await runAtsCheck(page, pdfPath, logger);
             }
-        });
-    }
-
-    await spellCheckPromise;
-    await pdfGenerationPromise;
-
-    if (options.format === "pdf") {
-        unlinkSync(htmlPath);
+        }
+    } finally {
+        // Runs on failure too, so spell-check findings are still logged before
+        // main prints, and the temporary HTML never lingers in the cwd. The
+        // spell check never rejects, so it can't mask a PDF error here.
+        await spellCheckPromise;
+        if (options.format === "pdf") {
+            unlinkSync(htmlPath);
+        }
     }
 
     logger.perf("Variant total", performance.now() - variantT);
