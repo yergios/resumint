@@ -1,6 +1,6 @@
 # Resumint
 
-[![CI](https://github.com/yergios/resumint/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/yergios/resumint/actions/workflows/ci.yml)
+[![CI](https://github.com/yergios/resumint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/yergios/resumint/actions/workflows/ci.yml)
 
 Generate multilingual, multi-variant, ATS-friendly PDF resumes from a single YAML file. Write your content, get clean PDFs, and check that applicant tracking systems can read them. Bring your own HTML/CSS template for pixel-perfect control, or use the default.
 
